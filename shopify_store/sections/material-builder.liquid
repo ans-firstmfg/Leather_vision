@@ -1,16 +1,21 @@
+{% comment %}
+  Displays merchant-configured materials with accessible keyboard tabs.
+  @example Add Material Builder to a page and configure its material blocks.
+{% endcomment %}
 {% liquid
   assign section_id = 'material-builder-' | append: section.id
 %}
 
-<section id="{{ section_id }}" class="material-builder">
+<material-builder-component id="{{ section_id }}" class="material-builder">
   <div class="material-builder__tabs-wrapper">
-    <div class="material-builder__tabs" role="tablist">
+    <div class="material-builder__tabs" role="tablist" aria-label="{{ 'accessibility.material_tabs' | t | escape }}">
       {% for block in section.blocks %}
         <button
           type="button"
           class="material-builder__tab {% if forloop.first %}is-active{% endif %}"
           id="{{ section_id }}-tab-{{ block.id }}"
           role="tab"
+          tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
           aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
           aria-controls="{{ section_id }}-panel-{{ block.id }}"
           data-tab="{{ block.id }}"
@@ -28,13 +33,14 @@
         id="{{ section_id }}-panel-{{ block.id }}"
         class="material-builder__panel {% if forloop.first %}is-active{% endif %}"
         role="tabpanel"
+        {% unless forloop.first %}hidden{% endunless %}
         aria-labelledby="{{ section_id }}-tab-{{ block.id }}"
         data-panel="{{ block.id }}"
       >
         <div class="material-builder__text">
           {% if block.settings.heading != blank %}
             <h2 class="material-builder__heading">
-              {{ block.settings.heading }}
+              {{ block.settings.heading | escape }}
             </h2>
           {% endif %}
 
@@ -46,7 +52,7 @@
 
           {% if block.settings.button_label != blank %}
             <a
-              href="{{ block.settings.button_link | default: '#' }}"
+              href="{{ block.settings.button_link | default: '#' | escape }}"
               class="material-builder__button"
             >
               {{ block.settings.button_label | escape }}
@@ -56,6 +62,7 @@
 
         <div class="material-builder__image-wrapper">
           {% if block.settings.image != blank %}
+            {% assign image_alt = block.settings.image.alt | default: block.settings.heading %}
             {{
               block.settings.image
               | image_url: width: 1600
@@ -64,8 +71,7 @@
                 class: 'material-builder__image',
                 widths: '400, 600, 800, 1000, 1200, 1600',
                 sizes: '(min-width: 990px) 50vw, 100vw',
-                alt: block.settings.image.alt
-              | default: block.settings.heading
+                alt: image_alt
             }}
 
           {% else %}
@@ -77,10 +83,11 @@
       </div>
     {% endfor %}
   </div>
-</section>
+</material-builder-component>
 
 <style>
   #{{ section_id }} {
+    display: block;
     --mb-background: {{ section.settings.background_color }};
     --mb-text-color: {{ section.settings.text_color }};
     --mb-accent-color: {{ section.settings.accent_color }};
@@ -109,7 +116,7 @@
     border: 0;
     background: transparent;
 
-    color: rgba(255, 255, 255, 0.62);
+    color: color-mix(in srgb, var(--mb-text-color) 62%, transparent);
 
     font-family: inherit;
     font-size: 15px;
@@ -126,11 +133,11 @@
   }
 
   #{{ section_id }} .material-builder__tab:hover {
-    color: #ffffff;
+    color: var(--mb-text-color);
   }
 
   #{{ section_id }} .material-builder__tab.is-active {
-    color: #ffffff;
+    color: var(--mb-text-color);
     font-weight: 500;
   }
 
@@ -157,6 +164,10 @@
     grid-template-columns: 1fr 1fr;
 
     min-height: 570px;
+  }
+
+  #{{ section_id }} .material-builder__panel[hidden] {
+    display: none;
   }
 
   #{{ section_id }} .material-builder__panel.is-active {
@@ -214,7 +225,7 @@
 
     border: 1px solid rgba(255, 255, 255, 0.8);
 
-    color: #ffffff;
+    color: var(--mb-text-color);
     background: transparent;
 
     font-size: 14px;
@@ -369,52 +380,7 @@
   }
 </style>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const section = document.getElementById('{{ section_id }}');
-
-    if (!section) return;
-
-    const tabs = section.querySelectorAll('.material-builder__tab');
-    const panels = section.querySelectorAll('.material-builder__panel');
-
-    tabs.forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        const target = this.dataset.tab;
-
-        /*
-         * Remove active state from all tabs
-         */
-        tabs.forEach(function (item) {
-          item.classList.remove('is-active');
-          item.setAttribute('aria-selected', 'false');
-        });
-
-        /*
-         * Remove active state from all panels
-         */
-        panels.forEach(function (panel) {
-          panel.classList.remove('is-active');
-        });
-
-        /*
-         * Activate clicked tab
-         */
-        this.classList.add('is-active');
-        this.setAttribute('aria-selected', 'true');
-
-        /*
-         * Activate corresponding panel
-         */
-        const panel = section.querySelector('[data-panel="' + target + '"]');
-
-        if (panel) {
-          panel.classList.add('is-active');
-        }
-      });
-    });
-  });
-</script>
+<script src="{{ 'material-builder.js' | asset_url }}" type="module"></script>
 
 {% schema %}
 {
