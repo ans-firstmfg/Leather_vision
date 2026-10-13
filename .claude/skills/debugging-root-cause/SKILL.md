@@ -11,7 +11,7 @@ Trace POST generation logs: received, authenticated, provider-not-configured, up
 
 Verify custom-element initialization when form values appear in the page query string. Separate Shopify unload-policy, favicon, CSS preload, and transport warnings from the actual failed generation request. For React hook failures inspect React/React DOM versions, Vite dedupe/prebundling, and stale client chunks.
 
-Check queue status/storage and provider configuration after 202 acceptance. OpenAI is the only provider; distinguish rejected 429 requests from ambiguous gateway timeouts. Do not automatically retry a generation POST or a stale processing job.
+Check queue status/storage and the provider saved in job options after 202 acceptance. IMAGE_PROVIDER defaults to OpenAI; development-only mock mode creates labelled local previews without AI changes or network calls. Changing the environment does not change an existing job's provider. Distinguish rejected OpenAI 429 requests from ambiguous gateway timeouts. Do not automatically retry a generation POST or a stale processing job.
 
 Make the smallest evidence-supported change, add a meaningful regression test when warranted, and state what remains unverified. Mock tests and a successful build do not prove live generation works.
 

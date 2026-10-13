@@ -10,7 +10,7 @@ APP = `shopify_app/ai-image-rendering`. The outer Git repository contains `shopi
 
 ## Product and architecture
 
-Customers upload a reference image, specify material/color/stitching/hardware and notes, generate 1–4 variations, select a design, and add a configured Shopify product variant to cart with a design reference. Merchants retrieve designs through the authenticated dashboard.
+Customers choose leather, color and product type, add instructions and an optional sample image, generate 1–4 variations, select a design, and add a configured Shopify product variant to cart with a design reference. Stitching, hardware and variation count are under More design options. Without a reference, a product type or product description is required. Merchants retrieve designs through the authenticated dashboard.
 
 - APP: React Router 7.18.2, React/React DOM 19.3.0, Vite, mixed JS/JSX and TS/TSX, Prisma 6, Sharp.
 - Routes are filesystem routes from APP/app/routes.js using flatRoutes(); do not add Next.js, Express, or an invented /api layer.
@@ -20,7 +20,7 @@ Customers upload a reference image, specify material/color/stitching/hardware an
 - Database: APP/prisma/schema.prisma defines SQLite Session and Generation. Images live on disk; the database stores filenames and JSON strings.
 - APP/app/services/jobs.server.ts owns quotas, hashed capability tokens, ownership, leases, states, and selection.
 - APP/app/services/worker.server.ts runs within the long-lived Node process; APP/app/entry.server.jsx starts it. No Redis, external worker service, or serverless queue is implemented.
-- OpenAI is the only provider, in APP/app/services/ai/openai.server.ts. Prompt rules are in promptBuilder.server.ts. Default model gpt-image-1, fixed 1024x1024 output, high input fidelity for the configured model, output quality left to API auto. Each variation edits the original upload in a separate request. Do not claim masks, iterative refinement, usage-cost tracking, or NVIDIA support exist.
+- IMAGE_PROVIDER defaults to openai; its implementation is APP/app/services/ai/openai.server.ts. Development-only mock mode uses Sharp locally, needs no key, applies no requested AI changes, and labels previews and cart properties; no-reference jobs produce labelled placeholders. Jobs snapshot the provider and hasReferenceImage in stored options; legacy jobs use OpenAI and require their original upload. Mock mode is rejected in production. Prompt rules are in promptBuilder.server.ts. Default OpenAI model gpt-image-1, fixed 1024x1024 output, high input fidelity for supported edit models, output quality left to API auto. Each real variation edits the original upload or generates from specifications in a separate request. Do not claim masks, iterative refinement, usage-cost tracking, Puter integration, or NVIDIA support exist.
 
 ## Route contract
 
@@ -56,7 +56,7 @@ Run app commands from APP, using npm and its package-lock.json.
 
 setup invokes scripts/prisma.mjs, which loads an existing .env and defaults DATABASE_URL to file:dev.sqlite. Relative SQLite URLs resolve from the Prisma schema directory. Never overwrite .env with .env.example when it already exists.
 
-shopify.web.toml generates Prisma before dev; its dev command applies migrations and launches React Router. npm test uses scripts/test.mjs, temporary SQLite/storage, Node's test runner, and mocked AI; it does not test a live Shopify installation. Static UI fixtures are not a storefront or authenticated runtime test.
+shopify.web.toml generates Prisma before dev; its dev command applies migrations and launches React Router. Storefront JavaScript source is APP/storefront/leather-vision.js; npm run build:storefront generates APP/extensions/leather-vision/assets/leather-vision.js with esbuild and enforces Shopify's 10,000-byte limit. npm predev/prebuild/predeploy/pretest generate it automatically. During a running dev session, regenerate after source edits. npm test uses scripts/test.mjs, temporary SQLite/storage, Node's test runner, and mocked AI; frontend tests execute the generated extension asset. It does not test a live Shopify installation. Static UI fixtures are not a storefront or authenticated runtime test.
 
 The app-local .github/workflows/checks.yml assumes the app is checkout root. It is not an automatically active outer-repository workflow. Do not invent an outer CI pipeline.
 

@@ -7,7 +7,7 @@ description: "Modify reference-image options, edit prompts, generated variations
 
 Read [the project guide](../../../CLAUDE.md), upload.server.ts, materials.server.ts, promptBuilder.server.ts, generate.server.ts, jobs.server.ts, and the extension block/JS in APP.
 
-Inputs are image, productType, leather, color, stitching, hardware, instructions, and variationCount. Product/material values are server-validated enums; free text is bounded. Uploaded designs are converted to catalog-style photos while requesting preserved silhouette/seams/pockets. Additional variations currently change lighting/angle and use the original upload.
+Inputs are optional image, productType, leather, color, stitching, hardware, instructions, and variationCount. Product/material values are server-validated enums; free text is bounded. Without an image, productType or instructions must describe the product. Jobs persist hasReferenceImage; legacy jobs default to requiring the upload. Reference jobs request preserved silhouette/seams/pockets through image edits; no-reference jobs generate from specifications. Additional variations change lighting/angle. Mock mode uses labelled placeholders when no reference is supplied.
 
 A new control needs aligned Liquid, locale, frontend FormData, server parsing/types, persisted JobOptions, and prompt handling. Don't treat browser validation as authoritative. Model edits cannot guarantee manufacturing geometry.
 
