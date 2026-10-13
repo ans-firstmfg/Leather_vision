@@ -8,6 +8,7 @@ Leather Vision is a Shopify embedded app and theme app extension. Customers choo
 - Shopify's official React Router package handles merchant authentication, signed proxy requests, and webhooks.
 - Prisma / SQLite stores Shopify sessions and durable generation jobs.
 - A leased database queue runs within the long-lived Node server. Pending jobs resume after a restart; interrupted provider calls fail rather than being retried and billed automatically.
+- Puter jobs run in the customer's browser instead of the worker. The server reserves quota and stores validated result uploads under the same private design references.
 - Sharp validates and normalizes uploads and provider output.
 - The theme extension calls the app through the signed store proxy. Every job requires both the originating shop/customer context and a private random access token, sent only in the Authorization header (never in URLs). The storefront loads result images with that header and displays them as local blob URLs.
 - Image files live in GENERATION_DATA_DIR. The database stores references, never image blobs.
@@ -19,7 +20,7 @@ Use Node 22.12 or newer in the Node 22 series, or a supported newer Node version
 
 1. Run `npm ci`.
 2. Copy `.env.example` to `.env` **only if you do not already have an environment file**. Preserve existing credentials.
-3. Configure OpenAI as described below.
+3. Configure Puter, OpenAI, or the local mock as described below.
 4. Run `npm run setup`. The additive generation migration preserves existing Shopify sessions.
 5. Run `npm run dev`. Shopify CLI supplies Shopify credentials and the development HTTPS tunnel.
 6. Open the theme editor and add the Leather Vision app block. Select a dedicated custom-design product and confirm the proxy path.
@@ -37,6 +38,27 @@ For an HTTP 504 on `/apps/leather-vision/generations`, check the running develop
 Set IMAGE_PROVIDER=openai (the default), OPENAI_API_KEY and optionally OPENAI_IMAGE_MODEL (existing default: gpt-image-1). With a sample image, the app sends the normalized reference and instructions to the Images Edit API. Without one, it sends the selected specifications to the Images Generation API. A product type or product description is required when no image is supplied. Ensure the selected model is available to your account.
 
 Uploaded images and customer instructions are sent to OpenAI. Publish your store's appropriate customer-facing privacy information before using the feature publicly.
+
+## Puter configuration
+
+Set these in your existing `.env`, then restart `npm run dev` and refresh the storefront:
+
+```dotenv
+IMAGE_PROVIDER=puter
+PUTER_IMAGE_MODEL=gemini-3.1-flash-image
+PUTER_IMAGE_QUALITY=512
+PUTER_TEST_MODE=false
+```
+
+No OpenAI or Google API key is required for this mode. Click **Connect Puter**, allow its sign-in popup, and sign in to your own Puter account. Choose specifications and optionally supply a sample image, then generate. Start with **one variation** to check your account's allowance. A signed-in Puter account covers each variation's usage; its free monthly allowance is limited and exhausted accounts may be prompted to upgrade. See [Puter's user-pays documentation](https://docs.puter.com/user-pays-model/).
+
+The Puter SDK is loaded only when this provider is selected. The server's validated choices build the prompts and normalize the optional reference. The browser calls `puter.ai.txt2img` with the configured model/quality and optional data-URI reference; returned images are downloaded in the browser and uploaded as bytes to `POST /apps/leather-vision/generations/:id/result`. Provider URLs are never fetched by our backend, and Puter account credentials are never sent to our backend. The result endpoint verifies the signed proxy, ownership, capability, count/order, request size, decoded image format and pixel limits, and stores private normalized PNGs. Selection and cart attachment use the existing routes.
+
+`PUTER_TEST_MODE=true` asks Puter for sample images without generation credits; it does **not** apply your instructions or reference. Sample results are labelled as demos in the storefront, dashboard and cart. Supported quality pairs are Flash `512`/`1K`/`2K`/`4K`, Flash Lite `1K`, and Pro `1K`/`2K`/`4K`. The default is Flash at 512, with a square aspect ratio. [Puter image API documentation](https://docs.puter.com/AI/txt2img/) describes these options and account-dependent access.
+
+Puter jobs use `awaiting_client` while the browser generates and `receiving_client` during a bounded result upload. Waiting jobs count against active quotas and fail after 30 minutes without activity; stale result-upload leases fail after 60 seconds. Reloads cancel interrupted waiting jobs and never automatically repeat AI calls. Already-ready designs recover normally. A provider request can finish or consume allowance after a tab closes or times out; check Puter usage before starting again.
+
+These results are customer-submitted bytes: the server can validate image safety and job ownership but cannot independently prove AI origin or that the prompt was followed. The merchant dashboard and cart identify the Puter source. Verify designs before fulfillment. Browser popup restrictions, third-party blockers, Shopify theme preview frames, CORS on temporary output URLs, and Puter account/model access need a live development-store check. Test in the actual storefront tab if the theme-editor iframe blocks sign-in.
 
 ### Free local demo
 
@@ -62,7 +84,7 @@ Defaults:
 | Variable | Default |
 | --- | --- |
 | GENERATION_CONCURRENCY | 2 active jobs across the database |
-| GENERATION_ACTIVE_PER_SHOP | 3 queued/uploading/processing jobs |
+| GENERATION_ACTIVE_PER_SHOP | 3 active jobs, including browser generation and result uploads |
 | GENERATION_DAILY_IMAGES_PER_SHOP | 50 images per rolling 24 hours |
 | GENERATION_DAILY_IMAGES_PER_ACTOR | 12 images per rolling 24 hours |
 | GENERATION_RETENTION_DAYS | 30 days |
@@ -80,7 +102,7 @@ This deployment supports a single long-lived application instance with persisten
 ## Deployment
 
 1. Set the actual production application_url and /auth/callback redirect URL in shopify.app.toml. The checked-in example URLs are placeholders; development CLI replaces them for a dev session.
-2. Supply SHOPIFY_API_KEY, SHOPIFY_API_SECRET, SHOPIFY_APP_URL, SCOPES=write_app_proxy, DATABASE_URL, and OpenAI configuration at runtime.
+2. Supply SHOPIFY_API_KEY, SHOPIFY_API_SECRET, SHOPIFY_APP_URL, SCOPES=write_app_proxy, DATABASE_URL, and your chosen image provider configuration at runtime.
 3. Run `npm run setup`, `npm run build`, and `npm run start`.
 4. Deploy app configuration and the theme extension with `npm run deploy`. Hosting the Node app and publishing the storefront theme are separate operations.
 
@@ -90,7 +112,7 @@ The only requested Shopify scope is write_app_proxy. Demo product and metaobject
 
 ## Verification
 
-Edit storefront behavior in `storefront/leather-vision.js`. `npm run build:storefront` generates the checked-in minified extension asset and rejects output above Shopify's 10,000-byte limit. This runs automatically before `npm run dev`, `npm run build`, `npm run deploy`, and `npm test`. After editing the source during an active dev session, run `npm run build:storefront` again so Shopify sees the updated asset. Frontend tests execute the generated asset.
+Edit storefront behavior in `storefront/leather-vision.js` and the lazy-loaded Puter adapter in `storefront/leather-vision-puter.js`. `npm run build:storefront` generates both checked-in minified extension assets and rejects any asset above Shopify's 10,000-byte limit. This runs automatically before `npm run dev`, `npm run build`, `npm run deploy`, and `npm test`. After editing the source during an active dev session, run `npm run build:storefront` again so Shopify sees the updated assets. Frontend tests execute the generated assets with mocked SDK calls.
 
 - `npm run typecheck`: generated route types and TypeScript checks.
 - `npm run lint`: ESLint.
@@ -99,6 +121,6 @@ Edit storefront behavior in `storefront/leather-vision.js`. `npm run build:store
 - `shopify app config validate --json`: Shopify app and extension configuration.
 - `shopify theme check --path ../../shopify_store`: storefront theme checks.
 
-CI runs installation, Prisma generation, type checking, linting, tests, and production build.
+The app-local CI definition covers installation, Prisma generation, type checking, linting, tests, and production build. Its nested `.github` path is not automatically active in the parent repository.
 
 Before publishing, verify the complete flow on a development store with a configured provider: upload, generation, refresh recovery, variant selection, add to cart, and design retrieval from an order. Check failed uploads, quota responses, slow generation, sold-out variants, keyboard navigation, mobile layout, and a non-default storefront language.

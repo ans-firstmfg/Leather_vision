@@ -9,9 +9,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   if (!job) return Response.json({ error: "Generation not found" }, { status: 404, headers: privateHeaders });
   const prefix = proxyPath(request);
   return Response.json({ generationId: job.id, status: job.status, error: job.error,
-    demo: job.options.provider === "mock",
+    demo: job.options.provider === "mock" || job.options.puter?.testMode === true,
     expiresAt: job.expiresAt, selectedVariation: job.selectedVariation,
-    variations: job.variations.map((v) => ({ ...v,
+    variations: (job.status === "ready" ? job.variations : []).map((v) => ({ ...v,
       url: prefix + "/images/" + job.id + "/" + v.filename,
     })) }, { headers: privateHeaders });
 };

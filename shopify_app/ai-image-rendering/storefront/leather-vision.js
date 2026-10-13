@@ -58,6 +58,28 @@
           void this.poll();
         }
       } catch { /* Storage can be disabled by the browser. */ }
+      this.providerReady = this.configureProvider();
+    }
+
+    async configureProvider() {
+      try {
+        const config = await this.api("/config");
+        if (config.provider !== "puter" || !this.isConnected) return;
+        if (!window.LeatherVisionPuter) await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = this.dataset.puterScript;
+          const timer = setTimeout(() => { script.remove(); reject(); }, 30000);
+          script.onload = () => { clearTimeout(timer); resolve(); };
+          script.onerror = () => { clearTimeout(timer); script.remove(); reject(); };
+          document.head.append(script);
+        });
+        if (!this.isConnected) return;
+        this.puter = new window.LeatherVisionPuter(this, config.puter);
+        await this.puter.init();
+      } catch {
+        if (this.isConnected) this.setError(this.copy.error_connection);
+        this.providerError = true;
+      }
     }
 
     setStatus(text) { this.statusEl.textContent = text || ""; this.statusEl.hidden = !text; }
@@ -124,6 +146,12 @@
       if (!file && !this.form.elements.productType.value && !this.form.elements.instructions.value.trim()) {
         this.setError(this.copy.error_details); return;
       }
+      try {
+        await this.providerReady;
+        if (this.providerError) { this.setError(this.copy.error_connection); return; }
+        if (this.puter && !this.puter.connected()) { this.setError(this.copy.puter_connect_required); return; }
+      } catch { this.setError(this.copy.error_connection); return; }
+      if (!this.isConnected || this.submitBtn.disabled) return;
       clearTimeout(this.pollTimer);
       this.results.hidden = true;
       if (this.demoEl) this.demoEl.hidden = true;
@@ -143,6 +171,10 @@
         this.persist();
         this.deadline = Date.now() + 30 * 60 * 1000;
         this.pollFailures = 0;
+        if (result.clientGeneration) {
+          if (!this.puter) throw new Error(this.copy.puter_connect_required);
+          await this.puter.generate(result.clientGeneration);
+        }
         void this.poll();
       } catch (error) {
         if (!this.isConnected) return;
@@ -156,6 +188,12 @@
       if (!this.isConnected || !this.job) return;
       try {
         const result = await this.api("/generations/" + encodeURIComponent(this.job.id));
+        if (result.status === "awaiting_client") {
+          const body = new FormData(); body.set("action", "cancel");
+          await this.api("/generations/" + this.job.id + "/result", { method: "POST", body }).catch(() => {});
+          this.setBusy(false); this.setStatus(""); this.setError(this.copy.puter_interrupted);
+          this.job = null; this.persist(); return;
+        }
         this.pollFailures = 0;
         if (this.demoEl) this.demoEl.hidden = !result.demo;
         if (result.status === "ready") {

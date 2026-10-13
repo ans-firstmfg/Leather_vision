@@ -17,10 +17,142 @@ import { action as uninstalled } from "../app/routes/webhooks.app.uninstalled";
 import { action as compliance } from "../app/routes/webhooks.compliance";
 import { loader as statusLoader, action as selectionAction } from "../app/routes/proxy.generations.$id";
 import { loader as imageLoader } from "../app/routes/proxy.images.$gen.$file";
+import { action as startGeneration } from "../app/routes/proxy.generations";
+import { action as saveClientResult } from "../app/routes/proxy.generations.$id.result";
+import { loader as providerConfig } from "../app/routes/proxy.config";
+import { puterConfiguration } from "../app/services/ai/config.server";
 
 const owner = { shop: "test.myshopify.com", customerId: null, actorHash: "visitor" };
 const options = { variationCount: 2 };
 let png: Buffer;
+
+function clientArgs(id: string, token: string, form: FormData, shop = owner.shop) {
+  const url = new URL(request(id, token, shop).url);
+  url.pathname += "/result";
+  const resultRequest = new Request(url, {
+    method: "POST", headers: { Authorization: "Bearer " + token, "X-Leather-Vision": "1" }, body: form,
+  });
+  return { request: resultRequest, params: { id }, context: {}, url, pattern: "/proxy/generations/:id/result" };
+}
+
+function clientImage(variationId = "v1") {
+  const form = new FormData();
+  form.set("variationId", variationId);
+  form.set("image", new File([new Uint8Array(png)], "result.png", { type: "image/png" }));
+  return form;
+}
+
+test("Puter configuration needs no API key and rejects unsupported model/size combinations", () => {
+  const saved = { model: process.env.PUTER_IMAGE_MODEL, quality: process.env.PUTER_IMAGE_QUALITY, mode: process.env.IMAGE_PROVIDER, test: process.env.PUTER_TEST_MODE };
+  try {
+    process.env.IMAGE_PROVIDER = "puter";
+    delete process.env.PUTER_IMAGE_MODEL; delete process.env.PUTER_IMAGE_QUALITY; delete process.env.PUTER_TEST_MODE;
+    assert.doesNotThrow(validateProviderConfiguration);
+    assert.deepEqual(puterConfiguration(), { model: "gemini-3.1-flash-image", quality: "512", testMode: false });
+    assert.throws(() => getImageEditProvider(), /customer's browser/);
+    process.env.PUTER_IMAGE_MODEL = "gemini-3.1-flash-lite-image";
+    assert.throws(puterConfiguration, /Unsupported/);
+    process.env.PUTER_IMAGE_QUALITY = "1K";
+    assert.equal(puterConfiguration().quality, "1K");
+    process.env.PUTER_TEST_MODE = "maybe";
+    assert.throws(puterConfiguration, /true or false/);
+  } finally {
+    for (const [name, value] of Object.entries({ PUTER_IMAGE_MODEL: saved.model, PUTER_IMAGE_QUALITY: saved.quality, IMAGE_PROVIDER: saved.mode, PUTER_TEST_MODE: saved.test })) {
+      if (value === undefined) delete process.env[name]; else process.env[name] = value;
+    }
+  }
+});
+
+test("Puter reservation, protected result uploads and cart selection work without a server AI call", async () => {
+  const mode = process.env.IMAGE_PROVIDER, originalFetch = globalThis.fetch;
+  const ids: string[] = [];
+  globalThis.fetch = async () => { throw new Error("Backend must never call Puter or fetch result URLs"); };
+  try {
+    process.env.IMAGE_PROVIDER = "puter";
+    const configReq = request(randomUUID(), "");
+    const config = await (await providerConfig({ request: configReq, params: {}, context: {}, url: new URL(configReq.url), pattern: "/proxy/config" })).json();
+    assert.equal(config.provider, "puter");
+    assert.equal(config.puter.quality, "512");
+    assert.ok(!JSON.stringify(config).includes("API_KEY"));
+    for (const reference of [false, true]) {
+      const form = new FormData(); form.set("productType", "jacket"); form.set("leather", "suede"); form.set("color", "Brown"); form.set("variationCount", "2");
+      if (reference) form.set("image", new File([new Uint8Array(png)], "sample.png", { type: "image/png" }));
+      const req = new Request(configReq.url, { method: "POST", headers: { "X-Leather-Vision": "1" }, body: form });
+      const response = await startGeneration({ request: req, params: {}, context: {}, url: new URL(req.url), pattern: "/proxy/generations" });
+      assert.equal(response.status, 202);
+      const result = await response.json(); const id = result.generationId; ids.push(id);
+      assert.equal(result.status, "awaiting_client");
+      assert.equal(Boolean(result.clientGeneration.referenceImage), reference);
+      assert.equal(result.clientGeneration.prompts.length, 2);
+      assert.equal(result.clientGeneration.model, "gemini-3.1-flash-image");
+      assert.equal((await getJob(id))!.options.hasReferenceImage, reference);
+      assert.equal(await claimJob("must-not-claim-puter"), undefined);
+      assert.equal((await saveClientResult(clientArgs(id, "wrong", clientImage()))).status, 404);
+      assert.equal((await saveClientResult(clientArgs(id, result.token, clientImage(), "other.myshopify.com"))).status, 404);
+      assert.equal((await saveClientResult(clientArgs(id, result.token, clientImage("v2")))).status, 409);
+      const arbitraryUrl = new FormData(); arbitraryUrl.set("variationId", "v1"); arbitraryUrl.set("image", "http://127.0.0.1/private");
+      assert.equal((await saveClientResult(clientArgs(id, result.token, arbitraryUrl))).status, 400);
+      const corrupt = new FormData(); corrupt.set("variationId", "v1"); corrupt.set("image", new File(["not an image"], "result.png"));
+      assert.equal((await saveClientResult(clientArgs(id, result.token, corrupt))).status, 400);
+      assert.equal((await saveClientResult(clientArgs(id, result.token, clientImage()))).status, 200);
+      assert.equal((await getJob(id))!.status, "awaiting_client");
+      const statusReq = request(id, result.token);
+      const statusArgs = { request: statusReq, params: { id }, context: {}, url: new URL(statusReq.url), pattern: "/proxy/generations/:id" };
+      assert.deepEqual((await (await statusLoader(statusArgs)).json()).variations, []);
+      assert.equal((await saveClientResult(clientArgs(id, result.token, clientImage()))).status, 200);
+      assert.equal((await getJob(id))!.variations.length, 1);
+      assert.equal((await saveClientResult(clientArgs(id, result.token, clientImage("v2")))).status, 200);
+      const job = (await getJob(id))!;
+      assert.equal(job.status, "ready");
+      const status = await (await statusLoader(statusArgs)).json();
+      assert.equal(status.variations.length, 2);
+      assert.equal(status.demo, false);
+      assert.ok(!JSON.stringify(status).includes(result.token));
+      const properties = await saveSelection(job, "v2");
+      assert.equal(properties?.["Design source"], "Puter - customer supplied");
+      assert.equal(properties?._leather_vision_variation, "v2");
+      assert.equal((await sharp(await readFile(generationFilePath(id, "variation-2.png"))).metadata()).format, "png");
+      assert.equal((await saveClientResult(clientArgs(id, result.token, clientImage("v3")))).status, 409);
+      const cancel = new FormData(); cancel.set("action", "cancel");
+      await saveClientResult(clientArgs(id, result.token, cancel));
+      assert.equal((await getJob(id))!.status, "ready");
+      await removeGenerations({ id });
+    }
+  } finally {
+    globalThis.fetch = originalFetch; process.env.IMAGE_PROVIDER = mode;
+    for (const id of ids) await removeGenerations({ id });
+  }
+});
+
+test("Puter jobs count against active quotas, expire without replay, and label SDK test samples", async () => {
+  const mode = process.env.IMAGE_PROVIDER, active = process.env.GENERATION_ACTIVE_PER_SHOP, testMode = process.env.PUTER_TEST_MODE;
+  const ids: string[] = [];
+  try {
+    process.env.IMAGE_PROVIDER = "puter"; process.env.GENERATION_ACTIVE_PER_SHOP = "1"; process.env.PUTER_TEST_MODE = "true";
+    const id = randomUUID(); ids.push(id);
+    const { token } = await createJob(id, owner, { variationCount: 1, productType: "bag" });
+    await enqueueJob(id, true);
+    await assert.rejects(createJob(randomUUID(), owner, options), QuotaError);
+    await saveClientResult(clientArgs(id, token, clientImage()));
+    const job = (await getJob(id))!;
+    assert.equal((await saveSelection(job, "v1"))?.["Design mode"], "Demo - AI editing disabled");
+    const waitingId = randomUUID(); ids.push(waitingId);
+    await createJob(waitingId, owner, { variationCount: 1 }); await enqueueJob(waitingId, true);
+    await db.generation.update({ where: { id: waitingId }, data: { updatedAt: new Date(Date.now() - 31 * 60000) } });
+    await maintainJobs();
+    assert.equal((await getJob(waitingId))!.status, "failed");
+    const receivingId = randomUUID(); ids.push(receivingId);
+    await createJob(receivingId, owner, { variationCount: 1 });
+    await db.generation.update({ where: { id: receivingId }, data: { status: "receiving_client", workerId: "expired-upload", leaseUntil: new Date(Date.now() - 1000) } });
+    await maintainJobs();
+    assert.equal((await getJob(receivingId))!.status, "failed");
+  } finally {
+    process.env.IMAGE_PROVIDER = mode;
+    if (active === undefined) delete process.env.GENERATION_ACTIVE_PER_SHOP; else process.env.GENERATION_ACTIVE_PER_SHOP = active;
+    if (testMode === undefined) delete process.env.PUTER_TEST_MODE; else process.env.PUTER_TEST_MODE = testMode;
+    for (const id of ids) await removeGenerations({ id });
+  }
+});
 
 before(async () => {
   for (const file of ["prisma/migrations/20240530213853_create_session_table/migration.sql", "prisma/migrations/20261009000000_generation_queue/migration.sql"]) {
@@ -290,7 +422,7 @@ test("mock mode needs no key, rejects production and unknown providers", () => {
     assert.throws(() => getImageEditProvider(), /development only/);
     process.env.NODE_ENV = "test";
     process.env.IMAGE_PROVIDER = "invalid";
-    assert.throws(() => getImageEditProvider(), /must be openai or mock/);
+    assert.throws(() => getImageEditProvider(), /must be openai, mock or puter/);
   } finally {
     if (key === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = key;
     process.env.IMAGE_PROVIDER = mode;

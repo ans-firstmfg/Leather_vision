@@ -7,6 +7,8 @@ import { parseGenerationFormData, processReferenceImage, readGenerationForm, Upl
 import { authenticateProxy, requireStorefrontAction, privateHeaders, proxyPath } from "../services/proxy.server";
 import { validateProviderConfiguration } from "../services/ai/index.server";
 import { startWorker } from "../services/worker.server";
+import { buildEditPrompt } from "../services/promptBuilder.server";
+import type { GenerationJob } from "../services/jobs.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const requestId = randomUUID();
@@ -36,8 +38,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { image, variationCount, ...options } = parsed.data;
   const generationId = randomUUID();
   let token: string;
+  let job: GenerationJob;
   try {
-    ({ token } = await createJob(generationId, owner, { ...options, variationCount, hasReferenceImage: Boolean(image) }));
+    ({ token, job } = await createJob(generationId, owner, { ...options, variationCount, hasReferenceImage: Boolean(image) }));
     trace("reserved");
   } catch (error) {
     if (error instanceof ShopUnavailableError) return Response.json({ error: error.message }, { status: 403, headers: privateHeaders });
@@ -46,13 +49,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     console.error("Leather Vision job reservation failed");
     return Response.json({ error: "Generation is temporarily unavailable." }, { status: 503, headers: privateHeaders });
   }
+  let png: Buffer | undefined;
+  const client = job.options.provider === "puter";
   try {
     await mkdir(generationDir(generationId), { recursive: true });
     if (image) {
-      const png = await processReferenceImage(Buffer.from(await image.arrayBuffer()));
+      png = await processReferenceImage(Buffer.from(await image.arrayBuffer()));
       await writeFile(generationFilePath(generationId, UPLOAD_FILENAME), png);
     }
-    await enqueueJob(generationId);
+    await enqueueJob(generationId, client);
     trace("queued");
   } catch {
     await failUpload(generationId);
@@ -60,8 +65,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return Response.json({ error: "The upload could not be processed. Please use a valid PNG, JPG, or WebP image." },
       { status: 400, headers: privateHeaders });
   }
-  startWorker();
-  return Response.json({ generationId, token, status: "pending",
+  if (!client) startWorker();
+  return Response.json({ generationId, token, status: client ? "awaiting_client" : "pending",
+    ...(client ? { clientGeneration: {
+      ...job.options.puter, prompts: Array.from({ length: variationCount }, (_, index) => buildEditPrompt(job.options, index)),
+      ...(png ? { referenceImage: "data:image/png;base64," + png.toString("base64") } : {}),
+    } } : {}),
     pollUrl: prefix + "/generations/" + generationId }, { status: 202, headers: privateHeaders });
 };
 

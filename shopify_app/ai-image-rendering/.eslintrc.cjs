@@ -20,7 +20,7 @@ module.exports = {
     es6: true,
   },
   // Lint readable storefront source; tests execute this generated asset.
-  ignorePatterns: ["!**/.server", "!**/.client", "extensions/leather-vision/assets/leather-vision.js"],
+  ignorePatterns: ["!**/.server", "!**/.client", "extensions/leather-vision/assets/leather-vision*.js"],
 
   // Base config
   extends: ["eslint:recommended"],

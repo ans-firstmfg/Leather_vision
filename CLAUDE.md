@@ -20,7 +20,7 @@ Customers choose leather, color and product type, add instructions and an option
 - Database: APP/prisma/schema.prisma defines SQLite Session and Generation. Images live on disk; the database stores filenames and JSON strings.
 - APP/app/services/jobs.server.ts owns quotas, hashed capability tokens, ownership, leases, states, and selection.
 - APP/app/services/worker.server.ts runs within the long-lived Node process; APP/app/entry.server.jsx starts it. No Redis, external worker service, or serverless queue is implemented.
-- IMAGE_PROVIDER defaults to openai; its implementation is APP/app/services/ai/openai.server.ts. Development-only mock mode uses Sharp locally, needs no key, applies no requested AI changes, and labels previews and cart properties; no-reference jobs produce labelled placeholders. Jobs snapshot the provider and hasReferenceImage in stored options; legacy jobs use OpenAI and require their original upload. Mock mode is rejected in production. Prompt rules are in promptBuilder.server.ts. Default OpenAI model gpt-image-1, fixed 1024x1024 output, high input fidelity for supported edit models, output quality left to API auto. Each real variation edits the original upload or generates from specifications in a separate request. Do not claim masks, iterative refinement, usage-cost tracking, Puter integration, or NVIDIA support exist.
+- IMAGE_PROVIDER defaults to openai. OpenAI uses APP/app/services/ai/openai.server.ts (default gpt-image-1, 1024x1024, input fidelity on supported edits); development-only mock uses Sharp with labelled previews/placeholders and no AI changes. Puter runs in the browser through storefront/leather-vision-puter.js with explicit customer sign-in, default gemini-3.1-flash-image at quality 512, and the user's Puter allowance/credits. PUTER_TEST_MODE=true returns labelled demo samples. Jobs snapshot provider, hasReferenceImage and Puter model/quality/testMode; legacy jobs use OpenAI and require the original upload. Prompt rules are in promptBuilder.server.ts. Each variation edits the original upload or generates from specifications separately. No masks, iterative refinement, usage-cost tracking, or NVIDIA support exist.
 
 ## Route contract
 
@@ -28,8 +28,10 @@ Storefront URLs use the configured /apps/leather-vision prefix; Shopify forwards
 
 | Backend path | Method / purpose | Guard |
 | --- | --- | --- |
+| /proxy/config | GET public provider/model/quality/testMode settings; no credentials | authenticateProxy |
 | /proxy/generations | POST multipart; returns 202 with generationId, token, status, pollUrl; GET returns 405 | authenticateProxy + storefront action header for POST |
 | /proxy/generations/:id | GET job status/images; POST small JSON variationId selection returning cart properties | signed proxy + shop/customer ownership + capability; action header for POST |
+| /proxy/generations/:id/result | POST bounded multipart Puter result bytes + variationId, or action=cancel | signed proxy + shop/customer ownership + capability + action header |
 | /proxy/images/:gen/:file | GET a ready variation PNG | same ownership/capability; filename allowlist |
 | /app | GET merchant generation dashboard / reference lookup | authenticate.admin |
 | /app/additional | Merchant setup page under /app layout | authenticated layout |
@@ -56,7 +58,7 @@ Run app commands from APP, using npm and its package-lock.json.
 
 setup invokes scripts/prisma.mjs, which loads an existing .env and defaults DATABASE_URL to file:dev.sqlite. Relative SQLite URLs resolve from the Prisma schema directory. Never overwrite .env with .env.example when it already exists.
 
-shopify.web.toml generates Prisma before dev; its dev command applies migrations and launches React Router. Storefront JavaScript source is APP/storefront/leather-vision.js; npm run build:storefront generates APP/extensions/leather-vision/assets/leather-vision.js with esbuild and enforces Shopify's 10,000-byte limit. npm predev/prebuild/predeploy/pretest generate it automatically. During a running dev session, regenerate after source edits. npm test uses scripts/test.mjs, temporary SQLite/storage, Node's test runner, and mocked AI; frontend tests execute the generated extension asset. It does not test a live Shopify installation. Static UI fixtures are not a storefront or authenticated runtime test.
+shopify.web.toml generates Prisma before dev; its dev command applies migrations and launches React Router. Storefront sources are APP/storefront/leather-vision.js and leather-vision-puter.js; npm run build:storefront generates both corresponding extension assets with esbuild and enforces Shopify's 10,000-byte limit per asset. npm predev/prebuild/predeploy/pretest generate them automatically. During a running dev session, regenerate after source edits. npm test uses scripts/test.mjs, temporary SQLite/storage, Node's test runner, and mocked AI/SDKs; frontend tests execute the generated assets. It does not test a live Shopify installation or real Puter account. Static UI fixtures are not a storefront or authenticated runtime test.
 
 The app-local .github/workflows/checks.yml assumes the app is checkout root. It is not an automatically active outer-repository workflow. Do not invent an outer CI pipeline.
 
@@ -65,6 +67,8 @@ The app-local .github/workflows/checks.yml assumes the app is checkout root. It 
 Authenticate proxy, admin, and webhook routes with the SDK; X-Leather-Vision alone is not authentication. Job access requires shop, matching customer context, valid unexpired capability token, and a ready variation where applicable. Capability tokens travel only in the Authorization header (requestToken ignores query strings); storefront and merchant images load via authenticated fetch into blob URLs. Cart items carry Design reference, _leather_vision_generation, and _leather_vision_variation; never attach capability tokens or private image URLs.
 
 Keep the upload stream bounded without relying on Content-Length (8 MB image plus multipart allowance), still PNG/JPEG/WebP only, 16 megapixel limit, Sharp normalization, and 1–4 variation validation. Keep quotas atomic with reservation, lease ownership, and expiry checks; read-then-write transactions in jobs.server.ts run through an in-process serializer because concurrent SQLite transactions fail to upgrade to writes. Guest actors come from the Shopify-supplied X-Forwarded-For entry, TRUSTED_PROXY_HOPS from the end. Interrupted paid calls fail rather than replay; the provider separately retries explicit 429 rejections up to three times.
+
+Puter jobs wait in awaiting_client (30-minute inactivity cutoff), then briefly receiving_client (60-second upload lease). Both count against active quotas and are excluded from worker claims. Results are accepted in order, idempotently, with an atomic lease and private PNG storage; partial results cannot be selected. The backend never fetches a customer/provider URL and never accepts Puter account tokens. The browser downloads output with credentials omitted and never sends its job capability to the output host. Browser-generated AI provenance is not verified; label merchant/cart results as customer supplied. Do not automatically repeat SDK generation after reload, timeout or disconnection.
 
 Do not expose credentials, cookies, customer payloads, or raw provider errors in logs, client responses, screenshots, or commits. Tests should use synthetic inputs and mocks unless a live paid call is authorized.
 

@@ -13,6 +13,8 @@ export async function maintainJobs() {
   // Interrupted provider calls may already have been billed, so do not retry them.
   await db.generation.updateMany({ where: { OR: [
     { status: "processing", leaseUntil: { lt: now } },
+    { status: "receiving_client", leaseUntil: { lt: now } },
+    { status: "awaiting_client", updatedAt: { lt: new Date(now.getTime() - 30 * 60000) } },
     { status: "uploading", updatedAt: { lt: new Date(now.getTime() - 300000) } },
   ] }, data: { status: "failed", error: "This generation was interrupted. Please start a new generation.", workerId: null, leaseUntil: null } });
   await removeGenerations({ expiresAt: { lt: now }, status: { not: "processing" } }, 100);

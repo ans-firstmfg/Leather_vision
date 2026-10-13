@@ -15,3 +15,5 @@ Check queue status/storage and the provider saved in job options after 202 accep
 
 Make the smallest evidence-supported change, add a meaningful regression test when warranted, and state what remains unverified. Mock tests and a successful build do not prove live generation works.
 
+For Puter inspect GET /proxy/config, SDK loading, Connect Puter popup/account access, then generation and POST /proxy/generations/:id/result. AI runs in the browser, not the worker; server logs cannot confirm the upstream model succeeded. Capture sanitized SDK error codes without raw messages or account tokens. Insufficient funds, moderation refusal, blocked popups/third-party requests and result download/upload failures are distinct. Reloads must not retry an interrupted Puter call; test mode returns labelled samples.
+

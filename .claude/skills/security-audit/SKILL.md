@@ -13,5 +13,7 @@ Check streaming upload and selection limits, MIME/extension/decoded image consis
 
 Review atomic quotas, active-worker concurrency, stale leases, provider retries, cancellation, and uninstall/retention cleanup. API cost abuse is relevant even without merchant billing. Tokens are accepted only in the Authorization header; keep them out of URLs, logs, and cart/order properties. Compliance webhooks live in webhooks.compliance.jsx; uninstall retains designs until shop/redact.
 
+Puter result uploads must validate signed proxy, ownership, capability, expiry, ordered variation count, byte/pixel/page limits, and atomic upload leases. Do not fetch submitted result URLs on the server. Browser downloads omit credentials and job tokens; Puter auth tokens stay with its SDK. Customer-submitted images do not prove AI provenance. Check awaiting_client/receiving_client quotas, timeout cleanup, uninstall cancellation and recovery without replaying SDK calls.
+
 Inspect .gitignore/.dockerignore for secrets, SQLite journals, generated files and customer images; do not print .env or session rows. Report reproducible issues with file/line evidence, impact, and a narrow remediation. Distinguish observed vulnerabilities from untested deployment assumptions. Don't change authentication, scopes, or production credentials merely because an audit was requested.
 

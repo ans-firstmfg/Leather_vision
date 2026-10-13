@@ -4,11 +4,12 @@ import { readFile } from "node:fs/promises";
 import { JSDOM, VirtualConsole } from "jsdom";
 
 const source = await readFile("extensions/leather-vision/assets/leather-vision.js", "utf8");
+const puterSource = await readFile("extensions/leather-vision/assets/leather-vision-puter.js", "utf8");
 const block = await readFile("extensions/leather-vision/blocks/leather-vision.liquid", "utf8");
 const copy = JSON.parse(await readFile("extensions/leather-vision/locales/en.default.json", "utf8")).leather_vision;
 const id = "00000000-0000-4000-8000-000000000000", token = "a".repeat(64);
 
-async function storefront(fetch, resume = false) {
+async function storefront(fetch, resume = false, options = {}) {
   const start = block.indexOf("<leather-vision"), end = block.indexOf("</leather-vision>") + "</leather-vision>".length;
   assert.ok(start >= 0 && end > start, "Liquid must render the registered custom element");
   const markup = block.slice(start, end).replace(/{%[\s\S]*?%}/g, "").replace(/{{[\s\S]*?}}/g, "");
@@ -26,12 +27,133 @@ async function storefront(fetch, resume = false) {
     return controller.signal;
   };
   window.AbortSignal.timeout = () => new window.AbortController().signal;
-  window.fetch = fetch;
+  window.fetch = (url, init) => String(url).endsWith("/config")
+    ? Promise.resolve(Response.json({ provider: options.puter ? "puter" : "openai",
+      puter: { model: "gemini-3.1-flash-image", quality: "512", testMode: false } })) : fetch(url, init);
+  if (options.puter) { window.puter = options.puter; window.eval(puterSource); }
   if (resume) window.sessionStorage.setItem("leather-vision:/apps/custom-design:demo", JSON.stringify({ id, token }));
   window.eval(source);
   await new Promise((resolve) => setTimeout(resolve, 0));
   return { dom, window, root, get revoked() { return revoked; } };
 }
+
+test("Puter sign-in is explicit and required before reserving a generation", async () => {
+  let signedIn = false, signIns = 0, requests = 0;
+  const sdk = { auth: { isSignedIn: () => signedIn, signIn: async () => { signIns++; signedIn = true; } } };
+  const { root, window } = await storefront(async () => { requests++; return ready(); }, false, { puter: sdk });
+  await root.providerReady;
+  root.form.elements.productType.value = "jacket";
+  await root.generate();
+  assert.equal(requests, 0);
+  assert.equal(root.errorEl.textContent, copy.puter_connect_required);
+  assert.equal(root.querySelector("[data-lv-puter]").hidden, false);
+  root.querySelector("[data-lv-puter-connect]").click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(signIns, 1);
+  assert.equal(root.querySelector("[data-lv-puter-connect]").textContent, copy.puter_connected);
+  root.remove(); window.close();
+});
+
+for (const referenceImage of [undefined, "data:image/png;base64,cmVmZXJlbmNl"]) {
+  test("Puter generates and saves private results " + (referenceImage ? "with a sample" : "from text"), async () => {
+    const aiCalls = [], uploads = [], downloads = [];
+    const sdk = { auth: { isSignedIn: () => true }, ai: { txt2img: async (prompt, options) => {
+      aiCalls.push({ prompt, options }); return { src: "https://images.puter.example/result.png" };
+    } } };
+    const { root, window } = await storefront(async (url, options) => {
+      if (url === "https://images.puter.example/result.png") {
+        downloads.push(options); return new Response("image-bytes", { headers: { "Content-Type": "image/png" } });
+      }
+      if (String(url).endsWith("/result")) { uploads.push(options); return Response.json({ status: "ready" }); }
+      if (options.method === "POST") return Response.json({ generationId: id, token, status: "awaiting_client",
+        clientGeneration: { prompts: ["Create a brown suede jacket"], model: "gemini-3.1-flash-image", quality: "512", testMode: false,
+          ...(referenceImage ? { referenceImage } : {}) } });
+      return ready();
+    }, false, { puter: sdk });
+    await root.providerReady;
+    root.form.elements.productType.value = "jacket";
+    await root.generate();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.equal(aiCalls.length, 1);
+    assert.equal(aiCalls[0].options.model, "gemini-3.1-flash-image");
+    assert.equal(aiCalls[0].options.quality, "512");
+    assert.equal(aiCalls[0].options.input_image, referenceImage);
+    assert.equal(downloads[0].credentials, "omit");
+    assert.equal(downloads[0].headers, undefined);
+    assert.equal(uploads[0].body.get("variationId"), "v1");
+    assert.equal(uploads[0].body.get("image").size, 11);
+    assert.equal(uploads[0].headers.Authorization, "Bearer " + token);
+    assert.equal(root.results.hidden, false);
+    root.remove(); window.close();
+  });
+}
+
+test("Puter failure cancels the job without exposing provider messages or retrying AI", async () => {
+  let aiCalls = 0, cancelled = 0;
+  const sdk = { auth: { isSignedIn: () => true }, ai: { txt2img: async () => {
+    aiCalls++; throw new Error("Secret raw provider diagnostic");
+  } } };
+  const { root, window } = await storefront(async (url, options) => {
+    if (String(url).endsWith("/result")) { assert.equal(options.body.get("action"), "cancel"); cancelled++; return Response.json({ status: "failed" }); }
+    return Response.json({ generationId: id, token, clientGeneration: { prompts: ["Design"], model: "gemini-3.1-flash-image", quality: "512" } });
+  }, false, { puter: sdk });
+  root.form.elements.productType.value = "bag";
+  await root.generate();
+  assert.equal(aiCalls, 1); assert.equal(cancelled, 1);
+  assert.equal(root.errorEl.textContent, copy.puter_error);
+  assert.equal(root.submitBtn.disabled, false);
+  root.remove(); window.close();
+});
+
+test("reload of an interrupted Puter generation never invokes AI again", async () => {
+  let aiCalls = 0, cancelled = 0;
+  const sdk = { auth: { isSignedIn: () => true }, ai: { txt2img: async () => { aiCalls++; } } };
+  const { root, window } = await storefront(async (url, options) => {
+    if (options.method === "POST") { assert.ok(String(url).endsWith("/result")); cancelled++; return Response.json({ status: "failed" }); }
+    return Response.json({ status: "awaiting_client", variations: [] });
+  }, true, { puter: sdk });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(aiCalls, 0); assert.equal(cancelled, 1);
+  assert.equal(root.errorEl.textContent, copy.puter_interrupted);
+  root.remove(); window.close();
+});
+
+test("Puter credit exhaustion gives an account-specific message without retrying", async () => {
+  let calls = 0;
+  const sdk = { auth: { isSignedIn: () => true }, ai: { txt2img: async () => {
+    calls++; throw { code: "insufficient_funds", message: "Private billing diagnostic" };
+  } } };
+  const { root, window } = await storefront(async (url) => String(url).endsWith("/result")
+    ? Response.json({ status: "failed" }) : Response.json({ generationId: id, token,
+      clientGeneration: { prompts: ["Design"], model: "gemini-3.1-flash-image", quality: "512" } }), false, { puter: sdk });
+  root.form.elements.productType.value = "bag";
+  await root.generate();
+  assert.equal(calls, 1);
+  assert.equal(root.errorEl.textContent, copy.puter_error_funds);
+  root.remove(); window.close();
+});
+
+test("disconnect stops the Puter flow without requesting another variation or uploading late results", async () => {
+  let resolveImage, calls = 0, uploads = 0;
+  const sdk = { auth: { isSignedIn: () => true }, ai: { txt2img: () => {
+    calls++; return new Promise((resolve) => { resolveImage = resolve; });
+  } } };
+  const { root, window } = await storefront(async (url) => {
+    if (String(url).endsWith("/result")) uploads++;
+    return Response.json({ generationId: id, token, clientGeneration: {
+      prompts: ["Design one", "Design two"], model: "gemini-3.1-flash-image", quality: "512" } });
+  }, false, { puter: sdk });
+  root.form.elements.productType.value = "bag";
+  const pending = root.generate();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(calls, 1);
+  root.remove();
+  await pending;
+  resolveImage({ src: "https://images.puter.example/late.png" });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(calls, 1); assert.equal(uploads, 0);
+  window.close();
+});
 
 const ready = () => Response.json({ status: "ready", variations: [
   { id: "v1", filename: "variation-1.png", url: "/apps/custom-design/images/" + id + "/variation-1.png" },

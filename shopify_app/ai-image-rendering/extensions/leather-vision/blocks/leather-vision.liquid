@@ -20,7 +20,14 @@
 "variation": {{ "leather_vision.variation" | t | json }},
 "select": {{ "leather_vision.select" | t | json }},
 "selected": {{ "leather_vision.selected" | t | json }},
-"adding": {{ "leather_vision.adding" | t | json }}}
+"adding": {{ "leather_vision.adding" | t | json }},
+"puter_connect": {{ "leather_vision.puter_connect" | t | json }},
+"puter_connected": {{ "leather_vision.puter_connected" | t | json }},
+"puter_connect_required": {{ "leather_vision.puter_connect_required" | t | json }},
+"puter_interrupted": {{ "leather_vision.puter_interrupted" | t | json }},
+"puter_error": {{ "leather_vision.puter_error" | t | json }},
+"puter_error_funds": {{ "leather_vision.puter_error_funds" | t | json }},
+"puter_error_moderation": {{ "leather_vision.puter_error_moderation" | t | json }}}
 {% endcapture %}
 
 <leather-vision
@@ -31,6 +38,7 @@
   data-lv-copy="{{ lv_copy | escape }}"
   data-cart-add-url="{{ routes.cart_add_url | append: '.js' | escape }}"
   data-cart-url="{{ routes.cart_url | escape }}"
+  data-puter-script="{{ 'leather-vision-puter.js' | asset_url | escape }}"
   {{ block.shopify_attributes }}
 >
   <header class="lv__header">
@@ -116,6 +124,11 @@
       </div>
       </div>
     </details>
+    <div class="lv__field" data-lv-puter hidden>
+      <p class="lv__hint">{{ 'leather_vision.puter_notice' | t }}</p>
+      <p class="lv__hint" data-lv-puter-test hidden>{{ 'leather_vision.puter_test_notice' | t }}</p>
+      <button type="button" class="lv__btn lv__btn--secondary" data-lv-puter-connect>{{ 'leather_vision.puter_connect' | t }}</button>
+    </div>
     <div class="lv__actions">
       <button type="submit" class="lv__btn" data-lv-submit>{{ 'leather_vision.submit' | t }}</button>
     </div>

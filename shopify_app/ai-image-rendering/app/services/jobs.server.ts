@@ -2,13 +2,14 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Generation } from "@prisma/client";
 import db from "../db.server";
 import { generationLimits } from "./config.server";
-import { configuredProvider, type ImageProviderId } from "./ai/config.server";
+import { configuredProvider, puterConfiguration, type ImageProviderId } from "./ai/config.server";
 
-export type JobStatus = "uploading" | "pending" | "processing" | "ready" | "failed";
+export type JobStatus = "uploading" | "awaiting_client" | "receiving_client" | "pending" | "processing" | "ready" | "failed";
 export type JobVariation = { id: string; filename: string };
 export type JobOptions = {
   provider?: ImageProviderId;
   hasReferenceImage?: boolean;
+  puter?: ReturnType<typeof puterConfiguration>;
   productType?: string; leather?: string; color?: string; stitching?: string;
   hardware?: string; instructions?: string; variationCount: number;
 };
@@ -47,13 +48,14 @@ export async function createJob(id: string, owner: JobOwner, options: JobOptions
   const now = new Date();
   const since = new Date(now.getTime() - 86400000);
   const token = randomBytes(32).toString("hex");
-  const storedOptions = { ...options, provider: configuredProvider() };
+  const provider = configuredProvider();
+  const storedOptions = { ...options, provider, puter: provider === "puter" ? puterConfiguration() : undefined };
   const row = await serialized(() => db.$transaction(async (tx) => {
     if (!(await tx.session.findFirst({ where: { shop: owner.shop } }))) {
       throw new ShopUnavailableError("This shop is not connected to Leather Vision.");
     }
     const active = await tx.generation.count({ where: {
-      shop: owner.shop, status: { in: ["uploading", "pending", "processing"] },
+      shop: owner.shop, status: { in: ["uploading", "awaiting_client", "receiving_client", "pending", "processing"] },
     } });
     const shopUsage = await tx.generation.aggregate({ where: { shop: owner.shop, createdAt: { gte: since } }, _sum: { variationCount: true } });
     const actorUsage = await tx.generation.aggregate({ where: { shop: owner.shop, actorHash: owner.actorHash, createdAt: { gte: since } }, _sum: { variationCount: true } });
@@ -87,8 +89,8 @@ export async function getOwnedJob(id: string, owner: Pick<JobOwner, "shop" | "cu
   return job && canAccessJob(job, owner, token) ? job : undefined;
 }
 
-export async function enqueueJob(id: string) {
-  return db.generation.updateMany({ where: { id, status: "uploading" }, data: { status: "pending" } });
+export async function enqueueJob(id: string, client = false) {
+  return db.generation.updateMany({ where: { id, status: "uploading" }, data: { status: client ? "awaiting_client" : "pending" } });
 }
 
 export async function failUpload(id: string) {
@@ -97,7 +99,7 @@ export async function failUpload(id: string) {
 }
 
 export async function cancelQueuedJobs(shop: string) {
-  return db.generation.updateMany({ where: { shop, status: { in: ["uploading", "pending"] } },
+  return db.generation.updateMany({ where: { shop, status: { in: ["uploading", "awaiting_client", "receiving_client", "pending"] } },
     data: { status: "failed", error: "This store is no longer connected to Leather Vision." } });
 }
 
@@ -134,6 +136,7 @@ export async function saveSelection(job: GenerationJob, variationId: string) {
     expiresAt: new Date(Date.now() + generationLimits().retentionDays * 86400000) } });
   if (!updated.count) return undefined;
   return { "Design reference": job.id + " / " + variation.id,
-    ...(job.options.provider === "mock" ? { "Design mode": "Demo - AI editing disabled" } : {}),
+    ...(job.options.provider === "mock" || job.options.puter?.testMode ? { "Design mode": "Demo - AI editing disabled" } : {}),
+    ...(job.options.provider === "puter" ? { "Design source": "Puter - customer supplied" } : {}),
     _leather_vision_generation: job.id, _leather_vision_variation: variation.id };
 }
