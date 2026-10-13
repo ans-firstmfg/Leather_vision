@@ -1,0 +1,178 @@
+{% comment %}
+  Leather Vision storefront block.
+  Talks to the app only via App Proxy (/apps/leather-vision/...).
+{% endcomment %}
+
+{% capture lv_copy %}
+{"submit": {{ "leather_vision.submit" | t | json }},
+"generating": {{ "leather_vision.generating" | t | json }},
+"error_generic": {{ "leather_vision.error_generic" | t | json }},
+"error_connection": {{ "leather_vision.error_connection" | t | json }},
+"error_size": {{ "leather_vision.error_size" | t | json }},
+"error_details": {{ "leather_vision.error_details" | t | json }},
+"error_timeout": {{ "leather_vision.error_timeout" | t | json }},
+"error_cart": {{ "leather_vision.error_cart" | t | json }},
+"uploading": {{ "leather_vision.uploading" | t | json }},
+"done": {{ "leather_vision.done" | t | json }},
+"demo_done": {{ "leather_vision.demo_done" | t | json }},
+"reconnecting": {{ "leather_vision.reconnecting" | t | json }},
+"upload_preview": {{ "leather_vision.upload_preview" | t | json }},
+"variation": {{ "leather_vision.variation" | t | json }},
+"select": {{ "leather_vision.select" | t | json }},
+"selected": {{ "leather_vision.selected" | t | json }},
+"adding": {{ "leather_vision.adding" | t | json }}}
+{% endcapture %}
+
+<leather-vision
+  class="lv"
+  id="LeatherVision-{{ block.id }}"
+  data-proxy-path="{{ block.settings.proxy_path | default: '/apps/leather-vision' | escape }}"
+  data-block-id="{{ block.id }}"
+  data-lv-copy="{{ lv_copy | escape }}"
+  data-cart-add-url="{{ routes.cart_add_url | append: '.js' | escape }}"
+  data-cart-url="{{ routes.cart_url | escape }}"
+  {{ block.shopify_attributes }}
+>
+  <header class="lv__header">
+    <h2 class="lv__title">{{ block.settings.heading | default: 'Leather Vision' | escape }}</h2>
+    <p class="lv__subtitle">{{ 'leather_vision.subtitle' | t }}</p>
+  </header>
+
+  <form class="lv__form" data-lv-form novalidate>
+    <div class="lv__grid">
+      <div class="lv__field">
+        <label class="lv__label" for="lv-leather-{{ block.id }}">{{ 'leather_vision.leather_label' | t }}</label>
+        <select id="lv-leather-{{ block.id }}" class="lv__input" name="leather" data-lv-field>
+          <option value="">{{ 'leather_vision.choose' | t }}</option>
+          <option value="full-grain">{{ 'leather_vision.options.full_grain' | t }}</option>
+          <option value="top-grain">{{ 'leather_vision.options.top_grain' | t }}</option>
+          <option value="suede">{{ 'leather_vision.options.suede' | t }}</option>
+          <option value="nubuck">{{ 'leather_vision.options.nubuck' | t }}</option>
+          <option value="crazy-horse">{{ 'leather_vision.options.crazy_horse' | t }}</option>
+        </select>
+      </div>
+    <div class="lv__field">
+        <label class="lv__label" for="lv-color-{{ block.id }}">{{ 'leather_vision.color_label' | t }}</label>
+        <input id="lv-color-{{ block.id }}" class="lv__input" type="text" name="color" maxlength="100" placeholder="{{ 'leather_vision.color_placeholder' | t | escape }}" data-lv-field>
+      </div>
+    <div class="lv__field">
+        <label class="lv__label" for="lv-product-{{ block.id }}">{{ 'leather_vision.product_type_label' | t }}</label>
+        <select id="lv-product-{{ block.id }}" class="lv__input" name="productType" data-lv-field>
+          <option value="">{{ 'leather_vision.choose' | t }}</option>
+          <option value="briefcase">{{ 'leather_vision.options.briefcase' | t }}</option>
+          <option value="wallet">{{ 'leather_vision.options.wallet' | t }}</option>
+          <option value="belt">{{ 'leather_vision.options.belt' | t }}</option>
+          <option value="bag">{{ 'leather_vision.options.bag' | t }}</option>
+          <option value="jacket">{{ 'leather_vision.options.jacket' | t }}</option>
+          <option value="other">{{ 'leather_vision.options.other' | t }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="lv__field">
+      <label class="lv__label" for="lv-instructions-{{ block.id }}">{{ 'leather_vision.instructions_label' | t }}</label>
+      <textarea
+        id="lv-instructions-{{ block.id }}"
+        class="lv__input lv__textarea"
+        name="instructions"
+        rows="3"
+        maxlength="500"
+        placeholder="{{ 'leather_vision.instructions_placeholder' | t | escape }}"
+        data-lv-field
+      ></textarea>
+    </div>
+    <div class="lv__field">
+      <label class="lv__label" for="lv-image-{{ block.id }}">{{ 'leather_vision.upload_label' | t }}</label>
+      <input
+        id="lv-image-{{ block.id }}"
+        class="lv__input"
+        type="file"
+        name="image"
+        accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.jfif,.webp"
+        data-lv-image
+      >
+      <p class="lv__hint">{{ 'leather_vision.upload_hint' | t }}</p>
+      <div class="lv__preview" data-lv-preview hidden></div>
+    </div>
+
+    <details class="lv__extra-options">
+      <summary>{{ 'leather_vision.extra_options' | t }}</summary>
+      <div class="lv__grid">
+      <div class="lv__field">
+        <label class="lv__label" for="lv-stitching-{{ block.id }}">{{ 'leather_vision.stitching_label' | t }}</label>
+        <input id="lv-stitching-{{ block.id }}" class="lv__input" type="text" name="stitching" maxlength="100" placeholder="{{ 'leather_vision.stitching_placeholder' | t | escape }}" data-lv-field>
+      </div>
+    <div class="lv__field">
+        <label class="lv__label" for="lv-hardware-{{ block.id }}">{{ 'leather_vision.hardware_label' | t }}</label>
+        <input id="lv-hardware-{{ block.id }}" class="lv__input" type="text" name="hardware" maxlength="100" placeholder="{{ 'leather_vision.hardware_placeholder' | t | escape }}" data-lv-field>
+      </div>
+    <div class="lv__field">
+        <label class="lv__label" for="lv-count-{{ block.id }}">{{ 'leather_vision.variations_label' | t }}</label>
+        <select id="lv-count-{{ block.id }}" class="lv__input" name="variationCount" data-lv-field>
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      </div>
+    </details>
+    <div class="lv__actions">
+      <button type="submit" class="lv__btn" data-lv-submit>{{ 'leather_vision.submit' | t }}</button>
+    </div>
+  </form>
+
+  <p class="lv__status" data-lv-demo hidden role="status">{{ 'leather_vision.demo' | t }}</p>
+  <p class="lv__status" data-lv-status hidden role="status" aria-live="polite"></p>
+  <p class="lv__error" data-lv-error hidden role="alert"></p>
+
+  <div class="lv__results" data-lv-results hidden>
+    <h3 class="lv__results-title">{{ 'leather_vision.results' | t }}</h3>
+    <div class="lv__variations" data-lv-variations></div>
+    {% assign lv_product = block.settings.product %}
+    {% if lv_product != blank and lv_product.available and lv_product.requires_selling_plan == false %}
+      <div class="lv__field">
+        <label class="lv__label" for="lv-variant-{{ block.id }}">{{ lv_product.title | escape }}</label>
+        <select id="lv-variant-{{ block.id }}" class="lv__input" data-lv-variant>
+          {% for variant in lv_product.variants %}
+            {% if variant.available %}
+              <option value="{{ variant.id }}">{{ variant.title | escape }} · {{ variant.price | money }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <button type="button" class="lv__btn" data-lv-cart disabled>{{ 'leather_vision.add_to_cart' | t }}</button>
+    {% else %}
+      <p class="lv__hint">{{ 'leather_vision.product_unavailable' | t }}</p>
+    {% endif %}
+  </div>
+</leather-vision>
+
+{% schema %}
+{
+  "name": "t:name",
+  "target": "section",
+  "stylesheet": "leather-vision.css",
+  "javascript": "leather-vision.js",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "Leather Vision"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product",
+      "info": "t:settings.product_info"
+    },
+    {
+      "type": "text",
+      "id": "proxy_path",
+      "label": "t:settings.proxy_path",
+      "info": "t:settings.proxy_path_info",
+      "default": "/apps/leather-vision"
+    }
+  ]
+}
+{% endschema %}

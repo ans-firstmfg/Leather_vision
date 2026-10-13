@@ -2,11 +2,11 @@
 
 ## Verified scope
 
-This guide was checked against the local workspace on 2026-10-12, after the ZIP replacement (outer commit 60a625f; app commit 12e3b64). There is no configured Git remote. The user explicitly said not to add one; do not describe a GitHub repository as this project's source of truth.
+This guide reflects the local workspace on 2026-10-13, after consolidating the app and theme into the parent Git repository. There is no configured Git remote. Do not invent a GitHub destination; request a remote URL before publishing.
 
 Re-read source before changing behavior; these instructions are a snapshot, not a substitute for code. Respect the user's requested scope and read applicable AGENTS.md files. The app's existing CLAUDE.md imports its AGENTS.md; preserve it. Paths below are relative to this workspace root unless prefixed with APP.
 
-APP = `shopify_app/ai-image-rendering`. The outer Git repository contains `shopify_store` and tracks APP as a gitlink. APP has its own Git repository. There is no root package.json.
+APP = `shopify_app/ai-image-rendering`. One Git repository at the workspace root tracks both APP and `shopify_store` as ordinary files. The former app repository's history and Git metadata are archived locally under `.git/backups/`. There is no root package.json. Run Git commands from the workspace root and npm commands from APP.
 
 ## Product and architecture
 

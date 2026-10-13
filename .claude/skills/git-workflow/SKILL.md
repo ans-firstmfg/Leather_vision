@@ -1,15 +1,15 @@
 ---
 name: git-workflow
-description: "Manage Leather Vision's outer repository and nested app repository without losing work or inventing GitHub remotes."
+description: "Manage Leather Vision's single parent repository without losing work or inventing GitHub remotes."
 ---
 
 # Git Workflow
 
-Read [the project guide](../../../CLAUDE.md). Run git status, branch, diff, and remote -v in the workspace root and git -C shopify_app/ai-image-rendering before changes. The app is a nested repository recorded as a gitlink, not ordinary files tracked by the outer repository.
+Read [the project guide](../../../CLAUDE.md). Run git status, branch, diff, and remote -v in the workspace root before changes. One repository tracks both shopify_store and shopify_app/ai-image-rendering as ordinary files. Git commands inside APP resolve to the parent repository; npm commands still run inside APP.
 
-No remotes are configured and the user said not to add a GitHub repository. Do not infer remotes from connected accounts, archives, or previous examples. Use codex/ prefixes for requested new branches unless the user names another branch; coordinate both repositories when the task spans them. Current ZIP replacement was committed separately in each.
+No remotes are configured. Do not infer destinations from connected accounts, archives, or previous examples. Ask for a remote URL when publication is requested. Use codex/ prefixes for requested new branches unless the user names another branch. The historical ZIP replacement used separate repositories; the former app history and metadata are archived under .git/backups/ and excluded from commits.
 
-Stage app changes inside APP. If committing a task that changes the app and parent reference, commit the app first and then stage/commit its gitlink in the outer repository. Root CLAUDE.md/.claude skills are outer-repository files. Check each staged diff; don't fold unrelated edits into the task.
+Stage app changes with shopify_app/ai-image-rendering paths in the parent repository. Check each staged diff; don't fold unrelated edits into the task. Keep credentials, databases, images, dependencies, and generated build directories ignored. Do not reinitialize a nested app repository or recreate its former gitlink.
 
 Preserve Git directories during archive replacement and back up working files, local credentials/data, and staged/unstaged changes before authorized destructive operations. Never copy archived Git history over the active checkout. Repair archived workspace links without deleting their targets.
 

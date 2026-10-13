@@ -1,0 +1,10 @@
+{
+  "name": "Leather Vision",
+  "settings": {
+    "heading": "Heading",
+    "proxy_path": "App proxy path",
+    "proxy_path_info": "Must match the app proxy on the store (default /apps/leather-vision).",
+    "product": "Purchase product",
+    "product_info": "The selected design will be attached to this product as a cart item property. Use a dedicated custom-design product."
+  }
+}

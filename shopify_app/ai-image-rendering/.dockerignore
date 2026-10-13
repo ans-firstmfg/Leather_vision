@@ -1,0 +1,13 @@
+.cache
+build
+node_modules
+.git
+.env
+.env.*
+.data
+.shopify
+.react-router
+.cursor
+.gemini
+prisma/*.sqlite*
+tests

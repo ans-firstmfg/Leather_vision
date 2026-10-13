@@ -1,0 +1,50 @@
+---
+description: Context for the Leather Vision AI design feature in this Shopify app
+alwaysApply: true
+---
+
+# Project
+This is a Shopify app (created with Shopify CLI) for a leather products store.
+We are building a "Leather Vision"-style feature:
+1. Customer uploads a sketch/pattern/reference image on the storefront.
+2. They add instructions (product type, leather, color, stitching, hardware, changes).
+3. The backend generates realistic product images that PRESERVE the structure of
+   the uploaded design (image-to-image editing, not text-to-image).
+4. Customer reviews 2-4 variations, can refine, and selects one.
+5. Selected design goes to cart (line item properties) or a quote request.
+
+# Architecture (do not deviate without asking)
+- Storefront UI: Theme App Extension app block in `extensions/leather-vision/`
+  (Liquid + vanilla JS + CSS). No frameworks.
+- Storefront -> backend: Shopify App Proxy only (`/apps/leather-vision/...`),
+  mapped to routes named `app/routes/proxy.*.tsx`. Every proxy route MUST call
+  `authenticate.public.appProxy(request)` first.
+- Backend: the app's existing framework (check package.json: React Router or Remix).
+- AI calls: only server-side, through a provider adapter in
+  `app/services/ai/`. OpenAI Images Edit API processes uploaded references.
+  Provider must be swappable without touching routes or UI.
+- Jobs are asynchronous: POST returns 202 + generationId; client polls GET status.
+- Jobs persist in SQLite (Prisma `Generation` model) and run in an in-process
+  worker; images live on disk under `GENERATION_DATA_DIR` (default `.data/`).
+  Postgres + object storage are possible future migrations, not current behavior.
+  Keep storage behind small service functions.
+
+# Rules
+- Never expose API keys to the browser or extension code. Keys live in `.env`.
+- Never commit `.env` or `.data/`.
+- Validate uploads: PNG/JPG/WebP only, max 8 MB, resize with sharp, strip EXIF.
+- Cap variations per request (max 4) and sanitize/limit all user text in prompts.
+- Keep changes minimal and incremental. Don't refactor unrelated files.
+- Don't invent Shopify APIs or config keys. If unsure, say so and check the docs.
+- Request only the minimum Shopify access scopes.
+- Prefer TypeScript on the server; plain JS in the extension.
+
+# Folder map
+- app/routes/proxy.generations.tsx          POST start generation
+- app/routes/proxy.generations.$id.tsx      GET status + variations
+- app/routes/proxy.images.$gen.$file.tsx    GET generated image
+- app/services/ai/openai.server.ts          provider adapter
+- app/services/promptBuilder.server.ts      options -> prompt
+- app/services/materials.server.ts          leather catalog
+- app/services/jobs.server.ts, generate.server.ts
+- extensions/leather-vision/                blocks/, assets/
