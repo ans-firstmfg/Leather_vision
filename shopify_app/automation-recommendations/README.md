@@ -1,0 +1,42 @@
+# Automation Recommendations
+
+A separate, read-only Shopify merchant app. It scans product content and inventory and presents prioritized actions. No paid AI API or product data is needed for the local sample demo.
+
+## Test with an empty store
+
+From this folder run `npm run demo`, then open http://127.0.0.1:3091.
+Choose **Try sample products** or **Preview empty store**. Fixtures are fictional and never written to Shopify. This local demo is a standalone preview; the installed app uses Shopify Polaris in the merchant admin.
+
+## How the installed app works
+
+1. Open Automation Recommendations from Shopify admin.
+2. Click **Scan products**. The server authenticates the merchant through Shopify and reads their catalog.
+3. Rules flag missing images/descriptions, zero prices and tracked stock at five units or fewer. Archived products are skipped; stock alerts only apply to active products.
+4. Review each explanation and follow the link to the product in Shopify. Changes are made by the merchant, never by this app.
+5. Scan again after fixing a product. Results are not retained. There is no background schedule or automatic restocking.
+
+With no products, a scan shows **No products found** and an **Add a product** link. **Try sample demo** lets the merchant test the same rules without adding products.
+
+Inventory counts are totals across locations, not promises of online availability. Each scan is bounded to the first 100 products by ID and 20 variants per product; a warning identifies incomplete coverage. These checks are not a complete store audit or sales forecast.
+
+## Shopify setup (pending)
+
+This project is not registered or installed yet. Do not reuse Leather Vision's credentials or client ID.
+
+1. From this folder run `npm run config:link` (or `shopify app config link --reset`) and sign in to your Shopify developer account.
+2. Choose to create a new app named **Automation Recommendations**, or select that app if you already created it in the Dev Dashboard. Preserve the checked-in scopes, webhook subscriptions and development URL settings if the command replaces the configuration.
+3. Install dependencies with `npm ci` if needed.
+4. Run `npm run dev -- --store leather-vision-dev.myshopify.com` and approve installation with `read_products,read_inventory`. The CLI supplies development credentials and tunnel URLs.
+5. Open the app in Shopify admin and test its empty state and sample demo.
+
+The app has its own SQLite file at `prisma/automation.sqlite`, used only for Shopify sessions. No image jobs, app proxy, storefront block or Puter account are involved.
+
+## Commands
+
+- `npm run demo`: standalone local preview on loopback port 3091; no dependencies needed.
+- `npm test`: rule engine tests, no store/API calls.
+- `npm run setup`: generate the Prisma client and apply session migrations.
+- `npm run lint`, `npm run typecheck`, `npm run build`: checks and build.
+- `npm run start`: production server after setup/build and new app environment configuration.
+
+`shopify.app.toml` deliberately contains a client ID placeholder and example URLs until registration. There is no verified hosting service. A production deployment needs HTTPS, the new app's credentials, and persistent session storage. Shopify configuration deployment does not host the Node server. Hosting may have costs even though these recommendations require no AI credits.

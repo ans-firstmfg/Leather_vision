@@ -1,0 +1,23 @@
+query RecommendationCatalog($after: String) {
+  products(first: 10, after: $after, sortKey: ID) {
+    nodes {
+      id
+      title
+      status
+      description
+      mediaCount { count }
+      variants(first: 20) {
+        nodes {
+          id
+          title
+          price
+          inventoryQuantity
+          inventoryPolicy
+          inventoryItem { tracked }
+        }
+        pageInfo { hasNextPage }
+      }
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
