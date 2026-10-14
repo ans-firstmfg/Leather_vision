@@ -24,6 +24,22 @@ import { puterConfiguration } from "../app/services/ai/config.server";
 
 const owner = { shop: "test.myshopify.com", customerId: null, actorHash: "visitor" };
 const options = { variationCount: 2 };
+
+test("supplied leather categories are accepted and described in generation prompts", async () => {
+  for (const [slug, label] of [
+    ["atlas-full-grain", "Atlas full-grain leather"],
+    ["buffalo-pebble", "Buffalo pebble leather"],
+    ["sassari-embossed", "Sassari embossed leather"],
+    ["stardust-glitter-cow", "Stardust glitter cow leather"],
+    ["tennessee-italian", "Tennessee Italian leather"],
+  ]) {
+    const form = new FormData();
+    form.set("leather", slug); form.set("color", "Red"); form.set("productType", "other");
+    const parsed = await parseGenerationFormData(form);
+    assert.equal(parsed.ok, true);
+    assert.ok(buildEditPrompt({ ...parsed.data, hasReferenceImage: false }, 0).includes(label));
+  }
+});
 let png: Buffer;
 
 function clientArgs(id: string, token: string, form: FormData, shop = owner.shop) {
@@ -235,6 +251,17 @@ test("reference images are optional but empty designs and invalid supplied files
   form.delete("productType");
   form.set("instructions", "A small suede travel bag with brass buckles");
   assert.equal((await parseGenerationFormData(form)).ok, true);
+  form.delete("instructions");
+  form.set("leather", "atlas-full-grain");
+  assert.equal((await parseGenerationFormData(form)).ok, false);
+  form.set("color", "Red");
+  const choicesOnly = await parseGenerationFormData(form);
+  assert.ok(choicesOnly.ok);
+  assert.equal(choicesOnly.data.productType, undefined);
+  form.set("instructions", "Make a jacket with brass buttons");
+  const fromNotes = await parseGenerationFormData(form);
+  assert.ok(fromNotes.ok);
+  assert.match(buildEditPrompt({ ...fromNotes.data, hasReferenceImage: false }, 0), /Make a jacket with brass buttons/);
 });
 
 test("prompts create from specifications without a reference and preserve uploaded designs otherwise", () => {

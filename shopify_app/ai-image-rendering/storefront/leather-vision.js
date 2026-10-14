@@ -27,6 +27,11 @@
       const signal = this.controller.signal;
       this.copy = JSON.parse(this.dataset.lvCopy || "{}");
       this.form = this.querySelector("[data-lv-form]");
+      if (!customElements.get("leather-vision-flow") && this.dataset.flowScript) {
+        const script = document.createElement("script");
+        script.src = this.dataset.flowScript;
+        document.head.append(script);
+      }
       this.imageInput = this.querySelector("[data-lv-image]");
       this.preview = this.querySelector("[data-lv-preview]");
       this.statusEl = this.querySelector("[data-lv-status]");
@@ -62,6 +67,7 @@
     }
 
     async configureProvider() {
+      this.submitBtn.disabled = true;
       try {
         const config = await this.api("/config");
         if (config.provider !== "puter" || !this.isConnected) return;
@@ -79,6 +85,8 @@
       } catch {
         if (this.isConnected) this.setError(this.copy.error_connection);
         this.providerError = true;
+      } finally {
+        if (this.isConnected && this.form.getAttribute("aria-busy") !== "true") this.submitBtn.disabled = false;
       }
     }
 
@@ -141,16 +149,17 @@
 
     async generate() {
       if (this.submitBtn.disabled) return;
+      const flow = this.form.querySelector("leather-vision-flow");
+      if (flow?.validate && !flow.validate()) return;
       this.setError("");
       const file = this.imageInput.files[0];
       if (file && file.size > 8 * 1024 * 1024) { this.setError(this.copy.error_size); return; }
-      if (!file && !this.form.elements.productType.value && !this.form.elements.instructions.value.trim()) {
-        this.setError(this.copy.error_details); return;
-      }
       try {
+        // Open sign-in within the submit gesture, before awaiting any network work.
+        const signIn = this.puter && !this.puter.connected() ? this.puter.signIn() : null;
         await this.providerReady;
         if (this.providerError) { this.setError(this.copy.error_connection); return; }
-        if (this.puter && !this.puter.connected()) { this.setError(this.copy.puter_connect_required); return; }
+        if (signIn && !await signIn) return;
       } catch { this.setError(this.copy.error_connection); return; }
       if (!this.isConnected || this.submitBtn.disabled) return;
       clearTimeout(this.pollTimer);
@@ -199,7 +208,7 @@
         if (this.demoEl) this.demoEl.hidden = !result.demo;
         if (result.status === "ready") {
           this.setBusy(false);
-          this.setStatus(result.demo ? this.copy.demo_done : this.copy.done);
+          this.setStatus(result.demo ? this.copy.demo_done : "");
           this.renderVariations(result.variations || [], result.selectedVariation);
           return;
         }

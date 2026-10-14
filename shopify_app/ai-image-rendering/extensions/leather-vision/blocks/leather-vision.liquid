@@ -13,7 +13,6 @@
 "error_timeout": {{ "leather_vision.error_timeout" | t | json }},
 "error_cart": {{ "leather_vision.error_cart" | t | json }},
 "uploading": {{ "leather_vision.uploading" | t | json }},
-"done": {{ "leather_vision.done" | t | json }},
 "demo_done": {{ "leather_vision.demo_done" | t | json }},
 "reconnecting": {{ "leather_vision.reconnecting" | t | json }},
 "upload_preview": {{ "leather_vision.upload_preview" | t | json }},
@@ -21,7 +20,7 @@
 "select": {{ "leather_vision.select" | t | json }},
 "selected": {{ "leather_vision.selected" | t | json }},
 "adding": {{ "leather_vision.adding" | t | json }},
-"puter_connect": {{ "leather_vision.puter_connect" | t | json }},
+"puter_connecting": {{ "leather_vision.puter_connecting" | t | json }},
 "puter_connected": {{ "leather_vision.puter_connected" | t | json }},
 "puter_connect_required": {{ "leather_vision.puter_connect_required" | t | json }},
 "puter_interrupted": {{ "leather_vision.puter_interrupted" | t | json }},
@@ -39,6 +38,7 @@
   data-cart-add-url="{{ routes.cart_add_url | append: '.js' | escape }}"
   data-cart-url="{{ routes.cart_url | escape }}"
   data-puter-script="{{ 'leather-vision-puter.js' | asset_url | escape }}"
+  data-flow-script="{{ 'leather-vision-flow.js' | asset_url | escape }}"
   {{ block.shopify_attributes }}
 >
   <header class="lv__header">
@@ -53,74 +53,125 @@
 
   <div class="lv__workspace">
   <form class="lv__form" data-lv-form novalidate>
-<div class="lv__grid">
-      <div class="lv__field">
-        <label class="lv__label" for="lv-leather-{{ block.id }}">{{ 'leather_vision.leather_label' | t }}</label>
-        <select id="lv-leather-{{ block.id }}" class="lv__input" name="leather" data-lv-field>
-          <option value="">{{ 'leather_vision.choose' | t }}</option>
-          <option value="full-grain">{{ 'leather_vision.options.full_grain' | t }}</option>
-          <option value="top-grain">{{ 'leather_vision.options.top_grain' | t }}</option>
-          <option value="suede">{{ 'leather_vision.options.suede' | t }}</option>
-          <option value="nubuck">{{ 'leather_vision.options.nubuck' | t }}</option>
-          <option value="crazy-horse">{{ 'leather_vision.options.crazy_horse' | t }}</option>
-        </select>
-      </div>
-    <div class="lv__field">
-        <label class="lv__label" for="lv-color-{{ block.id }}">{{ 'leather_vision.color_label' | t }}</label>
-        <input id="lv-color-{{ block.id }}" class="lv__input" type="text" name="color" maxlength="100" placeholder="{{ 'leather_vision.color_placeholder' | t | escape }}" data-lv-field>
-      </div>
-    <div class="lv__field">
-        <label class="lv__label" for="lv-product-{{ block.id }}">{{ 'leather_vision.product_type_label' | t }}</label>
-        <select id="lv-product-{{ block.id }}" class="lv__input" name="productType" data-lv-field>
-          <option value="">{{ 'leather_vision.choose' | t }}</option>
-          <option value="briefcase">{{ 'leather_vision.options.briefcase' | t }}</option>
-          <option value="wallet">{{ 'leather_vision.options.wallet' | t }}</option>
-          <option value="belt">{{ 'leather_vision.options.belt' | t }}</option>
-          <option value="bag">{{ 'leather_vision.options.bag' | t }}</option>
-          <option value="jacket">{{ 'leather_vision.options.jacket' | t }}</option>
-          <option value="other">{{ 'leather_vision.options.other' | t }}</option>
-        </select>
-      </div>
-    </div>
-    <div class="lv__field">
-      <label class="lv__label" for="lv-instructions-{{ block.id }}">{{ 'leather_vision.instructions_label' | t }}</label>
-      <textarea
-        id="lv-instructions-{{ block.id }}"
-        class="lv__input lv__textarea"
-        name="instructions"
-        rows="3"
-        maxlength="500"
-        placeholder="{{ 'leather_vision.instructions_placeholder' | t | escape }}"
-        data-lv-field
-      ></textarea>
-    </div>
+  <leather-vision-flow class="lv__flow">
+  <section class="lv__flow-step" data-flow-step="1" >
+    <h3 class="lv__flow-heading"><button type="button" class="lv__flow-toggle" data-flow-toggle="1" aria-expanded="true" aria-controls="lv-flow-1-{{ block.id }}">
+      <span class="lv__flow-number" aria-hidden="true">1</span><span class="lv__flow-title"><span id="lv-flow-title-1-{{ block.id }}">{{ 'leather_vision.flow_category' | t }}</span><small data-flow-summary></small></span><span class="lv__flow-chevron" aria-hidden="true"></span>
+    </button></h3>
+    <div class="lv__flow-panel" id="lv-flow-1-{{ block.id }}" data-flow-panel ><fieldset class="lv__choices" aria-labelledby="lv-flow-title-1-{{ block.id }}"><label class="lv__choice ">
+      <input type="radio" name="leather" value="atlas-full-grain" required data-lv-field data-label="{{ 'leather_vision.flow_categories.atlas-full-grain' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-leather-atlas-full-grain.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.atlas-full-grain' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice ">
+      <input type="radio" name="leather" value="buffalo-pebble" required data-lv-field data-label="{{ 'leather_vision.flow_categories.buffalo-pebble' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-leather-buffalo-pebble.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.buffalo-pebble' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice ">
+      <input type="radio" name="leather" value="sassari-embossed" required data-lv-field data-label="{{ 'leather_vision.flow_categories.sassari-embossed' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-leather-sassari-embossed.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sassari-embossed' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice ">
+      <input type="radio" name="leather" value="stardust-glitter-cow" required data-lv-field data-label="{{ 'leather_vision.flow_categories.stardust-glitter-cow' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-leather-stardust-glitter-cow.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stardust-glitter-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice ">
+      <input type="radio" name="leather" value="tennessee-italian" required data-lv-field data-label="{{ 'leather_vision.flow_categories.tennessee-italian' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-leather-tennessee-italian.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.tennessee-italian' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label></fieldset></div>
+  </section>
+  <section class="lv__flow-step" data-flow-step="2" hidden>
+    <h3 class="lv__flow-heading"><button type="button" class="lv__flow-toggle" data-flow-toggle="2" aria-expanded="false" aria-controls="lv-flow-2-{{ block.id }}">
+      <span class="lv__flow-number" aria-hidden="true">2</span><span class="lv__flow-title"><span id="lv-flow-title-2-{{ block.id }}">{{ 'leather_vision.flow_color' | t }}</span><small data-flow-summary></small></span><span class="lv__flow-chevron" aria-hidden="true"></span>
+    </button></h3>
+    <div class="lv__flow-panel" id="lv-flow-2-{{ block.id }}" data-flow-panel hidden><fieldset class="lv__choices lv__choices--colors" aria-labelledby="lv-flow-title-2-{{ block.id }}"><label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Baby Blue" required data-lv-field data-label="{{ 'leather_vision.flow_colors.baby-blue' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-baby-blue.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.baby-blue' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Beige" required data-lv-field data-label="{{ 'leather_vision.flow_colors.beige' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-beige.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.beige' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Black" required data-lv-field data-label="{{ 'leather_vision.flow_colors.black' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-black.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.black' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Bone" required data-lv-field data-label="{{ 'leather_vision.flow_colors.bone' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-bone.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.bone' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Camel" required data-lv-field data-label="{{ 'leather_vision.flow_colors.camel' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-camel.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.camel' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Chocolate" required data-lv-field data-label="{{ 'leather_vision.flow_colors.chocolate' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-chocolate.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.chocolate' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Coral" required data-lv-field data-label="{{ 'leather_vision.flow_colors.coral' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-coral.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.coral' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Electric" required data-lv-field data-label="{{ 'leather_vision.flow_colors.electric' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-electric.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.electric' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Gray" required data-lv-field data-label="{{ 'leather_vision.flow_colors.gray' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-gray.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.gray' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Red" required data-lv-field data-label="{{ 'leather_vision.flow_colors.red' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-red.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.red' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Teal" required data-lv-field data-label="{{ 'leather_vision.flow_colors.teal' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-teal.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.teal' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="Vanilla" required data-lv-field data-label="{{ 'leather_vision.flow_colors.vanilla' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-vanilla.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.vanilla' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label>
+<label class="lv__choice lv__choice--color">
+      <input type="radio" name="color" value="White" required data-lv-field data-label="{{ 'leather_vision.flow_colors.white' | t | escape }}">
+      <span class="lv__choice-tile"><img src="{{ 'lv-color-white.jpg' | asset_url }}" alt="" width="96" height="96" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_colors.white' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+    </label></fieldset></div>
+  </section>
+  <section class="lv__flow-step" data-flow-step="3" hidden>
+    <h3 class="lv__flow-heading"><button type="button" class="lv__flow-toggle" data-flow-toggle="3" aria-expanded="false" aria-controls="lv-flow-3-{{ block.id }}">
+      <span class="lv__flow-number" aria-hidden="true">3</span><span class="lv__flow-title"><span id="lv-flow-title-3-{{ block.id }}">{{ 'leather_vision.flow_details' | t }}</span><small data-flow-summary></small></span><span class="lv__flow-chevron" aria-hidden="true"></span>
+    </button></h3>
+    <div class="lv__flow-panel" id="lv-flow-3-{{ block.id }}" data-flow-panel hidden>
+    <div class="lv__field"><textarea id="lv-instructions-{{ block.id }}" class="lv__input lv__textarea" name="instructions" aria-labelledby="lv-flow-title-3-{{ block.id }}" rows="3" maxlength="500" placeholder="{{ 'leather_vision.instructions_placeholder' | t | escape }}" data-lv-field></textarea></div>
+    <div class="lv__or"><span>{{ 'leather_vision.or' | t }}</span></div>
     <div class="lv__field lv__upload">
-      <label class="lv__label" for="lv-image-{{ block.id }}">{{ 'leather_vision.upload_label' | t }}</label>
+      <label class="lv__upload-control" for="lv-image-{{ block.id }}">
+      <span>{{ 'leather_vision.upload_label' | t }}</span>
       <input
         id="lv-image-{{ block.id }}"
-        class="lv__input"
+        class="lv__upload-input"
         type="file"
         name="image"
         accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.jfif,.webp"
         data-lv-image
       >
+      </label>
       <div class="lv__preview" data-lv-preview hidden></div>
     </div>
 
     <input type="hidden" name="variationCount" value="2">
-    <div class="lv__field" data-lv-puter hidden>
-      <p class="lv__hint">{{ 'leather_vision.puter_notice' | t }}</p>
-      <p class="lv__hint" data-lv-puter-test hidden>{{ 'leather_vision.puter_test_notice' | t }}</p>
-      <button type="button" class="lv__btn lv__btn--secondary" data-lv-puter-connect>{{ 'leather_vision.puter_connect' | t }}</button>
-    </div>
     <p class="lv__error" data-lv-error hidden role="alert"></p>
     <div class="lv__actions">
       <button type="submit" class="lv__btn" data-lv-submit>{{ 'leather_vision.submit' | t }}</button>
     </div>
+    <p class="lv__hint" data-lv-puter hidden>{{ 'leather_vision.puter_notice' | t }}</p>
+    <p class="lv__hint" data-lv-puter-test hidden>{{ 'leather_vision.puter_test_notice' | t }}</p>
+</div>
+  </section>
+  </leather-vision-flow>
   </form>
   <aside class="lv__output" aria-label="{{ 'leather_vision.output_title' | t | escape }}">
     <div class="lv__output-heading">
-      <div><span class="lv__eyebrow">{{ 'leather_vision.output_label' | t }}</span><h3>{{ 'leather_vision.output_title' | t }}</h3></div>
+      <div><h3>{{ 'leather_vision.output_title' | t }}</h3></div>
     </div>
     <div class="lv__empty" data-lv-empty>
       <div class="lv__empty-canvas" aria-hidden="true">
@@ -137,7 +188,6 @@
 
 
   <div class="lv__results" data-lv-results hidden>
-    <h3 class="lv__results-title">{{ 'leather_vision.results' | t }}</h3>
     <div class="lv__variations" data-lv-variations></div>
     {% assign lv_product = block.settings.product %}
     {% if lv_product != blank and lv_product.available and lv_product.requires_selling_plan == false %}
@@ -152,8 +202,6 @@
         </select>
       </div>
       <button type="button" class="lv__btn" data-lv-cart disabled>{{ 'leather_vision.add_to_cart' | t }}</button>
-    {% else %}
-      <p class="lv__hint">{{ 'leather_vision.product_unavailable' | t }}</p>
     {% endif %}
   </div>
   </aside>

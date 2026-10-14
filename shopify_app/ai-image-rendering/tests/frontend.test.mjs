@@ -5,6 +5,7 @@ import { JSDOM, VirtualConsole } from "jsdom";
 
 const source = await readFile("extensions/leather-vision/assets/leather-vision.js", "utf8");
 const puterSource = await readFile("extensions/leather-vision/assets/leather-vision-puter.js", "utf8");
+const flowSource = await readFile("extensions/leather-vision/assets/leather-vision-flow.js", "utf8");
 const block = await readFile("extensions/leather-vision/blocks/leather-vision.liquid", "utf8");
 const copy = JSON.parse(await readFile("extensions/leather-vision/locales/en.default.json", "utf8")).leather_vision;
 const id = "00000000-0000-4000-8000-000000000000", token = "a".repeat(64);
@@ -18,6 +19,10 @@ async function storefront(fetch, resume = false, options = {}) {
   Object.assign(root.dataset, { proxyPath: "/apps/custom-design", blockId: "demo", lvCopy: JSON.stringify(copy),
     cartAddUrl: "/en/cart/add.js", cartUrl: "/en/cart" });
   root.querySelector("[data-lv-variant]").options[0].value = "123";
+  if (!options.fresh) {
+    root.querySelector('input[name="leather"][value="atlas-full-grain"]').checked = true;
+    root.querySelector('input[name="color"][value="Red"]').checked = true;
+  }
   let revoked = 0;
   window.URL.createObjectURL = () => "blob:test";
   window.URL.revokeObjectURL = () => { revoked++; };
@@ -32,25 +37,46 @@ async function storefront(fetch, resume = false, options = {}) {
       puter: { model: "gemini-3.1-flash-image", quality: "512", testMode: false } })) : fetch(url, init);
   if (options.puter) { window.puter = options.puter; window.eval(puterSource); }
   if (resume) window.sessionStorage.setItem("leather-vision:/apps/custom-design:demo", JSON.stringify({ id, token }));
+  window.eval(flowSource);
   window.eval(source);
   await new Promise((resolve) => setTimeout(resolve, 0));
   return { dom, window, root, get revoked() { return revoked; } };
 }
 
-test("Puter sign-in is explicit and required before reserving a generation", async () => {
-  let signedIn = false, signIns = 0, requests = 0;
-  const sdk = { auth: { isSignedIn: () => signedIn, signIn: async () => { signIns++; signedIn = true; } } };
+test("Generate opens Puter sign-in before reserving a generation and continues once", async () => {
+  let signedIn = false, signIns = 0, requests = 0, finishSignIn;
+  const sdk = { auth: { isSignedIn: () => signedIn, signIn: () => {
+    signIns++; return new Promise(resolve => { finishSignIn = () => { signedIn = true; resolve(); }; });
+  } } };
+  const { root, window } = await storefront(async (url, options) => {
+    if (options.method === "POST") { requests++; return Response.json({ generationId: id, token }); }
+    return ready();
+  }, false, { puter: sdk });
+  await root.providerReady;
+  const pending = root.generate();
+  assert.equal(signIns, 1, "Sign-in must start synchronously within the submit gesture");
+  assert.equal(requests, 0, "Do not reserve a job until sign-in completes");
+  assert.equal(root.submitBtn.disabled, true);
+  await root.generate();
+  assert.equal(signIns, 1, "Repeated clicks cannot open duplicate popups");
+  assert.equal(root.querySelector("[data-lv-puter-connect]"), null);
+  finishSignIn(); await pending;
+  assert.equal(requests, 1);
+  root.remove(); window.close();
+});
+
+test("cancelled or blocked Puter sign-in leaves choices intact and creates no job", async () => {
+  let requests = 0;
+  const sdk = { auth: { isSignedIn: () => false, signIn: async () => { throw new Error("popup closed"); } } };
   const { root, window } = await storefront(async () => { requests++; return ready(); }, false, { puter: sdk });
   await root.providerReady;
-  root.form.elements.productType.value = "jacket";
+  root.form.elements.instructions.value = "Make a jacket";
   await root.generate();
   assert.equal(requests, 0);
+  assert.equal(root.submitBtn.disabled, false);
   assert.equal(root.errorEl.textContent, copy.puter_connect_required);
-  assert.equal(root.querySelector("[data-lv-puter]").hidden, false);
-  root.querySelector("[data-lv-puter-connect]").click();
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  assert.equal(signIns, 1);
-  assert.equal(root.querySelector("[data-lv-puter-connect]").textContent, copy.puter_connected);
+  assert.equal(root.form.elements.instructions.value, "Make a jacket");
+  assert.equal(root.form.elements.color.value, "Red");
   root.remove(); window.close();
 });
 
@@ -71,7 +97,6 @@ for (const referenceImage of [undefined, "data:image/png;base64,cmVmZXJlbmNl"]) 
       return ready();
     }, false, { puter: sdk });
     await root.providerReady;
-    root.form.elements.productType.value = "jacket";
     await root.generate();
     await new Promise((resolve) => setTimeout(resolve, 20));
     assert.equal(aiCalls.length, 1);
@@ -97,7 +122,6 @@ test("Puter failure cancels the job without exposing provider messages or retryi
     if (String(url).endsWith("/result")) { assert.equal(options.body.get("action"), "cancel"); cancelled++; return Response.json({ status: "failed" }); }
     return Response.json({ generationId: id, token, clientGeneration: { prompts: ["Design"], model: "gemini-3.1-flash-image", quality: "512" } });
   }, false, { puter: sdk });
-  root.form.elements.productType.value = "bag";
   await root.generate();
   assert.equal(aiCalls, 1); assert.equal(cancelled, 1);
   assert.equal(root.errorEl.textContent, copy.puter_error);
@@ -126,7 +150,6 @@ test("Puter credit exhaustion gives an account-specific message without retrying
   const { root, window } = await storefront(async (url) => String(url).endsWith("/result")
     ? Response.json({ status: "failed" }) : Response.json({ generationId: id, token,
       clientGeneration: { prompts: ["Design"], model: "gemini-3.1-flash-image", quality: "512" } }), false, { puter: sdk });
-  root.form.elements.productType.value = "bag";
   await root.generate();
   assert.equal(calls, 1);
   assert.equal(root.errorEl.textContent, copy.puter_error_funds);
@@ -143,7 +166,6 @@ test("disconnect stops the Puter flow without requesting another variation or up
     return Response.json({ generationId: id, token, clientGeneration: {
       prompts: ["Design one", "Design two"], model: "gemini-3.1-flash-image", quality: "512" } });
   }, false, { puter: sdk });
-  root.form.elements.productType.value = "bag";
   const pending = root.generate();
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(calls, 1);
@@ -171,29 +193,85 @@ test("customers can generate from choices with the sample upload after instructi
     return ready();
   });
   const { root, window } = instance;
-  assert.deepEqual([...root.form.elements].map((el) => el.name).filter(Boolean).slice(0, 5),
-    ["leather", "color", "productType", "instructions", "image"]);
+  assert.deepEqual([...new Set([...root.form.elements].map((el) => el.name).filter(Boolean))].slice(0, 5),
+    ["leather", "color", "instructions", "image", "variationCount"]);
   assert.equal(root.imageInput.required, false);
-  root.form.elements.leather.value = "suede";
-  root.form.elements.color.value = "Brown";
-  root.form.elements.productType.value = "jacket";
+  root.form.elements.leather.value = "atlas-full-grain";
+  root.form.elements.color.value = "Camel";
   root.form.elements.instructions.value = "Add brass buttons";
   await root.generate();
   await new Promise((resolve) => setTimeout(resolve, 20));
   assert.equal(posted.has("image"), false);
-  assert.equal(posted.get("leather"), "suede");
+  assert.equal(posted.get("leather"), "atlas-full-grain");
+  assert.equal(posted.get("color"), "Camel");
   assert.equal(posted.get("instructions"), "Add brass buttons");
   assert.equal(root.results.hidden, false);
   assert.equal(root.errorEl.hidden, true);
   root.remove(); window.close();
 });
 
-test("an empty design is rejected before submitting a generation request", async () => {
+test("missing required progressive choices are rejected before submitting a generation", async () => {
   let calls = 0;
-  const { root, window } = await storefront(async () => { calls++; return ready(); });
+  const { root, window } = await storefront(async () => { calls++; return ready(); }, false, { fresh: true });
   await root.generate();
   assert.equal(calls, 0);
-  assert.equal(root.errorEl.textContent, copy.error_details);
+  assert.equal(root.form.checkValidity(), false);
+  assert.equal(root.querySelector('[data-flow-toggle="1"]').getAttribute("aria-expanded"), "true");
+  root.remove(); window.close();
+});
+
+test("progressive choices reveal steps, summarize selections and preserve downstream edits", async () => {
+  const { root, window } = await storefront(async () => ready(), false, { fresh: true });
+  const step = (number) => root.querySelector(`[data-flow-step="${number}"]`);
+  const toggle = (number) => root.querySelector(`[data-flow-toggle="${number}"]`);
+  assert.equal(step(1).hidden, false);
+  assert.equal(step(2).hidden, true);
+  assert.equal(step(3).hidden, true);
+  root.querySelector('input[value="atlas-full-grain"]').click();
+  assert.equal(step(1).classList.contains("is-complete"), true);
+  assert.equal(toggle(1).getAttribute("aria-expanded"), "false");
+  assert.equal(step(2).hidden, false);
+  assert.equal(step(3).hidden, true);
+  assert.equal(window.document.activeElement, toggle(2));
+  root.querySelector('input[name="color"][value="Teal"]').click();
+  assert.equal(step(3).hidden, false);
+  assert.equal(step(2).classList.contains("is-complete"), true);
+  assert.equal(toggle(3).getAttribute("aria-expanded"), "true");
+  root.form.elements.instructions.value = "Keep my notes";
+  toggle(1).click();
+  assert.equal(step(2).hidden, false);
+  assert.equal(step(3).hidden, false);
+  root.querySelector('input[value="buffalo-pebble"]').click();
+  assert.equal(root.form.elements.color.value, "Teal");
+  assert.equal(root.form.elements.productType, undefined);
+  assert.equal(root.form.elements.instructions.value, "Keep my notes");
+  toggle(3).click();
+  assert.equal(toggle(3).getAttribute("aria-expanded"), "true");
+  assert.equal(step(1).querySelector("[data-flow-summary]").textContent, "buffalo-pebble");
+  root.remove(); window.close();
+});
+
+test("category and color alone can generate; product type, notes and reference stay optional", async () => {
+  let posted;
+  const { root, window } = await storefront(async (url, options) => {
+    if (options.method === "POST") { posted = options.body; return Response.json({ generationId: id, token }); }
+    if (url.includes("/images/")) return new Response("image", { headers: { "Content-Type": "image/png" } });
+    return ready();
+  }, false, { fresh: true });
+  root.querySelector('input[value="sassari-embossed"]').click();
+  await root.generate();
+  assert.equal(posted, undefined, "Color is required before reserving a generation");
+  root.querySelector('input[name="color"][value="Baby Blue"]').click();
+  assert.equal(root.form.elements.instructions.required, false);
+  assert.equal(root.form.elements.productType, undefined);
+  await root.generate();
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(posted.get("leather"), "sassari-embossed");
+  assert.equal(posted.get("color"), "Baby Blue");
+  assert.equal(posted.has("productType"), false);
+  assert.equal(posted.get("instructions"), "");
+  assert.equal(posted.has("image"), false);
+  assert.equal(root.results.hidden, false);
   root.remove(); window.close();
 });
 

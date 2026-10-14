@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { isLeather } from "./materials.server";
 
 export const MAX_BYTES = 8 * 1024 * 1024;
 export const MAX_REQUEST_BYTES = MAX_BYTES + 64 * 1024;
@@ -66,7 +67,7 @@ export async function parseGenerationFormData(form: FormData):
   if (productType && !["briefcase", "wallet", "belt", "bag", "jacket", "other"].includes(productType)) {
     return { ok: false, error: "Invalid product type." };
   }
-  if (leather && !["full-grain", "top-grain", "suede", "nubuck", "crazy-horse"].includes(leather)) {
+  if (leather && !isLeather(leather)) {
     return { ok: false, error: "Invalid leather type." };
   }
   const variationCount = Number(form.get("variationCount") ?? 2);
@@ -74,8 +75,8 @@ export async function parseGenerationFormData(form: FormData):
     return { ok: false, error: "Choose between 1 and 4 variations." };
   }
   const instructions = text(form.get("instructions"), 500);
-  if (!image && !productType && !instructions) {
-    return { ok: false, error: "Choose a product type or describe the product you want to create." };
+  if (!image && !productType && !instructions && !(leather && text(form.get("color")))) {
+    return { ok: false, error: "Choose leather and color, or describe the product you want to create." };
   }
   return { ok: true, data: { image: image as File | undefined, productType, leather, variationCount,
     color: text(form.get("color")), stitching: text(form.get("stitching")),

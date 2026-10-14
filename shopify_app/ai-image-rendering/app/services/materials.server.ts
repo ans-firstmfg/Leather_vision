@@ -8,12 +8,21 @@ const PRODUCT_TYPES: Record<string, string> = {
 };
 
 const LEATHERS: Record<string, string> = {
+  "atlas-full-grain": "Atlas full-grain leather",
+  "buffalo-pebble": "Buffalo pebble leather with a pebbled grain",
+  "sassari-embossed": "Sassari embossed leather with a woven basket pattern",
+  "stardust-glitter-cow": "Stardust glitter cow leather",
+  "tennessee-italian": "Tennessee Italian leather",
   "full-grain": "full-grain leather",
   "top-grain": "top-grain leather",
   suede: "suede",
   nubuck: "nubuck",
   "crazy-horse": "crazy horse leather",
 };
+
+export function isLeather(slug: string): boolean {
+  return Object.hasOwn(LEATHERS, slug);
+}
 
 export function leatherLabel(slug?: string): string | undefined {
   if (!slug) return undefined;

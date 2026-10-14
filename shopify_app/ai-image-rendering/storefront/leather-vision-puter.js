@@ -20,29 +20,24 @@
     constructor(root, config) { this.root = root; this.config = config; }
     async init() {
       const root = this.root;
-      this.button = root.querySelector("[data-lv-puter-connect]");
       root.querySelector("[data-lv-puter]").hidden = false;
       root.querySelector("[data-lv-puter-test]").hidden = !this.config.testMode;
-      this.button.disabled = true;
       await loadSdk();
-      if (!root.isConnected) return;
-      this.updateButton();
-      this.button.addEventListener("click", () => { void this.signIn(); }, { signal: root.controller.signal });
     }
     connected() { return Boolean(window.puter?.auth.isSignedIn()); }
-    updateButton() {
-      this.button.disabled = false;
-      this.button.textContent = this.connected() ? this.root.copy.puter_connected : this.root.copy.puter_connect;
-    }
     async signIn() {
-      this.button.disabled = true;
+      const root = this.root;
+      root.setBusy(true);
+      root.submitBtn.textContent = root.copy.puter_connecting;
       try {
-        // Called directly from the button click so browsers allow the sign-in popup.
+        // Generate designs is the user gesture that permits this popup.
         await window.puter.auth.signIn();
-        if (this.root.isConnected) this.root.setError("");
+        if (!this.connected()) throw new Error("Sign-in incomplete");
+        return true;
       } catch {
-        if (this.root.isConnected) this.root.setError(this.root.copy.puter_connect_required);
-      } finally { if (this.root.isConnected) this.updateButton(); }
+        if (root.isConnected) root.setError(root.copy.puter_connect_required);
+        return false;
+      } finally { if (root.isConnected) root.setBusy(false); }
     }
     async cancel() {
       if (!this.root.job) return;
