@@ -1,5 +1,6 @@
 # Local dependencies, credentials, runtime data, and generated files.
 node_modules/
+.vite/
 .env
 .env.*
 !.env.example

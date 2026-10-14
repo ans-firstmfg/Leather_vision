@@ -2,7 +2,7 @@
 
 ## Verified scope
 
-This guide reflects the local workspace on 2026-10-13, after consolidating the app and theme into the parent Git repository. There is no configured Git remote. Do not invent a GitHub destination; request a remote URL before publishing.
+This guide reflects the local workspace on 2026-10-14, after consolidating both apps and the theme into the parent Git repository. The user-authorized GitHub destination is https://github.com/ans-firstmfg/Leather_vision.git, configured as origin. Use master as the shared integration branch; publish only when requested.
 
 Re-read source before changing behavior; these instructions are a snapshot, not a substitute for code. Respect the user's requested scope and read applicable AGENTS.md files. The app's existing CLAUDE.md imports its AGENTS.md; preserve it. Paths below are relative to this workspace root unless prefixed with APP.
 
