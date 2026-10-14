@@ -1,5 +1,5 @@
-# Link this project to a NEW app before running dev; never use Leather Vision's client ID.
-client_id = "REPLACE_WITH_NEW_APP_CLIENT_ID"
+# Separate Automation Recommendations app registration.
+client_id = "69512104b1002de55055ed73b427ef94"
 name = "Automation Recommendations"
 application_url = "https://example.com"
 embedded = true

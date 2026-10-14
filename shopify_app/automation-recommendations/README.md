@@ -19,9 +19,9 @@ With no products, a scan shows **No products found** and an **Add a product** li
 
 Inventory counts are totals across locations, not promises of online availability. Each scan is bounded to the first 100 products by ID and 20 variants per product; a warning identifies incomplete coverage. These checks are not a complete store audit or sales forecast.
 
-## Shopify setup (pending)
+## Shopify setup
 
-This project is not registered or installed yet. Do not reuse Leather Vision's credentials or client ID.
+This app is registered separately in the My Store organization and linked to leather-vision-dev.myshopify.com. The CLI currently uses shopify.app.automation-recommendations.toml. Do not reuse Leather Vision's credentials or client ID.
 
 1. From this folder run `npm run config:link` (or `shopify app config link --reset`) and sign in to your Shopify developer account.
 2. Choose to create a new app named **Automation Recommendations**, or select that app if you already created it in the Dev Dashboard. Preserve the checked-in scopes, webhook subscriptions and development URL settings if the command replaces the configuration.
@@ -39,4 +39,8 @@ The app has its own SQLite file at `prisma/automation.sqlite`, used only for Sho
 - `npm run lint`, `npm run typecheck`, `npm run build`: checks and build.
 - `npm run start`: production server after setup/build and new app environment configuration.
 
-`shopify.app.toml` deliberately contains a client ID placeholder and example URLs until registration. There is no verified hosting service. A production deployment needs HTTPS, the new app's credentials, and persistent session storage. Shopify configuration deployment does not host the Node server. Hosting may have costs even though these recommendations require no AI credits.
+Both app configurations use this app's own client ID, July 2026 webhooks and /auth/callback. The CLI updates development URLs for its tunnel. There is no verified hosting service. A production deployment needs HTTPS, the new app's credentials, and persistent session storage. Shopify configuration deployment does not host the Node server. Hosting may have costs even though these recommendations require no AI credits.
+
+## Windows lockfile access
+
+If Shopify CLI reports an npm error opening package-lock.json, first stop duplicate startup commands, then run npm install --ignore-scripts --offline --no-audit --no-fund --cache .npm-cache. After installation succeeds, run npm run dev -- --store leather-vision-dev.myshopify.com --skip-dependencies-installation. The skip flag is a temporary workaround; install dependencies again whenever package.json or the lockfile changes.

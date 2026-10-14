@@ -7,4 +7,4 @@ No product writes, customer or order access, AI provider, billing, background sc
 The demo uses synthetic in-memory products and never installs them in Shopify.
 Recommendation engine: app/services/recommendations.mjs. Scan limits: 100 products / 20 variants each, clearly reported.
 Run npm test, npm run lint, npm run typecheck and npm run build. Runtime/credentials stay ignored.
-shopify.app.toml has an intentional placeholder until linked to a NEW app registration.
+The app is registered separately in My Store. Both app configs use its own client ID; CLI currently selects shopify.app.automation-recommendations.toml. Preserve /auth/callback, July 2026 webhook API and read-only scopes.

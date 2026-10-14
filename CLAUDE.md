@@ -82,7 +82,7 @@ No merchant billing, subscription model, billing webhook, or entitlement enforce
 
 ## Skills and delivery
 
-A second, independent merchant app is in `shopify_app/automation-recommendations`; read its AGENTS.md and README.md before changes. It has read-only catalog/stock rules, synthetic demos and a separate session database. Its Shopify registration is pending; never reuse Leather Vision credentials or client ID. No product data or paid AI is required for its local demo.
+A second, independent merchant app is in `shopify_app/automation-recommendations`; read its AGENTS.md and README.md before changes. It has read-only catalog/stock rules, synthetic demos and a separate session database. It is registered separately in My Store for the same dev store; never reuse Leather Vision credentials or client ID. No product data or paid AI is required for its local demo.
 
 The twelve project skills are under .claude/skills/<name>/SKILL.md. Read only relevant ones: project-architecture, safe-code-changes, shopify-app-development, product-builder-engine, live-preview-engine, database-prisma, debugging-root-cause, automated-testing, shopify-billing, railway-deployment, security-audit, git-workflow.
 
