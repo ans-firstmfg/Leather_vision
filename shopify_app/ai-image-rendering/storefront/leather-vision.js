@@ -85,6 +85,7 @@
     setStatus(text) { this.statusEl.textContent = text || ""; this.statusEl.hidden = !text; }
     setError(text) { this.errorEl.textContent = text || ""; this.errorEl.hidden = !text; }
     setBusy(busy) {
+      this.form.setAttribute("aria-busy", String(busy));
       this.form.querySelectorAll("input, select, textarea, button").forEach((el) => { el.disabled = busy; });
       this.submitBtn.textContent = busy ? this.copy.generating : this.copy.submit;
     }

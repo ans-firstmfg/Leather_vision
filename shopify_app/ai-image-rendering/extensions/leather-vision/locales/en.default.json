@@ -1,7 +1,7 @@
 {
   "leather_vision": {
     "title": "Leather Vision",
-    "subtitle": "Choose your leather article, color, and product type. Add instructions and an optional sample image, then generate your product preview.",
+    "subtitle": "Bring your next leather piece to life. Choose your materials, shape the details, and explore the possibilities.",
     "upload_label": "Sample product image (optional)",
     "product_type_label": "Product type",
     "leather_label": "Leather article",
@@ -59,6 +59,16 @@
       "suede": "Suede",
       "nubuck": "Nubuck",
       "crazy_horse": "Crazy horse"
-    }
+    },
+    "studio_label": "THE LEATHER DESIGN STUDIO",
+    "form_title": "Make it yours",
+    "form_hint": "Start with the essentials. Make every detail your own.",
+    "form_footer": "A reference image is optional. Your imagination is the starting point.",
+    "output_label": "YOUR CREATIVE CANVAS",
+    "output_title": "Your design, visualized",
+    "output_footer": "Explore your variations. Choose the one that feels like you.",
+    "preview_label": "DESIGN PREVIEW",
+    "preview_title": "Your next creation starts here.",
+    "preview_caption": "Choose your details and generate a design. Your results will appear in this space."
   }
 }

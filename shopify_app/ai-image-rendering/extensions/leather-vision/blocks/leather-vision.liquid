@@ -42,11 +42,17 @@
   {{ block.shopify_attributes }}
 >
   <header class="lv__header">
+    <span class="lv__eyebrow">{{ "leather_vision.studio_label" | t }}</span>
     <h2 class="lv__title">{{ block.settings.heading | default: 'Leather Vision' | escape }}</h2>
     <p class="lv__subtitle">{{ 'leather_vision.subtitle' | t }}</p>
   </header>
 
+  <div class="lv__workspace">
   <form class="lv__form" data-lv-form novalidate>
+    <div class="lv__panel-heading">
+      <span class="lv__step">01</span>
+      <div><h3>{{ 'leather_vision.form_title' | t }}</h3><p>{{ 'leather_vision.form_hint' | t }}</p></div>
+    </div>
     <div class="lv__grid">
       <div class="lv__field">
         <label class="lv__label" for="lv-leather-{{ block.id }}">{{ 'leather_vision.leather_label' | t }}</label>
@@ -88,7 +94,7 @@
         data-lv-field
       ></textarea>
     </div>
-    <div class="lv__field">
+    <div class="lv__field lv__upload">
       <label class="lv__label" for="lv-image-{{ block.id }}">{{ 'leather_vision.upload_label' | t }}</label>
       <input
         id="lv-image-{{ block.id }}"
@@ -129,14 +135,31 @@
       <p class="lv__hint" data-lv-puter-test hidden>{{ 'leather_vision.puter_test_notice' | t }}</p>
       <button type="button" class="lv__btn lv__btn--secondary" data-lv-puter-connect>{{ 'leather_vision.puter_connect' | t }}</button>
     </div>
+    <p class="lv__error" data-lv-error hidden role="alert"></p>
     <div class="lv__actions">
       <button type="submit" class="lv__btn" data-lv-submit>{{ 'leather_vision.submit' | t }}</button>
     </div>
+    <p class="lv__form-footer">{{ 'leather_vision.form_footer' | t }}</p>
   </form>
-
+  <aside class="lv__output" aria-label="{{ 'leather_vision.output_title' | t | escape }}">
+    <div class="lv__output-heading">
+      <div><span class="lv__eyebrow">{{ 'leather_vision.output_label' | t }}</span><h3>{{ 'leather_vision.output_title' | t }}</h3></div>
+      <span class="lv__step lv__step--light">02</span>
+    </div>
+    <div class="lv__empty" data-lv-empty>
+      <div class="lv__empty-canvas" aria-hidden="true">
+        <svg viewBox="0 0 80 80" fill="none" class="lv__empty-icon">
+          <rect x="12" y="12" width="56" height="56" rx="16" stroke="currentColor" stroke-width="1.5"/>
+          <path d="m40 24 4.5 11.5L56 40l-11.5 4.5L40 56l-4.5-11.5L24 40l11.5-4.5L40 24Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M61 15V5M56 10h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>{{ 'leather_vision.preview_label' | t }}</span>
+      </div>
+      <div class="lv__empty-caption"><h4>{{ 'leather_vision.preview_title' | t }}</h4><p>{{ 'leather_vision.preview_caption' | t }}</p></div>
+    </div>
   <p class="lv__status" data-lv-demo hidden role="status">{{ 'leather_vision.demo' | t }}</p>
   <p class="lv__status" data-lv-status hidden role="status" aria-live="polite"></p>
-  <p class="lv__error" data-lv-error hidden role="alert"></p>
+
 
   <div class="lv__results" data-lv-results hidden>
     <h3 class="lv__results-title">{{ 'leather_vision.results' | t }}</h3>
@@ -158,12 +181,16 @@
       <p class="lv__hint">{{ 'leather_vision.product_unavailable' | t }}</p>
     {% endif %}
   </div>
+    <p class="lv__output-footer">{{ 'leather_vision.output_footer' | t }}</p>
+  </aside>
+  </div>
 </leather-vision>
 
 {% schema %}
 {
   "name": "t:name",
   "target": "section",
+  "class": "leather-vision-app-block",
   "stylesheet": "leather-vision.css",
   "javascript": "leather-vision.js",
   "settings": [
