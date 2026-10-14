@@ -43,7 +43,11 @@
 >
   <header class="lv__header">
     <span class="lv__eyebrow">{{ "leather_vision.studio_label" | t }}</span>
-    <h2 class="lv__title">{{ block.settings.heading | default: 'Leather Vision' | escape }}</h2>
+    {% assign lv_heading = block.settings.heading | default: 'First MFG Co' %}
+    {% if lv_heading == 'Leather Vision' %}
+      {% assign lv_heading = 'First MFG Co' %}
+    {% endif %}
+    <h2 class="lv__title">{{ lv_heading | escape }}</h2>
     <p class="lv__subtitle">{{ 'leather_vision.subtitle' | t }}</p>
   </header>
 
@@ -168,7 +172,7 @@
       "type": "text",
       "id": "heading",
       "label": "t:settings.heading",
-      "default": "Leather Vision"
+      "default": "First MFG Co"
     },
     {
       "type": "product",
