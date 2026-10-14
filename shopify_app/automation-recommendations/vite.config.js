@@ -36,6 +36,8 @@ if (host === "localhost") {
 }
 
 export default defineConfig({
+  // Keep this app's prebundled runtime separate from old development cache entries.
+  cacheDir: "node_modules/.vite-automation",
   resolve: {
     // Route modules, App Bridge, and the renderer must share the same React instance.
     dedupe: ["react", "react-dom", "react-router"],
@@ -57,6 +59,7 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   optimizeDeps: {
+    force: true,
     // Prebundle the client runtime together instead of discovering it during hydration.
     include: [
       "react",

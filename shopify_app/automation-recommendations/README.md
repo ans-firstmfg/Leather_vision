@@ -1,6 +1,14 @@
 # Automation Recommendations
 
-A separate, read-only Shopify merchant app. It scans product content and inventory and presents prioritized actions. No paid AI API or product data is needed for the local sample demo.
+A separate Shopify app with a merchant recommendations dashboard and a shopper-facing product recommendations block. No paid AI API is used.
+
+## Add the storefront block
+
+After starting the development preview with the new extension, open Online Store → Themes → Customize.
+Choose Add section → Apps → Product recommendations (Automation Recommendations), or Add block → Apps inside an app-compatible section.
+On product pages, the block uses the current product; on other pages, choose a Source product. Shopify supplies related products through its recommendations API. Fallback products can be selected manually if no automatic results are returned.
+For an empty store, enable Show sample preview when empty. Sample cards are labelled fictional and have no purchase links. With demo off and no products, shoppers see no empty block; the editor shows setup guidance.
+Theme support for app blocks is required. The new extension is discovered on dev startup, so stop the existing app process and restart it once after adding the extension. These storefront recommendations do not expose the merchant dashboard's stock data.
 
 ## Test with an empty store
 
@@ -29,7 +37,7 @@ This app is registered separately in the My Store organization and linked to lea
 4. Run `npm run dev -- --store leather-vision-dev.myshopify.com` and approve installation with `read_products,read_inventory`. The CLI supplies development credentials and tunnel URLs.
 5. Open the app in Shopify admin and test its empty state and sample demo.
 
-The app has its own SQLite file at `prisma/automation.sqlite`, used only for Shopify sessions. No image jobs, app proxy, storefront block or Puter account are involved.
+The app has its own SQLite file at `prisma/automation.sqlite`, used only for Shopify sessions. No image jobs, app proxy or Puter account are involved. Storefront recommendations use Shopify's public same-origin endpoint.
 
 ## Commands
 

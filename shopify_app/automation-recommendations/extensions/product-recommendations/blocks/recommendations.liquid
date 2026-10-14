@@ -1,0 +1,68 @@
+{% liquid
+  assign source_product = product | default: block.settings.source_product
+  assign cards = block.settings.fallback_products
+  assign automatic_results = false
+  if recommendations.performed? and recommendations.products_count > 0
+    assign cards = recommendations.products
+    assign automatic_results = true
+  endif
+%}
+<automation-product-recommendations
+  class="ar-recommendations"
+  data-block-id="{{ block.id }}"
+  data-source="{{ source_product.id }}"
+  data-section="{{ section.id }}"
+  data-endpoint="{{ routes.product_recommendations_url }}"
+  data-limit="{{ block.settings.limit }}"
+  data-editor="{{ request.design_mode }}"
+  data-demo="{{ block.settings.show_demo }}"
+  data-complete="{{ recommendations.performed? }}"
+  {{ block.shopify_attributes }}
+>
+  <h2>{{ block.settings.heading | escape }}</h2>
+  <p data-notice {% if automatic_results or cards.size > 0 %}hidden{% endif %}>
+    {% if block.settings.show_demo %}
+      Sample preview — these fictional products are not available to buy.
+    {% elsif request.design_mode %}
+      Choose a source product for automatic recommendations, select fallback products, or enable the sample preview for an empty store.
+    {% endif %}
+  </p>
+  <div class="ar-grid" data-cards>
+    {% for card_product in cards limit: block.settings.limit %}
+      <a class="ar-card" href="{{ card_product.url }}">
+        {% if card_product.featured_image %}
+          {{ card_product.featured_image | image_url: width: 600 | image_tag: class: 'ar-image', loading: 'lazy', widths: '240,400,600' }}
+        {% else %}
+          <div class="ar-image ar-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+        {% endif %}
+        <h3>{{ card_product.title | escape }}</h3>
+        <p>{{ card_product.price | money }}</p>
+      </a>
+    {% else %}
+      {% if block.settings.show_demo %}
+        {% for number in (1..4) limit: block.settings.limit %}
+          <article class="ar-card">
+            <div class="ar-image ar-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+            <h3>Sample leather product {{ number }}</h3>
+            <p>Demo item · unavailable to buy</p>
+          </article>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</automation-product-recommendations>
+{% schema %}
+{
+  "name": "Product recommendations",
+  "target": "section",
+  "stylesheet": "recommendations.css",
+  "javascript": "recommendations.js",
+  "settings": [
+    {"type": "text", "id": "heading", "label": "Heading", "default": "You may also like"},
+    {"type": "product", "id": "source_product", "label": "Source product", "info": "Product pages use the current product. Choose one here for other pages."},
+    {"type": "product_list", "id": "fallback_products", "label": "Fallback products", "limit": 10, "info": "Shown when Shopify has no automatic recommendations."},
+    {"type": "range", "id": "limit", "label": "Number of products", "min": 1, "max": 10, "step": 1, "default": 4},
+    {"type": "checkbox", "id": "show_demo", "label": "Show sample preview when empty", "default": false, "info": "Displays labelled fictional products without purchase links."}
+  ]
+}
+{% endschema %}
