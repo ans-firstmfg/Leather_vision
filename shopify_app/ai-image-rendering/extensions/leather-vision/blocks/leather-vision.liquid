@@ -49,11 +49,7 @@
 
   <div class="lv__workspace">
   <form class="lv__form" data-lv-form novalidate>
-    <div class="lv__panel-heading">
-      <span class="lv__step">01</span>
-      <div><h3>{{ 'leather_vision.form_title' | t }}</h3><p>{{ 'leather_vision.form_hint' | t }}</p></div>
-    </div>
-    <div class="lv__grid">
+<div class="lv__grid">
       <div class="lv__field">
         <label class="lv__label" for="lv-leather-{{ block.id }}">{{ 'leather_vision.leather_label' | t }}</label>
         <select id="lv-leather-{{ block.id }}" class="lv__input" name="leather" data-lv-field>
@@ -104,32 +100,10 @@
         accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.jfif,.webp"
         data-lv-image
       >
-      <p class="lv__hint">{{ 'leather_vision.upload_hint' | t }}</p>
       <div class="lv__preview" data-lv-preview hidden></div>
     </div>
 
-    <details class="lv__extra-options">
-      <summary>{{ 'leather_vision.extra_options' | t }}</summary>
-      <div class="lv__grid">
-      <div class="lv__field">
-        <label class="lv__label" for="lv-stitching-{{ block.id }}">{{ 'leather_vision.stitching_label' | t }}</label>
-        <input id="lv-stitching-{{ block.id }}" class="lv__input" type="text" name="stitching" maxlength="100" placeholder="{{ 'leather_vision.stitching_placeholder' | t | escape }}" data-lv-field>
-      </div>
-    <div class="lv__field">
-        <label class="lv__label" for="lv-hardware-{{ block.id }}">{{ 'leather_vision.hardware_label' | t }}</label>
-        <input id="lv-hardware-{{ block.id }}" class="lv__input" type="text" name="hardware" maxlength="100" placeholder="{{ 'leather_vision.hardware_placeholder' | t | escape }}" data-lv-field>
-      </div>
-    <div class="lv__field">
-        <label class="lv__label" for="lv-count-{{ block.id }}">{{ 'leather_vision.variations_label' | t }}</label>
-        <select id="lv-count-{{ block.id }}" class="lv__input" name="variationCount" data-lv-field>
-          <option value="1">1</option>
-          <option value="2" selected>2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-        </select>
-      </div>
-      </div>
-    </details>
+    <input type="hidden" name="variationCount" value="2">
     <div class="lv__field" data-lv-puter hidden>
       <p class="lv__hint">{{ 'leather_vision.puter_notice' | t }}</p>
       <p class="lv__hint" data-lv-puter-test hidden>{{ 'leather_vision.puter_test_notice' | t }}</p>
@@ -139,12 +113,10 @@
     <div class="lv__actions">
       <button type="submit" class="lv__btn" data-lv-submit>{{ 'leather_vision.submit' | t }}</button>
     </div>
-    <p class="lv__form-footer">{{ 'leather_vision.form_footer' | t }}</p>
   </form>
   <aside class="lv__output" aria-label="{{ 'leather_vision.output_title' | t | escape }}">
     <div class="lv__output-heading">
       <div><span class="lv__eyebrow">{{ 'leather_vision.output_label' | t }}</span><h3>{{ 'leather_vision.output_title' | t }}</h3></div>
-      <span class="lv__step lv__step--light">02</span>
     </div>
     <div class="lv__empty" data-lv-empty>
       <div class="lv__empty-canvas" aria-hidden="true">
@@ -155,7 +127,6 @@
         </svg>
         <span>{{ 'leather_vision.preview_label' | t }}</span>
       </div>
-      <div class="lv__empty-caption"><h4>{{ 'leather_vision.preview_title' | t }}</h4><p>{{ 'leather_vision.preview_caption' | t }}</p></div>
     </div>
   <p class="lv__status" data-lv-demo hidden role="status">{{ 'leather_vision.demo' | t }}</p>
   <p class="lv__status" data-lv-status hidden role="status" aria-live="polite"></p>
@@ -181,7 +152,6 @@
       <p class="lv__hint">{{ 'leather_vision.product_unavailable' | t }}</p>
     {% endif %}
   </div>
-    <p class="lv__output-footer">{{ 'leather_vision.output_footer' | t }}</p>
   </aside>
   </div>
 </leather-vision>
