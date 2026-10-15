@@ -220,28 +220,22 @@ test("missing required progressive choices are rejected before submitting a gene
   root.remove(); window.close();
 });
 
-test("one full-width section advances automatically and Back preserves choices and notes", async () => {
+test("all three full-width sections stay visible and edits preserve selections and notes", async () => {
   const { root, window } = await storefront(async () => ready(), false, { fresh: true });
   const steps = [...root.querySelectorAll('[data-flow-step]')];
   const visible = () => steps.filter(step => !step.hidden).map(step => step.dataset.flowStep);
-  assert.deepEqual(visible(), ['1']);
-  assert.equal(root.querySelector('[data-flow-go="2"]').disabled, true);
-  root.querySelector('input[value="atlas-full-grain"]').click();
-  assert.deepEqual(visible(), ['2']);
-  assert.equal(window.document.activeElement, steps[1].querySelector('h3'));
-  root.querySelector('input[name="color"][value="Teal"]').click();
-  assert.deepEqual(visible(), ['3']);
+  assert.deepEqual(visible(), ['1', '2', '3']);
+  assert.equal(root.querySelector('[data-flow-go]'), null);
   root.form.elements.instructions.value = 'Make a wallet';
-  steps[2].querySelector('[data-flow-go="2"]').click();
-  assert.deepEqual(visible(), ['2']);
-  steps[1].querySelector('[data-flow-go="1"]').click();
-  assert.deepEqual(visible(), ['1']);
+  root.querySelector('input[name="color"][value="Teal"]').click();
+  root.querySelector('input[value="atlas-full-grain"]').click();
+  assert.deepEqual(visible(), ['1', '2', '3']);
+  assert.equal(steps[0].classList.contains('is-complete'), true);
+  assert.equal(steps[1].classList.contains('is-complete'), true);
   root.querySelector('input[value="buffalo-pebble"]').click();
-  assert.deepEqual(visible(), ['2']);
   assert.equal(root.form.elements.color.value, 'Teal');
-  steps[1].querySelector('[data-flow-go="3"]').click();
-  assert.deepEqual(visible(), ['3']);
   assert.equal(root.form.elements.instructions.value, 'Make a wallet');
+  assert.deepEqual(visible(), ['1', '2', '3']);
   root.remove(); window.close();
 });
 
