@@ -10,6 +10,6 @@ export type ImageEditResult = {
 };
 
 export type ImageEditProvider = {
-  id: "openai" | "mock";
+  id: "openai" | "mock" | "cloudflare";
   editImage: (request: ImageEditRequest) => Promise<ImageEditResult>;
 };

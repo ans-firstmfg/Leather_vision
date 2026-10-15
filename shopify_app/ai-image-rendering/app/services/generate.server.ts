@@ -5,6 +5,7 @@ import type { Prisma } from "@prisma/client";
 import db from "../db.server";
 import { getImageEditProvider } from "./ai/index.server";
 import { OpenAIError } from "./ai/openai.server";
+import { CloudflareImageError } from "./ai/cloudflare.server";
 import { getJob, completeJob, failJob, type GenerationJob, type JobVariation } from "./jobs.server";
 import { buildEditPrompt } from "./promptBuilder.server";
 
@@ -58,8 +59,10 @@ export async function runGeneration(job: GenerationJob, workerId: string, signal
     console.error("Leather Vision generation failed", { generationId: job.id,
       errorType: error instanceof Error ? error.name : "UnknownError",
       ...(error instanceof OpenAIError ? { provider: "openai", status: error.status,
-        code: error.code, providerType: error.type, requestId: error.requestId } : {}) });
-    await failJob(job.id, workerId);
+        code: error.code, providerType: error.type, requestId: error.requestId } : {}),
+      ...(error instanceof CloudflareImageError ? { provider: "cloudflare", status: error.status,
+        code: error.code, requestId: error.requestId } : {}) });
+    await failJob(job.id, workerId, error instanceof CloudflareImageError ? error.publicMessage : undefined);
   } finally {
     if (!(await getJob(job.id))) await rm(generationDir(job.id), { recursive: true, force: true });
   }

@@ -121,9 +121,9 @@ export async function completeJob(id: string, workerId: string, variations: JobV
     data: { status: "ready", variations: JSON.stringify(variations), workerId: null, leaseUntil: null } });
 }
 
-export async function failJob(id: string, workerId: string) {
+export async function failJob(id: string, workerId: string, message = "Generation failed. Please try again later.") {
   return db.generation.updateMany({ where: { id, status: "processing", workerId }, data: {
-    status: "failed", error: "Generation failed. Please try again later.", workerId: null, leaseUntil: null,
+    status: "failed", error: message, workerId: null, leaseUntil: null,
   } });
 }
 

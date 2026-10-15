@@ -1,8 +1,8 @@
-export type ImageProviderId = "openai" | "mock" | "puter";
+export type ImageProviderId = "openai" | "mock" | "puter" | "cloudflare";
 
 export function configuredProvider(): ImageProviderId {
   const provider = process.env.IMAGE_PROVIDER?.trim() || "openai";
-  if (!["openai", "mock", "puter"].includes(provider)) throw new Error("IMAGE_PROVIDER must be openai, mock or puter.");
+  if (!["openai", "mock", "puter", "cloudflare"].includes(provider)) throw new Error("IMAGE_PROVIDER must be openai, mock, puter or cloudflare.");
   return provider as ImageProviderId;
 }
 
@@ -21,6 +21,18 @@ export function puterConfiguration() {
   return { model, quality, testMode: testMode === "true" };
 }
 
+export function cloudflareConfiguration() {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim() || "";
+  const token = process.env.CLOUDFLARE_API_TOKEN?.trim() || "";
+  if (!/^[a-f0-9]{32}$/i.test(accountId)) throw new Error("CLOUDFLARE_ACCOUNT_ID must be a 32-character account ID.");
+  if (!token || /\s/.test(token)) throw new Error("CLOUDFLARE_API_TOKEN is required.");
+  const model = process.env.CLOUDFLARE_IMAGE_MODEL?.trim() || "@cf/black-forest-labs/flux-2-klein-4b";
+  if (model !== "@cf/black-forest-labs/flux-2-klein-4b") throw new Error("Unsupported Cloudflare image model.");
+  const size = Number(process.env.CLOUDFLARE_IMAGE_SIZE || "512");
+  if (![256, 512].includes(size)) throw new Error("CLOUDFLARE_IMAGE_SIZE must be 256 or 512 for this testing provider.");
+  return { accountId, token, model, size };
+}
+
 export function validateProviderConfiguration(provider = configuredProvider()) {
   if (provider === "mock") {
     if (process.env.NODE_ENV === "production") throw new Error("Mock image generation is for development only.");
@@ -28,5 +40,7 @@ export function validateProviderConfiguration(provider = configuredProvider()) {
     puterConfiguration();
   } else if (provider === "openai") {
     if (!process.env.OPENAI_API_KEY?.trim()) throw new Error("OPENAI_API_KEY is required.");
+  } else if (provider === "cloudflare") {
+    cloudflareConfiguration();
   } else throw new Error("Unknown image provider.");
 }

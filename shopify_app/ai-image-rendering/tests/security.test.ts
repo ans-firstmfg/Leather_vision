@@ -10,6 +10,7 @@ import { normalizeGeneratedImage, generationDir, generationFilePath, runGenerati
 import { maintainJobs, stopWorker } from "../app/services/worker.server";
 import { validateProviderConfiguration, getImageEditProvider } from "../app/services/ai/index.server";
 import { OpenAIError } from "../app/services/ai/openai.server";
+import { CloudflareImageError } from "../app/services/ai/cloudflare.server";
 import { buildEditPrompt } from "../app/services/promptBuilder.server";
 import { authenticate } from "../app/shopify.server";
 import { authenticateProxy, clientAddress, requireStorefrontAction, proxyPath } from "../app/services/proxy.server";
@@ -20,7 +21,7 @@ import { loader as imageLoader } from "../app/routes/proxy.images.$gen.$file";
 import { action as startGeneration } from "../app/routes/proxy.generations";
 import { action as saveClientResult } from "../app/routes/proxy.generations.$id.result";
 import { loader as providerConfig } from "../app/routes/proxy.config";
-import { puterConfiguration } from "../app/services/ai/config.server";
+import { puterConfiguration, cloudflareConfiguration } from "../app/services/ai/config.server";
 
 const owner = { shop: "test.myshopify.com", customerId: null, actorHash: "visitor" };
 const options = { variationCount: 2 };
@@ -449,7 +450,7 @@ test("mock mode needs no key, rejects production and unknown providers", () => {
     assert.throws(() => getImageEditProvider(), /development only/);
     process.env.NODE_ENV = "test";
     process.env.IMAGE_PROVIDER = "invalid";
-    assert.throws(() => getImageEditProvider(), /must be openai, mock or puter/);
+    assert.throws(() => getImageEditProvider(), /must be openai, mock, puter or cloudflare/);
   } finally {
     if (key === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = key;
     process.env.IMAGE_PROVIDER = mode;
@@ -709,4 +710,170 @@ test("compliance webhooks redact a customer's or a shop's designs and images", a
   assert.equal(await db.session.count({ where: { shop } }), 0);
   assert.ok(await getJob(otherShop));
   await removeGenerations({ id: otherShop });
+});
+
+async function withCloudflare(work: () => Promise<void> | void) {
+  const values = { IMAGE_PROVIDER: "cloudflare", CLOUDFLARE_ACCOUNT_ID: "a".repeat(32),
+    CLOUDFLARE_API_TOKEN: "test-cloudflare-token", CLOUDFLARE_IMAGE_MODEL: "@cf/black-forest-labs/flux-2-klein-4b",
+    CLOUDFLARE_IMAGE_SIZE: "512" };
+  const previous = Object.fromEntries(Object.keys(values).map(name => [name, process.env[name]]));
+  const originalFetch = globalThis.fetch;
+  Object.assign(process.env, values);
+  globalThis.fetch = async () => { throw new Error("Unexpected network request in Cloudflare test"); };
+  try { await work(); }
+  finally {
+    globalThis.fetch = originalFetch;
+    for (const [name, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[name]; else process.env[name] = value;
+    }
+  }
+}
+
+test("Cloudflare validates account access settings and keeps credentials out of storefront config", async () => {
+  await withCloudflare(async () => {
+    validateProviderConfiguration();
+    assert.equal(getImageEditProvider().id, "cloudflare");
+    assert.equal(cloudflareConfiguration().size, 512);
+    const response = await providerConfig({ request: request(randomUUID(), "") } as never);
+    assert.deepEqual(await response.json(), { provider: "cloudflare" });
+    process.env.CLOUDFLARE_IMAGE_SIZE = "256";
+    assert.equal(cloudflareConfiguration().size, 256);
+    process.env.CLOUDFLARE_IMAGE_SIZE = "1024";
+    assert.throws(cloudflareConfiguration, /256 or 512/);
+    process.env.CLOUDFLARE_IMAGE_SIZE = "512";
+    process.env.CLOUDFLARE_IMAGE_MODEL = "https://untrusted.example/model";
+    assert.throws(cloudflareConfiguration, /Unsupported/);
+    delete process.env.CLOUDFLARE_IMAGE_MODEL;
+    process.env.CLOUDFLARE_ACCOUNT_ID = "../other-account";
+    assert.throws(cloudflareConfiguration, /account ID/);
+    process.env.CLOUDFLARE_ACCOUNT_ID = "a".repeat(32);
+    delete process.env.CLOUDFLARE_API_TOKEN;
+    assert.throws(cloudflareConfiguration, /API_TOKEN/);
+  });
+});
+
+test("Cloudflare text generation uses server-authenticated multipart without a reference or automatic retries", async () => {
+  await withCloudflare(async () => {
+    let calls = 0;
+    globalThis.fetch = async (url, init) => {
+      calls++;
+      assert.equal(String(url), "https://api.cloudflare.com/client/v4/accounts/" + "a".repeat(32) + "/ai/run/@cf/black-forest-labs/flux-2-klein-4b");
+      assert.equal(init?.redirect, "error");
+      const headers = new Headers(init?.headers);
+      assert.equal(headers.get("Authorization"), "Bearer test-cloudflare-token");
+      assert.equal(headers.has("Content-Type"), false, "Fetch must create the multipart boundary");
+      assert.ok(init?.body instanceof FormData);
+      assert.equal(init.body.get("prompt"), "Make a brown leather wallet");
+      assert.equal(init.body.get("width"), "512");
+      assert.equal(init.body.get("height"), "512");
+      assert.equal(init.body.has("input_image_0"), false);
+      assert.equal(init.body.has("steps"), false, "Klein uses fixed inference steps");
+      return Response.json({ success: true, result: { image: png.toString("base64") } });
+    };
+    const output = await getImageEditProvider().editImage({ prompt: "Make a brown leather wallet" });
+    assert.deepEqual(output.bytes, png);
+    assert.equal(calls, 1);
+  });
+});
+
+test("Cloudflare edits normalize the uploaded reference below the documented input size", async () => {
+  await withCloudflare(async () => {
+    const reference = await sharp({ create: { width: 800, height: 600, channels: 3, background: "brown" } }).png().toBuffer();
+    globalThis.fetch = async (_url, init) => {
+      assert.ok(init?.body instanceof FormData);
+      const file = init.body.get("input_image_0");
+      assert.ok(file instanceof File);
+      assert.equal(file.type, "image/png");
+      const metadata = await sharp(Buffer.from(await file.arrayBuffer())).metadata();
+      assert.equal(metadata.width, 448);
+      assert.equal(metadata.height, 336);
+      return Response.json({ success: true, result: { image: png.toString("base64") } });
+    };
+    await getImageEditProvider().editImage({ prompt: "Change the leather to red", imagePng: reference });
+  });
+});
+
+test("Cloudflare quota and permission failures expose safe diagnostics and never repeat generation", async () => {
+  await withCloudflare(async () => {
+    for (const status of [401, 403, 429, 500]) {
+      let calls = 0;
+      globalThis.fetch = async () => { calls++; return Response.json({ success: false,
+        errors: [{ code: 3040, message: "Secret prompt and test-cloudflare-token" }] }, { status, headers: { "cf-ray": "abcdef1234567890-SIN" } }); };
+      await assert.rejects(getImageEditProvider().editImage({ prompt: "Private customer notes" }), (error: unknown) => {
+        assert.ok(error instanceof CloudflareImageError);
+        assert.equal(error.status, status);
+        assert.equal(error.code, 3040);
+        assert.equal(error.requestId, "abcdef1234567890-SIN");
+        assert.doesNotMatch(error.message + error.publicMessage, /Secret|test-cloudflare-token|Private customer/);
+        if (status === 429) assert.match(error.publicMessage, /allowance or rate limit/);
+        return true;
+      });
+      assert.equal(calls, 1);
+    }
+  });
+});
+
+test("Cloudflare rejects missing, corrupt, remote-URL and oversized image responses", async () => {
+  await withCloudflare(async () => {
+    for (const image of [undefined, "https://untrusted.example/image.png", Buffer.from("not an image").toString("base64")]) {
+      globalThis.fetch = async () => Response.json({ success: true, result: { image } });
+      await assert.rejects(getImageEditProvider().editImage({ prompt: "Make a wallet" }));
+    }
+    globalThis.fetch = async () => new Response("<html>Gateway failed</html>", { status: 502 });
+    await assert.rejects(getImageEditProvider().editImage({ prompt: "Make a wallet" }), (error: unknown) => error instanceof CloudflareImageError && error.status === 502);
+    globalThis.fetch = async () => new Response("too large", { headers: { "content-length": String(31 * 1024 * 1024) } });
+    await assert.rejects(getImageEditProvider().editImage({ prompt: "Make a wallet" }), CloudflareImageError);
+  });
+});
+
+test("Cloudflare respects cancellation before dispatching a request", async () => {
+  await withCloudflare(async () => {
+    let calls = 0;
+    globalThis.fetch = async () => { calls++; return Response.json({}); };
+    const controller = new AbortController(); controller.abort();
+    await assert.rejects(getImageEditProvider().editImage({ prompt: "Make a wallet", signal: controller.signal }));
+    assert.equal(calls, 0);
+  });
+});
+
+test("queued Cloudflare jobs retain their provider, save private PNGs and surface quota failures safely", async () => {
+  await withCloudflare(async () => {
+    const shop = "cloudflare-test.myshopify.com";
+    const cfOwner = { ...owner, shop };
+    await db.session.create({ data: { id: "offline_cloudflare_test", shop, state: "test", accessToken: "test-only" } });
+    try {
+      const id = randomUUID();
+      const { token } = await createJob(id, cfOwner, { variationCount: 1, instructions: "Make a wallet", hasReferenceImage: false });
+      await enqueueJob(id);
+      process.env.IMAGE_PROVIDER = "mock";
+      let calls = 0;
+      globalThis.fetch = async () => { calls++; return Response.json({ success: true, result: { image: png.toString("base64") } }); };
+      const job = (await claimJob("cloudflare-worker"))!;
+      assert.equal(job.id, id);
+      assert.equal(job.options.provider, "cloudflare");
+      await runGeneration(job, "cloudflare-worker");
+      const saved = (await getOwnedJob(id, cfOwner, token))!;
+      assert.equal(saved.status, "ready");
+      assert.equal(calls, 1);
+      assert.equal((await sharp(await readFile(generationFilePath(id, "variation-1.png"))).metadata()).format, "png");
+      assert.equal(await getOwnedJob(id, cfOwner, "0".repeat(64)), undefined);
+      const selection = await saveSelection(saved, "v1");
+      assert.ok(selection);
+      assert.doesNotMatch(JSON.stringify(selection), /test-cloudflare-token|Bearer/);
+      process.env.IMAGE_PROVIDER = "cloudflare";
+      const failedId = randomUUID();
+      await createJob(failedId, cfOwner, { variationCount: 1, instructions: "Make a belt", hasReferenceImage: false });
+      await enqueueJob(failedId);
+      globalThis.fetch = async () => Response.json({ success: false, errors: [{ code: 3040, message: "Private upstream diagnostic" }] }, { status: 429 });
+      const failedJob = (await claimJob("cloudflare-failure-worker"))!;
+      await runGeneration(failedJob, "cloudflare-failure-worker");
+      const failed = (await getJob(failedId))!;
+      assert.equal(failed.status, "failed");
+      assert.match(failed.error || "", /allowance or rate limit/);
+      assert.doesNotMatch(failed.error || "", /Private upstream/);
+    } finally {
+      await removeGenerations({ shop });
+      await db.session.deleteMany({ where: { shop } });
+    }
+  });
 });

@@ -1,6 +1,6 @@
 # Leather Vision
 
-Leather Vision is a Shopify embedded app and theme app extension. Customers choose leather, color and product type, add instructions and an optional sample image, generate variations, select a design, and attach its reference to a purchasable product in the cart. Stitching, hardware and variation count are available under More design options.
+Leather Vision is a Shopify embedded app and theme app extension. Customers choose leather and color, describe the product they want or upload an optional reference, generate variations, select a design, and attach its reference to a purchasable product in the cart. The three form sections remain visible, with results below the form.
 
 ## Architecture
 
@@ -20,7 +20,7 @@ Use Node 22.12 or newer in the Node 22 series, or a supported newer Node version
 
 1. Run `npm ci`.
 2. Copy `.env.example` to `.env` **only if you do not already have an environment file**. Preserve existing credentials.
-3. Configure Puter, OpenAI, or the local mock as described below.
+3. Configure Cloudflare, Puter, OpenAI, or the local mock as described below.
 4. Run `npm run setup`. The additive generation migration preserves existing Shopify sessions.
 5. Run `npm run dev`. Shopify CLI supplies Shopify credentials and the development HTTPS tunnel.
 6. Open the theme editor and add the Leather Vision app block. Select a dedicated custom-design product and confirm the proxy path.
@@ -32,6 +32,28 @@ The Prisma helper defaults DATABASE_URL to `file:dev.sqlite`, preserving the ori
 If the browser shows `Cannot read properties of null (reading 'useContext')`, stop the old development server, run `npm ci`, and restart `npm run dev`. Reopen the preview link printed by that new session and hard-refresh the browser (Ctrl+Shift+R). Vite explicitly deduplicates React and prebundles the client runtime together; an old tab can still retain incompatible dependency chunks until refreshed. React and React DOM must use matching versions.
 
 For an HTTP 504 on `/apps/leather-vision/generations`, check the running development terminal for `Leather Vision upload` logs. `received`, `authenticated`, `upload-read`, `reserved`, and `queued` identify how far the request got; logs contain no uploaded image, instructions, or access tokens. No `received` log means the request did not reach this route. `provider-not-configured` means the selected provider needs its environment configuration corrected. Keep the public tunnel running; a localhost-only server cannot receive Shopify app proxy requests. A CSS preload warning is unrelated to these proxy requests. Do not automatically retry a generation POST after a gateway timeout: the app may have accepted it before the gateway lost the response.
+
+## Cloudflare Workers AI configuration
+
+Create a Cloudflare account, open **Workers AI → Use REST API**, create a Workers AI API token, and copy the Account ID. The token needs Workers AI Read and Edit permissions for that account. No domain or separately deployed Worker is required. Follow the [official REST API setup guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/).
+
+Add these values to your existing local `.env` only after confirming Workers AI access:
+
+```dotenv
+IMAGE_PROVIDER=cloudflare
+CLOUDFLARE_ACCOUNT_ID=your_32_character_account_id
+CLOUDFLARE_API_TOKEN=your_private_api_token
+CLOUDFLARE_IMAGE_MODEL=@cf/black-forest-labs/flux-2-klein-4b
+CLOUDFLARE_IMAGE_SIZE=512
+```
+
+Restart your existing development server after changing configuration. Keep the token server-side; do not put it in Liquid, storefront JavaScript, Git, or chat. Existing jobs retain their original provider. New Cloudflare jobs use the existing server queue, private images, ownership checks, and cart selection flow; no Puter sign-in is involved.
+
+This adapter supports text generation and editing one uploaded reference using FLUX.2 Klein 4B. Output is square at 256 or 512 pixels (default 512). Reference images are normalized to PNG within 448×448 pixels, preserving aspect ratio, to meet the model's below-512 input restriction. Requests use multipart form data even without a reference. See the [model request requirements](https://developers.cloudflare.com/changelog/post/2026-01-15-flux-2-klein-4b-workers-ai/).
+
+Workers AI currently includes 10,000 neurons per day, shared across the account. On the Workers Free plan, requests fail after the daily allowance is exhausted; paid plans can incur overage charges. Confirm your account's plan, model access, and usage before live testing. The storefront currently requests two variations per generation, making two provider calls. The adapter does not automatically retry or fall back to another provider. See [Cloudflare pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/).
+
+Uploaded references and instructions are sent to Cloudflare. Update your store's customer-facing privacy information before public use. Automated tests mock all Cloudflare requests; successful mocked tests do not establish live account access or image quality. Once credentials and free-tier access are confirmed, check one text-only request and one reference-edit request before testing the complete storefront flow.
 
 ## OpenAI configuration
 
@@ -50,7 +72,7 @@ PUTER_IMAGE_QUALITY=512
 PUTER_TEST_MODE=false
 ```
 
-No OpenAI or Google API key is required for this mode. Click **Connect Puter**, allow its sign-in popup, and sign in to your own Puter account. Choose specifications and optionally supply a sample image, then generate. Start with **one variation** to check your account's allowance. A signed-in Puter account covers each variation's usage; its free monthly allowance is limited and exhausted accounts may be prompted to upgrade. See [Puter's user-pays documentation](https://docs.puter.com/user-pays-model/).
+No OpenAI or Google API key is required for this mode. Choose specifications and optionally supply a sample image, then click **Generate designs**. Allow the sign-in popup when needed and sign in to your own Puter account. The storefront requests two variations per generation. A signed-in Puter account covers each variation's usage; its free monthly allowance is limited and exhausted accounts may be prompted to upgrade. See [Puter's user-pays documentation](https://docs.puter.com/user-pays-model/).
 
 The Puter SDK is loaded only when this provider is selected. The server's validated choices build the prompts and normalize the optional reference. The browser calls `puter.ai.txt2img` with the configured model/quality and optional data-URI reference; returned images are downloaded in the browser and uploaded as bytes to `POST /apps/leather-vision/generations/:id/result`. Provider URLs are never fetched by our backend, and Puter account credentials are never sent to our backend. The result endpoint verifies the signed proxy, ownership, capability, count/order, request size, decoded image format and pixel limits, and stores private normalized PNGs. Selection and cart attachment use the existing routes.
 
