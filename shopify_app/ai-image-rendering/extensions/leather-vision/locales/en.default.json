@@ -94,9 +94,10 @@
       "gray": "Gray",
       "red": "Red",
       "teal": "Teal",
-      "vanilla": "Vanilla",
       "white": "White"
     },
-    "puter_connecting": "Signing in…"
+    "puter_connecting": "Signing in…",
+    "back": "Back",
+    "continue": "Continue"
   }
 }

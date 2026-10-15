@@ -216,38 +216,32 @@ test("missing required progressive choices are rejected before submitting a gene
   await root.generate();
   assert.equal(calls, 0);
   assert.equal(root.form.checkValidity(), false);
-  assert.equal(root.querySelector('[data-flow-toggle="1"]').getAttribute("aria-expanded"), "true");
+  assert.equal(window.document.activeElement, root.querySelector('input[name="leather"]'));
   root.remove(); window.close();
 });
 
-test("progressive choices reveal steps, summarize selections and preserve downstream edits", async () => {
+test("one full-width section advances automatically and Back preserves choices and notes", async () => {
   const { root, window } = await storefront(async () => ready(), false, { fresh: true });
-  const step = (number) => root.querySelector(`[data-flow-step="${number}"]`);
-  const toggle = (number) => root.querySelector(`[data-flow-toggle="${number}"]`);
-  assert.equal(step(1).hidden, false);
-  assert.equal(step(2).hidden, true);
-  assert.equal(step(3).hidden, true);
+  const steps = [...root.querySelectorAll('[data-flow-step]')];
+  const visible = () => steps.filter(step => !step.hidden).map(step => step.dataset.flowStep);
+  assert.deepEqual(visible(), ['1']);
+  assert.equal(root.querySelector('[data-flow-go="2"]').disabled, true);
   root.querySelector('input[value="atlas-full-grain"]').click();
-  assert.equal(step(1).classList.contains("is-complete"), true);
-  assert.equal(toggle(1).getAttribute("aria-expanded"), "false");
-  assert.equal(step(2).hidden, false);
-  assert.equal(step(3).hidden, true);
-  assert.equal(window.document.activeElement, toggle(2));
+  assert.deepEqual(visible(), ['2']);
+  assert.equal(window.document.activeElement, steps[1].querySelector('h3'));
   root.querySelector('input[name="color"][value="Teal"]').click();
-  assert.equal(step(3).hidden, false);
-  assert.equal(step(2).classList.contains("is-complete"), true);
-  assert.equal(toggle(3).getAttribute("aria-expanded"), "true");
-  root.form.elements.instructions.value = "Keep my notes";
-  toggle(1).click();
-  assert.equal(step(2).hidden, false);
-  assert.equal(step(3).hidden, false);
+  assert.deepEqual(visible(), ['3']);
+  root.form.elements.instructions.value = 'Make a wallet';
+  steps[2].querySelector('[data-flow-go="2"]').click();
+  assert.deepEqual(visible(), ['2']);
+  steps[1].querySelector('[data-flow-go="1"]').click();
+  assert.deepEqual(visible(), ['1']);
   root.querySelector('input[value="buffalo-pebble"]').click();
-  assert.equal(root.form.elements.color.value, "Teal");
-  assert.equal(root.form.elements.productType, undefined);
-  assert.equal(root.form.elements.instructions.value, "Keep my notes");
-  toggle(3).click();
-  assert.equal(toggle(3).getAttribute("aria-expanded"), "true");
-  assert.equal(step(1).querySelector("[data-flow-summary]").textContent, "buffalo-pebble");
+  assert.deepEqual(visible(), ['2']);
+  assert.equal(root.form.elements.color.value, 'Teal');
+  steps[1].querySelector('[data-flow-go="3"]').click();
+  assert.deepEqual(visible(), ['3']);
+  assert.equal(root.form.elements.instructions.value, 'Make a wallet');
   root.remove(); window.close();
 });
 
