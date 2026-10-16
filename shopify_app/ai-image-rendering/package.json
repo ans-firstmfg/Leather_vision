@@ -8,7 +8,7 @@
     "predeploy": "npm run build:storefront",
     "pretest": "npm run build:storefront",
     "build": "react-router build",
-    "dev": "shopify app dev",
+    "dev": "node scripts/dev.mjs",
     "config:link": "shopify app config link",
     "generate": "shopify app generate",
     "deploy": "shopify app deploy",

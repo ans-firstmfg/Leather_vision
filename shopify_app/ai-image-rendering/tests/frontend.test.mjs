@@ -33,7 +33,7 @@ async function storefront(fetch, resume = false, options = {}) {
   };
   window.AbortSignal.timeout = () => new window.AbortController().signal;
   window.fetch = (url, init) => String(url).endsWith("/config")
-    ? Promise.resolve(Response.json({ provider: options.puter ? "puter" : "openai",
+    ? options.config ? options.config(url, init) : Promise.resolve(Response.json({ provider: options.puter ? "puter" : "openai",
       puter: { model: "gemini-3.1-flash-image", quality: "512", testMode: false } })) : fetch(url, init);
   if (options.puter) { window.puter = options.puter; window.eval(puterSource); }
   if (resume) window.sessionStorage.setItem("leather-vision:/apps/custom-design:demo", JSON.stringify({ id, token }));
@@ -299,6 +299,38 @@ test("real storefront markup resumes a job, selects a variation, and sends only 
   }
   assert.equal(root.querySelector(".lv__card-img").getAttribute("src"), "blob:test");
   root.remove(); instance.window.close();
+});
+
+test("provider connection recovers on Generate without reloading or replaying a generation", async () => {
+  let configs = 0, posts = 0;
+  const instance = await storefront(async (_url, options) => {
+    if (options.method === "POST") posts++;
+    return Response.json({ error: "Test complete" }, { status: 422 });
+  }, false, { config: async () => ++configs === 1
+    ? new Response("Tunnel unavailable", { status: 503 })
+    : Response.json({ provider: "cloudflare" }) });
+  const { root, window } = instance;
+  assert.match(root.querySelector("[data-lv-error]").textContent, /HTTP 503/);
+  root.querySelector("[data-lv-form]").dispatchEvent(new window.Event("submit", { cancelable: true }));
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(configs, 2);
+  assert.equal(posts, 1);
+  assert.equal(root.providerError, false);
+  root.remove(); window.close();
+});
+
+test("provider configuration failures preserve actionable errors and never reserve a job", async () => {
+  let posts = 0;
+  const instance = await storefront(async () => { posts++; }, false, {
+    config: async () => Response.json({ error: "Image generation is not configured. Please contact the store." }, { status: 503 }),
+  });
+  const { root, window } = instance;
+  root.querySelector("[data-lv-form]").dispatchEvent(new window.Event("submit", { cancelable: true }));
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(root.querySelector("[data-lv-error]").textContent, "Image generation is not configured. Please contact the store.");
+  assert.equal(posts, 0);
+  assert.equal(root.querySelector("[data-lv-submit]").disabled, false);
+  root.remove(); window.close();
 });
 
 test("HTML gateway timeouts show the HTTP status without retrying a generation", async () => {

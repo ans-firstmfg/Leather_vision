@@ -2,6 +2,7 @@
   "leather_vision": {
     "title": "First MFG Co",
     "subtitle": "Bring your next leather piece to life. Choose your materials, shape the details, and explore the possibilities.",
+    "ai_notice": "Generative AI can make mistakes, use this tool for inspiration, and consult with a product swatch or our team if you have any questions.",
     "upload_label": "Choose your image",
     "or": "or",
     "product_type_label": "Product type",

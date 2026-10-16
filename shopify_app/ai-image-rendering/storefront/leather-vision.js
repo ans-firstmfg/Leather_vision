@@ -67,6 +67,7 @@
     }
 
     async configureProvider() {
+      this.providerError = false;
       this.submitBtn.disabled = true;
       try {
         const config = await this.api("/config");
@@ -82,9 +83,9 @@
         if (!this.isConnected) return;
         this.puter = new window.LeatherVisionPuter(this, config.puter);
         await this.puter.init();
-      } catch {
-        if (this.isConnected) this.setError(this.copy.error_connection);
-        this.providerError = true;
+      } catch (error) {
+        this.providerError = error.message || this.copy.error_connection;
+        if (this.isConnected) this.setError(this.providerError);
       } finally {
         if (this.isConnected && this.form.getAttribute("aria-busy") !== "true") this.submitBtn.disabled = false;
       }
@@ -158,7 +159,8 @@
         // Open sign-in within the submit gesture, before awaiting any network work.
         const signIn = this.puter && !this.puter.connected() ? this.puter.signIn() : null;
         await this.providerReady;
-        if (this.providerError) { this.setError(this.copy.error_connection); return; }
+        if (this.providerError) await this.configureProvider();
+        if (this.providerError) { this.setError(this.providerError); return; }
         if (signIn && !await signIn) return;
       } catch { this.setError(this.copy.error_connection); return; }
       if (!this.isConnected || this.submitBtn.disabled) return;
