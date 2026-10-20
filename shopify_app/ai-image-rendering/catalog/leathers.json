@@ -1,0 +1,1564 @@
+{
+  "source": "https://unitedleather.com/leather-vision",
+  "importedOn": "2026-10-17",
+  "groups": [
+    "Cowhide",
+    "Lambskin",
+    "Suede & Nubuck",
+    "Shearling & Fur",
+    "Hair-On",
+    "Novelty",
+    "Vegan"
+  ],
+  "articles": [
+    {
+      "name": "Liquid Patent Cow",
+      "handle": "liquid-patent-cow",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/undefined-high-19.gif?v=1775591293",
+      "slug": "liquid-patent-cow"
+    },
+    {
+      "name": "Plongé Lightweight Cowhide",
+      "handle": "plonge-lightweight",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PLONGE_BLACK.jpg?v=1763599875",
+      "slug": "plonge-lightweight-cowhide"
+    },
+    {
+      "name": "Buffalo Pebble Grain Cowhide",
+      "handle": "buffalo-pebble-grain",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Buffalo_Red.jpg?v=1776296080",
+      "slug": "buffalo-pebble"
+    },
+    {
+      "name": "Atlas Full Grain Cowhide",
+      "handle": "atlas",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Black_Atlas.jpg?v=1776296026",
+      "slug": "atlas-full-grain"
+    },
+    {
+      "name": "Sassari Embossed Woven Cowhide",
+      "handle": "sassari-woven-embossed",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Orange_Sassari.jpg?v=1776295895",
+      "slug": "sassari-embossed"
+    },
+    {
+      "name": "Crocodile Patent Cowhide",
+      "handle": "patent-crocodile",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Patent_Croc_Chocolate.jpg?v=1755721215",
+      "slug": "crocodile-patent-cowhide"
+    },
+    {
+      "name": "Barcelona Soft Full Grain Cowhide",
+      "handle": "barcelona-soft-full-grain",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Barcelona_-_Cognac.jpg?v=1750372093",
+      "slug": "barcelona-soft-full-grain-cowhide"
+    },
+    {
+      "name": "Tennessee Italian Suede",
+      "handle": "tennessee-italian-suede",
+      "groups": [
+        "Cowhide",
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/unnamed-11.jpg?v=1765236512",
+      "slug": "tennessee-italian"
+    },
+    {
+      "name": "Verona Vintage Distressed Cowhide",
+      "handle": "verona-distressed",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Verona_Black.jpg?v=1750372457",
+      "slug": "verona-vintage-distressed-cowhide"
+    },
+    {
+      "name": "Vermont Distressed Veg-Tanned Cowhide",
+      "handle": "vermont-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Vermont_Cognac_3179f980-c512-42eb-98b5-ccc3082bb077.jpg?v=1765236298",
+      "slug": "vermont-distressed-veg-tanned-cowhide"
+    },
+    {
+      "name": "Stardust Glitter Cow Suede",
+      "handle": "stardust-suede",
+      "groups": [
+        "Cowhide",
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Stardust_0000_Peach.jpg?v=1718129864",
+      "slug": "stardust-glitter-cow"
+    },
+    {
+      "name": "Classic Crocodile Cowhide",
+      "handle": "classic-crocodile-embossed",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/ClassicCroc.gif?v=1764777690",
+      "slug": "classic-crocodile-cowhide"
+    },
+    {
+      "name": "Stingray Embossed Cowhide",
+      "handle": "stingray",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Stingray_StringrayDenim_b80f6608-d38c-4bb0-bd0e-c74fa54ac9fe.webp?v=1718128370",
+      "slug": "stingray-embossed-cowhide"
+    },
+    {
+      "name": "Lorenzo Veg-Tanned Firm Cowhide",
+      "handle": "lorenzo-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/LORENZO_NATURAL.jpg?v=1724873623",
+      "slug": "lorenzo-veg-tanned-firm-cowhide"
+    },
+    {
+      "name": "Capri Embossed Pebble Cowhide",
+      "handle": "capri-pebble-grain",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Capri_0004_Gray.jpg?v=1750372070",
+      "slug": "capri-embossed-pebble-cowhide"
+    },
+    {
+      "name": "Cobra Matte Snake Cowhide",
+      "handle": "cobra-matte-embossed-snake",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Cobra_Matte_-_Black.jpg?v=1750371951",
+      "slug": "cobra-matte-snake-cowhide"
+    },
+    {
+      "name": "Sparkle Cow Suede",
+      "handle": "sparkle-leather",
+      "groups": [
+        "Cowhide",
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Sparkle_White.jpg?v=1756335978",
+      "slug": "sparkle-cow-suede"
+    },
+    {
+      "name": "Lugano Full Grain",
+      "handle": "lugano-full-grain",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Lugano_Cement.jpg?v=1750372020",
+      "slug": "lugano-full-grain"
+    },
+    {
+      "name": "Phoenix Pebble Grain Cowhide",
+      "handle": "phoenix-pebble",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PHOENIX_GIFS-low.gif?v=1764777656",
+      "slug": "phoenix-pebble-grain-cowhide"
+    },
+    {
+      "name": "Sorrento Veg-Tanned Natural Cowhide",
+      "handle": "sorrento-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Sorrento_Cognac.jpg?v=1765405033",
+      "slug": "sorrento-veg-tanned-natural-cowhide"
+    },
+    {
+      "name": "Boa Snake Print Embossed Cowhide",
+      "handle": "boa-embossed-snake-print",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Boa_Lime.jpg?v=1790891742",
+      "slug": "boa-snake-print-embossed-cowhide"
+    },
+    {
+      "name": "Bomber Distressed Cowhide",
+      "handle": "bomber-distressed-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/BOMBER_NAVY.jpg?v=1776296120",
+      "slug": "bomber-distressed-cowhide"
+    },
+    {
+      "name": "Smooth Neon Cow",
+      "handle": "neon-cow",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/ZAC09888.ARW_0004_Pink_c5af1a78-ee8b-4aa0-ba76-6d56c44c2039.jpg?v=1718130442",
+      "slug": "smooth-neon-cow"
+    },
+    {
+      "name": "Africa Python Snake Embossed Cowhide",
+      "handle": "africa-python-snake",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Africa_Python_Gray.jpg?v=1764871545",
+      "slug": "africa-python-snake-embossed-cowhide"
+    },
+    {
+      "name": "Cosmo Italian Pebble Cowhide",
+      "handle": "cosmo-italian-pebble-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Cosmo_Tan_84f482c0-af3f-47ee-a4af-efdd93c81790.jpg?v=1732236296",
+      "slug": "cosmo-italian-pebble-cowhide"
+    },
+    {
+      "name": "Sahara Snake Print Embossed Cowhide",
+      "handle": "sahara-embossed",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/SAHARA-BEIGE.jpg?v=1726006076",
+      "slug": "sahara-snake-print-embossed-cowhide"
+    },
+    {
+      "name": "Italian Hornback Crocodile Cowhide",
+      "handle": "italian-hornback-crocodile-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Italian_Hornback_Burgundy.jpg?v=1785968048",
+      "slug": "italian-hornback-crocodile-cowhide"
+    },
+    {
+      "name": "Chameleon UV Color Changing Cowhide",
+      "handle": "chameleon-uv-responsive",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Chameleon_ChameleonBlue.webp?v=1718130546",
+      "slug": "chameleon-uv-color-changing-cowhide"
+    },
+    {
+      "name": "Nubuck",
+      "handle": "nubuck-water-repellent",
+      "groups": [
+        "Cowhide",
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Nubuck_Chocolate.jpg?v=1776295736",
+      "slug": "nubuck"
+    },
+    {
+      "name": "Rodeo Full Grain Pebble Cowhide",
+      "handle": "rodeo-full-grain",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/RODEO_BROWN.jpg?v=1765404997",
+      "slug": "rodeo-full-grain-pebble-cowhide"
+    },
+    {
+      "name": "Kenya Python Foil Cowhide",
+      "handle": "kenya-python-foil",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/KenyaPython.gif?v=1764777702",
+      "slug": "kenya-python-foil-cowhide"
+    },
+    {
+      "name": "Arizona Lightweight Distressed",
+      "handle": "arizona-lightwight-distressed-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Arizona_Burgundy.jpg?v=1758235380",
+      "slug": "arizona-lightweight-distressed"
+    },
+    {
+      "name": "Boston Full Grain Water Repellent Cowhide",
+      "handle": "boston-full-grain-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Boston_Tobacco.jpg?v=1736890217",
+      "slug": "boston-full-grain-water-repellent-cowhide"
+    },
+    {
+      "name": "London Smooth Full Grain Cowhide",
+      "handle": "london-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/London_Black_be41b397-dd38-4677-bf67-55cbee9e7b56.jpg?v=1790892242",
+      "slug": "london-smooth-full-grain-cowhide"
+    },
+    {
+      "name": "Smooth Matte Leopard Veg-Tanned Cowhide",
+      "handle": "leopard-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/LeapordVeg_LeapordVeg.webp?v=1718129921",
+      "slug": "smooth-matte-leopard-veg-tanned-cowhide"
+    },
+    {
+      "name": "Ribbed Black Leather",
+      "handle": "ribbed-black-leather",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PLEATEDLEATHERBLACK_a76c942b-50ba-4f6a-9420-00277a38d262.jpg?v=1726598350",
+      "slug": "ribbed-black-leather"
+    },
+    {
+      "name": "Skyline Italian Cowhide",
+      "handle": "skyline-italian-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Skyline_Emerald.jpg?v=1758137104",
+      "slug": "skyline-italian-cowhide"
+    },
+    {
+      "name": "DoubleFace Classic Reversible Calfskin",
+      "handle": "doubleface-reversible-smooth",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Doubleface_Orange_Mocha.jpg?v=1737591900",
+      "slug": "doubleface-classic-reversible-calfskin"
+    },
+    {
+      "name": "Madison Soft Veg-Tanned Cowhide",
+      "handle": "madison-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Madison_Brown2.jpg?v=1764625608",
+      "slug": "madison-soft-veg-tanned-cowhide"
+    },
+    {
+      "name": "Stone Wash Cowhide",
+      "handle": "stone",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/STONE_SAND.jpg?v=1726005913",
+      "slug": "stone-wash-cowhide"
+    },
+    {
+      "name": "Africa Python Metallic Snake Cowhide",
+      "handle": "africa-python-metallic-snake",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Africa_Python_Silver.jpg?v=1787775285",
+      "slug": "africa-python-metallic-snake-cowhide"
+    },
+    {
+      "name": "Caspian Veg-Tanned Cowhide",
+      "handle": "caspian-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/CASPIAN_GIF-high.gif?v=1764777684",
+      "slug": "caspian-veg-tanned-cowhide"
+    },
+    {
+      "name": "Lauren Calfskin",
+      "handle": "lauren-calfskin",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Lauren_Whiskey.jpg?v=1748476592",
+      "slug": "lauren-calfskin"
+    },
+    {
+      "name": "Ralph Calfskin",
+      "handle": "ralph-calfskin",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Ralph_Tobacco.jpg?v=1748476562",
+      "slug": "ralph-calfskin"
+    },
+    {
+      "name": "Avalon Italian Pebble Cowhide",
+      "handle": "avalon-italian-pebble-cowhides",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Avalon-Tangerine_d6a2f37b-c91f-40a8-a436-1417affcd7d5.jpg?v=1775766323",
+      "slug": "avalon-italian-pebble-cowhide"
+    },
+    {
+      "name": "Monte Carlo Natural Grain Cowhide",
+      "handle": "monte-carlo-natural",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Montecarlo_Red.jpg?v=1770329123",
+      "slug": "monte-carlo-natural-grain-cowhide"
+    },
+    {
+      "name": "Denim Printed Calf Suede",
+      "handle": "denim-print-leather",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Denim_Leather.jpg?v=1744919387",
+      "slug": "denim-printed-calf-suede"
+    },
+    {
+      "name": "Fuzzy Cowhide",
+      "handle": "fuzzy-cowhide",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Blue_Fuzzy.jpg?v=1750371171",
+      "slug": "fuzzy-cowhide"
+    },
+    {
+      "name": "Atlantic Smooth Cowhide",
+      "handle": "atlantic-smooth-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Atlantic_0003_Brick_b612c690-eeb2-44e2-8c0c-2a6f513a4b95.jpg?v=1736890271",
+      "slug": "atlantic-smooth-cowhide"
+    },
+    {
+      "name": "Crazy Horse Veg-Tanned Cowhide",
+      "handle": "crazy-horse-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Crazy_Horse_Tobacco.jpg?v=1775775080",
+      "slug": "crazy-horse-veg-tanned-cowhide"
+    },
+    {
+      "name": "Winston Veg-Tanned Cowhide",
+      "handle": "winston-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Winston_0002_Tan.png?v=1718131028",
+      "slug": "winston-veg-tanned-cowhide"
+    },
+    {
+      "name": "Hair-On Tiger Print Cowhide",
+      "handle": "hair-on-printed-tiger",
+      "groups": [
+        "Cowhide",
+        "Hair-On",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_Tiger.webp?v=1718129307",
+      "slug": "hair-on-tiger-print-cowhide"
+    },
+    {
+      "name": "Utah Distressed Cowhide",
+      "handle": "utah-distressed-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Utah_-_Forest-Green.jpg?v=1747414676",
+      "slug": "utah-distressed-cowhide"
+    },
+    {
+      "name": "Iridescent Foil Cowhide",
+      "handle": "iridescent-cow",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/New_Iridescent_Cow_Bronze.webp?v=1718131054",
+      "slug": "iridescent-foil-cowhide"
+    },
+    {
+      "name": "DoubleFace Reversible Pebble Calfskin",
+      "handle": "doubleface-reversible-pebble",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/DoubleFace_Pebble.jpg?v=1737591669",
+      "slug": "doubleface-reversible-pebble-calfskin"
+    },
+    {
+      "name": "DoubleFace Reversible Suede",
+      "handle": "doubleface-reversible-suede",
+      "groups": [
+        "Cowhide",
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Revolve_Forest_Yellow.jpg?v=1737592391",
+      "slug": "doubleface-reversible-suede"
+    },
+    {
+      "name": "Amazon Snake Print Calfskin",
+      "handle": "amazon-snake-print",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/ArizonaHD.gif?v=1764777662",
+      "slug": "amazon-snake-print-calfskin"
+    },
+    {
+      "name": "Imperial Natural Pebble Grain Cowhide",
+      "handle": "imperial-pebble-grain",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/IMPERIAL_GIF-low.gif?v=1764777651",
+      "slug": "imperial-natural-pebble-grain-cowhide"
+    },
+    {
+      "name": "Sydney Crocodile Embossed Cowhide",
+      "handle": "sydney-crocodile",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/SydneyCroc.gif?v=1764777694",
+      "slug": "sydney-crocodile-embossed-cowhide"
+    },
+    {
+      "name": "Picasso Smooth Full Grain Cowhide",
+      "handle": "picasso-smooth",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PICASSO_TAN.jpg?v=1736890379",
+      "slug": "picasso-smooth-full-grain-cowhide"
+    },
+    {
+      "name": "Viper Snake Embossed Cowhide",
+      "handle": "viper-snake",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/VIPER_TAN.jpg?v=1726006235",
+      "slug": "viper-snake-embossed-cowhide"
+    },
+    {
+      "name": "Hair-On Small Cheetah Print Cowhide",
+      "handle": "hair-on-print-small-cheetah",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/SMALL_CHEETAH_WHITE.jpg?v=1784764220",
+      "slug": "hair-on-small-cheetah-print-cowhide"
+    },
+    {
+      "name": "Pacific Veg-Tanned Natural Cowhide",
+      "handle": "pacific-veg-tanned",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Pacific_Cognac.jpg?v=1736450629",
+      "slug": "pacific-veg-tanned-natural-cowhide"
+    },
+    {
+      "name": "Hair-On Natural Tricolor Cow",
+      "handle": "hair-on-natural",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Hides_Natural_Tricolor.jpg?v=1724802166",
+      "slug": "hair-on-natural-tricolor-cow"
+    },
+    {
+      "name": "Hair-On Medium Cheetah Print Cowhide",
+      "handle": "hair-on-print-medium-cheetah",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/MEDIUM_CHEETAH_TAN.jpg?v=1784827941",
+      "slug": "hair-on-medium-cheetah-print-cowhide"
+    },
+    {
+      "name": "Victoria Nubuck Distressed Water Repellent Suede",
+      "handle": "victoria-nubuck-distressed",
+      "groups": [
+        "Cowhide",
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Victoria_Nubuck_0000_Forest_Green.jpg?v=1718130673",
+      "slug": "victoria-nubuck-distressed-water-repellent-suede"
+    },
+    {
+      "name": "Rocky Natural Distressed Cowhide",
+      "handle": "rocky-distressed",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Rocky_0001_Tan.jpg?v=1776295653",
+      "slug": "rocky-natural-distressed-cowhide"
+    },
+    {
+      "name": "Stella Metallic Foil Cowhide",
+      "handle": "stella-metallic",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Stella_0000_Platinum.jpg?v=1718129894",
+      "slug": "stella-metallic-foil-cowhide"
+    },
+    {
+      "name": "Black-Tan Hair-On Large Cheetah Print Cowhide",
+      "handle": "hair-on-print-large-cheetah-black-tan",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/LARGE_LEOPARD.jpg?v=1784764522",
+      "slug": "black-tan-hair-on-large-cheetah-print-cowhide"
+    },
+    {
+      "name": "Roxy Smooth Cowhide",
+      "handle": "roxy-water-repellent",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Roxy_0000_Lilac.jpg?v=1759337701",
+      "slug": "roxy-smooth-cowhide"
+    },
+    {
+      "name": "Kansas Cowhide",
+      "handle": "kansas-cowhide",
+      "groups": [
+        "Cowhide"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Aspen_Mid_Blue.jpg?v=1779321208",
+      "slug": "kansas-cowhide"
+    },
+    {
+      "name": "Prato Honeycomb Embossed Metallic",
+      "handle": "prato-honeycomb",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Prato_0001_Silver.jpg?v=1718130069",
+      "slug": "prato-honeycomb-embossed-metallic"
+    },
+    {
+      "name": "Hair-On Natural Spotted Cow",
+      "handle": "hair-on-natural-spotted",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Hides_Natural_Spotted.jpg?v=1724783632",
+      "slug": "hair-on-natural-spotted-cow"
+    },
+    {
+      "name": "Hair-On Medium Zebra Print Cowhide",
+      "handle": "hair-on-print-medium-zebra",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Hides_Medium_Zebra_Brown.jpg?v=1724802015",
+      "slug": "hair-on-medium-zebra-print-cowhide"
+    },
+    {
+      "name": "Hair-On Mini Zebra Print Cowhide",
+      "handle": "hair-on-print-mini-zebra",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Mini_Zebra.jpg?v=1784828477",
+      "slug": "hair-on-mini-zebra-print-cowhide"
+    },
+    {
+      "name": "Leopard Metallic Cowhide",
+      "handle": "metallic-leopard",
+      "groups": [
+        "Cowhide",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Leopard_Gray_Metallic.jpg?v=1779318402",
+      "slug": "leopard-metallic-cowhide"
+    },
+    {
+      "name": "Hair-On Large Zebra Print Cowhide",
+      "handle": "hair-on-print-large-zebra",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Large_Zebra_Black_and_White_Full.jpg?v=1784763966",
+      "slug": "hair-on-large-zebra-print-cowhide"
+    },
+    {
+      "name": "Black-White Hair-On Large Cheetah Print Cowhide",
+      "handle": "hair-on-print-large-cheetah",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_LargeCheetahBlackWhite.webp?v=1718130931",
+      "slug": "black-white-hair-on-large-cheetah-print-cowhide"
+    },
+    {
+      "name": "Hair-On Butterfly Print Cowhide",
+      "handle": "hair-on-butterfly",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_LasercutButterfly.webp?v=1718130907",
+      "slug": "hair-on-butterfly-print-cowhide"
+    },
+    {
+      "name": "Italian Hair-On Solid Dyed Cowhide",
+      "handle": "italian-solid-hair-on",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Hair_On_Olive.jpg?v=1736470164",
+      "slug": "italian-hair-on-solid-dyed-cowhide"
+    },
+    {
+      "name": "Hair-On Printed Apache Cow",
+      "handle": "apache-printed",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Hides_Apache.jpg?v=1724801881",
+      "slug": "hair-on-printed-apache-cow"
+    },
+    {
+      "name": "Hair-On Python Print Cowhide",
+      "handle": "hair-on-printed-python",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_PythonTan.webp?v=1718129302",
+      "slug": "hair-on-python-print-cowhide"
+    },
+    {
+      "name": "Hair-On Metallic Acid Wash Cowhide",
+      "handle": "hair-on-metallic-acid-wash",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_AcidWashWhiteSilver.webp?v=1718129270",
+      "slug": "hair-on-metallic-acid-wash-cowhide"
+    },
+    {
+      "name": "Hair-On Feather Print Cowhide",
+      "handle": "hair-on-print-feather",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_Feather.webp?v=1718130913",
+      "slug": "hair-on-feather-print-cowhide"
+    },
+    {
+      "name": "Hair-On Garden Floral Print Cowhide",
+      "handle": "hair-on-garden",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_LasercutGarden.webp?v=1718130905",
+      "slug": "hair-on-garden-floral-print-cowhide"
+    },
+    {
+      "name": "Hair-On Laser-Cut Snake Cowhide",
+      "handle": "hair-on-lasercut-snake",
+      "groups": [
+        "Cowhide",
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_LasercutNavy.webp?v=1718130888",
+      "slug": "hair-on-laser-cut-snake-cowhide"
+    },
+    {
+      "name": "Caprice Nappa Lambskin",
+      "handle": "caprice-nappa-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Caprice_Burgundy.jpg?v=1775591228",
+      "slug": "caprice-nappa-lambskin"
+    },
+    {
+      "name": "Metallic Foil Lambskin",
+      "handle": "lamb-foil-metallic",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Foil_Lamb_Silver.jpg?v=1785436863",
+      "slug": "metallic-foil-lambskin"
+    },
+    {
+      "name": "Lamb Suede",
+      "handle": "lamb-suede",
+      "groups": [
+        "Lambskin",
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Lamb_Suede_Burgundy.jpg?v=1765408697",
+      "slug": "lamb-suede"
+    },
+    {
+      "name": "Torino Washed Lambskin",
+      "handle": "torino-washed-lamb",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Lime_Torino.jpg?v=1765408937",
+      "slug": "torino-washed-lambskin"
+    },
+    {
+      "name": "Pearlized Lambskin",
+      "handle": "pearlized-lamb",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Pearl_Pin.jpg?v=1765410061",
+      "slug": "pearlized-lambskin"
+    },
+    {
+      "name": "Stretch Nappa Lambskin",
+      "handle": "nappa-lamb-stretch",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/STRETCH_LAMB_GIF-low.gif?v=1764777681",
+      "slug": "stretch-nappa-lambskin"
+    },
+    {
+      "name": "Bari Soft Matte Lambskin",
+      "handle": "bari-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Bari_Caramel.jpg?v=1766448877",
+      "slug": "bari-soft-matte-lambskin"
+    },
+    {
+      "name": "Smooth Neon Lambskin",
+      "handle": "neon-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Neon_Lamb_Coral.jpg?v=1779319049",
+      "slug": "smooth-neon-lambskin"
+    },
+    {
+      "name": "Borello Wrinkle Washed Lamb",
+      "handle": "borello-wrinkle-washed-lambskin",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Borello_Cognac.jpg?v=1750371889",
+      "slug": "borello-wrinkle-washed-lamb"
+    },
+    {
+      "name": "$25 - Roma Overstock Lambskin",
+      "handle": "roma-overstock-lambskin-copy",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/RomaRed.jpg?v=1762383933",
+      "slug": "25-roma-overstock-lambskin"
+    },
+    {
+      "name": "Portofino Ultra Soft Nappa Lambskin",
+      "handle": "portofino-ultra-soft-nappa-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Portofino_0000_White.jpg?v=1765236568",
+      "slug": "portofino-ultra-soft-nappa-lambskin"
+    },
+    {
+      "name": "Small Round Perforated Lamb",
+      "handle": "perforated-small",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Perforated_Kelly_1c1f2828-f3bb-471f-8bf1-d8beb8d5e0e4.jpg?v=1764891019",
+      "slug": "small-round-perforated-lamb"
+    },
+    {
+      "name": "Camouflage Printed Lamb",
+      "handle": "camouflage",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/unnamed-9.jpg?v=1753395699",
+      "slug": "camouflage-printed-lamb"
+    },
+    {
+      "name": "Dots Embossed Metallic Lamb",
+      "handle": "dots-metallic-embossed",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/DotsMetallic.gif?v=1764777668",
+      "slug": "dots-embossed-metallic-lamb"
+    },
+    {
+      "name": "Western Distressed Lambskin",
+      "handle": "western-distressed-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/unnamed-3.jpg?v=1753395849",
+      "slug": "western-distressed-lambskin"
+    },
+    {
+      "name": "Crackle Neon Lamb",
+      "handle": "crackle-neon",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Crackle_Blue.jpg?v=1755711441",
+      "slug": "crackle-neon-lamb"
+    },
+    {
+      "name": "Smooth Patent Lamb",
+      "handle": "smooth-patent-lamb",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Patent_Lamb_White.jpg?v=1779319437",
+      "slug": "smooth-patent-lamb"
+    },
+    {
+      "name": "Castle Stud Embossed Lamb",
+      "handle": "castle-embossed",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Castle_Tan.jpg?v=1755717738",
+      "slug": "castle-stud-embossed-lamb"
+    },
+    {
+      "name": "Nicola Snake Lamb Suede",
+      "handle": "nicola-snake-suede",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Nicola.jpg?v=1779319662",
+      "slug": "nicola-snake-lamb-suede"
+    },
+    {
+      "name": "Rhino Metallic Bubbly Lambksin",
+      "handle": "rhino-metallic",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Rhino_Tan-Silver.jpg?v=1755709367",
+      "slug": "rhino-metallic-bubbly-lambksin"
+    },
+    {
+      "name": "Senegal Distressed Lambskin",
+      "handle": "senegal-distressed-lambskin",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/NewWesternRed.jpg?v=1736454355",
+      "slug": "senegal-distressed-lambskin"
+    },
+    {
+      "name": "Dots Embossed Lamb",
+      "handle": "dots-embossed",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Dots_Plum.jpg?v=1758133718",
+      "slug": "dots-embossed-lamb"
+    },
+    {
+      "name": "Sofia Snake Embossed Lambskin",
+      "handle": "sofia-snake",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Sofia_Camel.jpg?v=1764626119",
+      "slug": "sofia-snake-embossed-lambskin"
+    },
+    {
+      "name": "Large Oblong Perforated Lamb",
+      "handle": "perforated-large-oblong",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Large_Oblong_Red.jpg?v=1787775433",
+      "slug": "large-oblong-perforated-lamb"
+    },
+    {
+      "name": "Borello Metallic Wrinkle Washed Lambskin",
+      "handle": "borello-metallic-wrinkle-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Borello_Metallic_Vintage_Gold.jpg?v=1766449668",
+      "slug": "borello-metallic-wrinkle-washed-lambskin"
+    },
+    {
+      "name": "Amalfi Natural Grain Lambskin",
+      "handle": "amalfi-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/AmalfiMerlot.jpg?v=1777504405",
+      "slug": "amalfi-natural-grain-lambskin"
+    },
+    {
+      "name": "Stretch Metallic Nappa Lambskin",
+      "handle": "stretch-nappa-metallic",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Stretch_Lamb_Silver.jpg?v=1750895519",
+      "slug": "stretch-metallic-nappa-lambskin"
+    },
+    {
+      "name": "Liquid Patent Lambskin | Copper",
+      "handle": "liquid-patent-lambskin-copper",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/LIQUID_BRONZE.jpg?v=1723048328",
+      "slug": "liquid-patent-lambskin-copper"
+    },
+    {
+      "name": "Burnished Lambskin",
+      "handle": "burnished-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Burnished_Lamb.jpg?v=1779834807",
+      "slug": "burnished-lambskin"
+    },
+    {
+      "name": "Castle Metallic Stud Embossed Lamb",
+      "handle": "castle-metallic-embossed",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Castle_Gold_4baa0bb2-afd8-4a83-baed-57482477c06a.jpg?v=1755717280",
+      "slug": "castle-metallic-stud-embossed-lamb"
+    },
+    {
+      "name": "Prada Metallic Lamb",
+      "handle": "prada-metallic",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Prada.gif?v=1764777678",
+      "slug": "prada-metallic-lamb"
+    },
+    {
+      "name": "Braided Embossed Lambskin",
+      "handle": "braided-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Braided_Lamb_Black.jpg?v=1763068128",
+      "slug": "braided-embossed-lambskin"
+    },
+    {
+      "name": "Iridescent Foil Lamb",
+      "handle": "iridescent-foil",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/IridescentFoilBronze_IridescentFoilBronze.webp?v=1718130734",
+      "slug": "iridescent-foil-lamb"
+    },
+    {
+      "name": "Idaho Distressed Lambskin",
+      "handle": "idaho-distressed",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Idaho_Beige.jpg?v=1792108058",
+      "slug": "idaho-distressed-lambskin"
+    },
+    {
+      "name": "Croc Embossed Lamb",
+      "handle": "croc-embossed-lamb",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Embossed_Lamb_Croc.jpg?v=1787785627",
+      "slug": "croc-embossed-lamb"
+    },
+    {
+      "name": "Metallic Printed Pebble Lamb - Beige/Silver",
+      "handle": "metallic-printed-pebble-lamb-beige-silver",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/MetallicBeige8-10.jpg?v=1742945684",
+      "slug": "metallic-printed-pebble-lamb-beige-silver"
+    },
+    {
+      "name": "Liquid Patent Lambskin | Gold",
+      "handle": "liquid-patent-lambskin-gold",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/LIQUIDGOLD.jpg?v=1723048049",
+      "slug": "liquid-patent-lambskin-gold"
+    },
+    {
+      "name": "Mirror Crocodile Metallic Lamb",
+      "handle": "mirror-croc",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Mirror_Croc_Silver.jpg?v=1787010985",
+      "slug": "mirror-crocodile-metallic-lamb"
+    },
+    {
+      "name": "Liquid Patent Lambskin | Two tone patina (silver/gold)",
+      "handle": "liquid-patent-lambskin-silver",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/LIQUID_SILVER_PATINA.jpg?v=1723048536",
+      "slug": "liquid-patent-lambskin-two-tone-patina-silver-gold"
+    },
+    {
+      "name": "Snake Print Reversible Double Face Lamb Suede",
+      "handle": "snake-double-face-suede",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/SnakeDoubleface_SnakeDoublefaceTobacco.webp?v=1718130779",
+      "slug": "snake-print-reversible-double-face-lamb-suede"
+    },
+    {
+      "name": "Mirror Snake Metallic Lamb",
+      "handle": "mirror-snake",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Mirror_Snake_Gunmetal.jpg?v=1787779895",
+      "slug": "mirror-snake-metallic-lamb"
+    },
+    {
+      "name": "Kenya Distressed Reversible Double Face Lambskin",
+      "handle": "kenya-double-face",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Kenya_Doubleface_Green.jpg?v=1764625298",
+      "slug": "kenya-distressed-reversible-double-face-lambskin"
+    },
+    {
+      "name": "Hole-Punch Cutout Lace Lambskin",
+      "handle": "circular-lace-lambskin",
+      "groups": [
+        "Lambskin",
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/CircularLaceLambskin.jpg?v=1722372196",
+      "slug": "hole-punch-cutout-lace-lambskin"
+    },
+    {
+      "name": "Shrunken Metallic Lamb - Silver",
+      "handle": "shrunken-metallic-lamb-silver",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/ShrunkenMetallic8-10.jpg?v=1742945826",
+      "slug": "shrunken-metallic-lamb-silver"
+    },
+    {
+      "name": "XL 4-Panel Short Curly Shearling",
+      "handle": "xl-4-panel-short-curly-shearling",
+      "groups": [
+        "Lambskin",
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Shearling_Curly.jpg?v=1789082635",
+      "slug": "xl-4-panel-short-curly-shearling"
+    },
+    {
+      "name": "XL 4-Panel Natural Long Shearling",
+      "handle": "xl-4-panel-natural-long-shearling",
+      "groups": [
+        "Lambskin",
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Shearling_Hides-01_a64a8596-39b4-4927-abd8-d91adac6e1d3.webp?v=1776211049",
+      "slug": "xl-4-panel-natural-long-shearling"
+    },
+    {
+      "name": "Triangle Lasercut Lace Lambskin",
+      "handle": "triangle-lasercut-lace-lambskin",
+      "groups": [
+        "Lambskin"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/White_Triangle_Lace.jpg?v=1722442602",
+      "slug": "triangle-lasercut-lace-lambskin"
+    },
+    {
+      "name": "Calf Suede",
+      "handle": "calf-suede",
+      "groups": [
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Calf_Suede_Beige_5374242d-8711-43f4-a074-4a1d278ac676.jpg?v=1765408781",
+      "slug": "calf-suede"
+    },
+    {
+      "name": "Pig Suede",
+      "handle": "pig-suede",
+      "groups": [
+        "Suede & Nubuck"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PigSuede_PigSuedeDark-Taupe.webp?v=1765236085",
+      "slug": "pig-suede"
+    },
+    {
+      "name": "Short Merino Ultra-Soft Shearling",
+      "handle": "short-merino-ultra-soft-shearling",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/MerinoShort.jpg?v=1778714940",
+      "slug": "short-merino-ultra-soft-shearling"
+    },
+    {
+      "name": "Two-Toned Ironed Shearling",
+      "handle": "two-toned-ironed-shearling",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/TwoTonedShearlingOlive.png?v=1750371205",
+      "slug": "two-toned-ironed-shearling"
+    },
+    {
+      "name": "Teddy Curly Shearling",
+      "handle": "teddy-curly-shearling",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/OsloShearlingGray.jpg?v=1734994361",
+      "slug": "teddy-curly-shearling"
+    },
+    {
+      "name": "Mongolian Sheep Fur Blanket/Rug",
+      "handle": "mongolian-fur-blanket",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_MongolianWhite_1.webp?v=1750371295",
+      "slug": "mongolian-sheep-fur-blanket-rug"
+    },
+    {
+      "name": "Ironed Straight Hair Shearling",
+      "handle": "ironed-hair-shearling",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Shearling_Ironed_Denim.webp?v=1718130869",
+      "slug": "ironed-straight-hair-shearling"
+    },
+    {
+      "name": "Curly Hair Shearling",
+      "handle": "curly-hair-shearling",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Beige_Curly_Shearling.jpg?v=1775591074",
+      "slug": "curly-hair-shearling"
+    },
+    {
+      "name": "Natural Long Hair Shearling",
+      "handle": "natural-long-shearling",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/undefined-high-34.gif?v=1764777700",
+      "slug": "natural-long-hair-shearling"
+    },
+    {
+      "name": "Mongolian Sheep Fur",
+      "handle": "mongolian-sheep-fur",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/undefined-high-22.gif?v=1765495004",
+      "slug": "mongolian-sheep-fur"
+    },
+    {
+      "name": "Long Hair Goat Fur",
+      "handle": "long-hair-goat",
+      "groups": [
+        "Shearling & Fur"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/HairOn_LongHairGoatGray.webp?v=1750371802",
+      "slug": "long-hair-goat-fur"
+    },
+    {
+      "name": "Calf Hair",
+      "handle": "calf-hair",
+      "groups": [
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Calf_Hair_Solid_Black.jpg?v=1776900820",
+      "slug": "calf-hair"
+    },
+    {
+      "name": "Acid Wash Calf Hair",
+      "handle": "fine-calfskin-with-hair-on",
+      "groups": [
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Acid_Wash_Calfskin_Denim.jpg?v=1787786067",
+      "slug": "acid-wash-calf-hair"
+    },
+    {
+      "name": "Giraffe Print Calf Hair",
+      "handle": "giraffe-print-calf-hair",
+      "groups": [
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/GIRAFFE_CALF_HAIR.jpg?v=1776900861",
+      "slug": "giraffe-print-calf-hair"
+    },
+    {
+      "name": "Deer Print Calf Hair",
+      "handle": "deer-print-calf-hair",
+      "groups": [
+        "Hair-On"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Deer_Print.jpg?v=1779837389",
+      "slug": "deer-print-calf-hair"
+    },
+    {
+      "name": "Croc Embossed Lamb - Pink",
+      "handle": "croc-embossed-lamb-pink",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PinkCroc6-8.jpg?v=1742945643",
+      "slug": "croc-embossed-lamb-pink"
+    },
+    {
+      "name": "Lizard Print Metallic Lamb - Copper",
+      "handle": "lizard-print-metallic-lamb-copper",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/CopperMetallic8-10.jpg?v=1742945603",
+      "slug": "lizard-print-metallic-lamb-copper"
+    },
+    {
+      "name": "Embossed Lizard Lamb - Blue",
+      "handle": "embossed-lizard-lamb-blue",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/BlueLizard8-10.jpg?v=1742945717",
+      "slug": "embossed-lizard-lamb-blue"
+    },
+    {
+      "name": "Python Gloss - Beige",
+      "handle": "python-gloss-beige",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PythonBeige8-10.jpg?v=1742945537",
+      "slug": "python-gloss-beige"
+    },
+    {
+      "name": "Lizard Print Metallic Lamb - Charcoal",
+      "handle": "lizard-print-metallic-lamb-charcoal",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/GraphiteMetallic.jpg?v=1742945555",
+      "slug": "lizard-print-metallic-lamb-charcoal"
+    },
+    {
+      "name": "Ruched Leather | Black",
+      "handle": "ruched-leather-black",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/RUCHED_BLACK_PIGSKIN.jpg?v=1723072611",
+      "slug": "ruched-leather-black"
+    },
+    {
+      "name": "Python Gloss - Orange",
+      "handle": "python-gloss-orange",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/PythonOrange6-8.jpg?v=1742945423",
+      "slug": "python-gloss-orange"
+    },
+    {
+      "name": "Embossed Belly Croc Overstock",
+      "handle": "embossed-belly-croc-overstock",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/LargeEmbossedScaleTaupe.jpg?v=1745350907",
+      "slug": "embossed-belly-croc-overstock"
+    },
+    {
+      "name": "Embossed Hornback Suede",
+      "handle": "embossed-hornback-suede",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/CrocEmbossedSuedeTurquoise.jpg?v=1745351038",
+      "slug": "embossed-hornback-suede"
+    },
+    {
+      "name": "Ruched Leather | Chocolate",
+      "handle": "ruched-leather-chocolate",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/RUCHED_CHOCOLATE_PIGSKIN.jpg?v=1723073465",
+      "slug": "ruched-leather-chocolate"
+    },
+    {
+      "name": "Ruched Leather | White",
+      "handle": "ruched-leather-white",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/RUCHED_WHITE_PIGSKIN.jpg?v=1723073595",
+      "slug": "ruched-leather-white"
+    },
+    {
+      "name": "Ruched Leather | Cherry",
+      "handle": "ruched-leather-cherry",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/RUCHED_CHERRY_PIGSKIN.jpg?v=1723072746",
+      "slug": "ruched-leather-cherry"
+    },
+    {
+      "name": "Metallic Foil Cowhide",
+      "handle": "metallic-foil-cow",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/New_FoilCowGold.webp?v=1718131051",
+      "slug": "metallic-foil-cowhide"
+    },
+    {
+      "name": "Ruched Leather | Red",
+      "handle": "ruched-leather-red",
+      "groups": [
+        "Novelty"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/RUCHED_RED_PIGSKIN.jpg?v=1723073333",
+      "slug": "ruched-leather-red"
+    },
+    {
+      "name": "Galaxy Vegan Leather",
+      "handle": "galaxy-vegan",
+      "groups": [
+        "Vegan"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Vegan_GalaxyVeganCognac.webp?v=1718130270",
+      "slug": "galaxy-vegan-leather"
+    },
+    {
+      "name": "Terra Vegan Leather",
+      "handle": "terra-vegan-leather",
+      "groups": [
+        "Vegan"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Terra_Vegan.jpg?v=1721167890",
+      "slug": "terra-vegan-leather"
+    },
+    {
+      "name": "Venus Vegan Leather",
+      "handle": "venus-vegan-leather",
+      "groups": [
+        "Vegan"
+      ],
+      "sourceImage": "https://cdn.shopify.com/s/files/1/0061/5976/1478/files/Vegan_VenusVeganMustard.webp?v=1718130301",
+      "slug": "venus-vegan-leather"
+    }
+  ]
+}

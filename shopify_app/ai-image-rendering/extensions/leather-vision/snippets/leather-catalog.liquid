@@ -1,0 +1,680 @@
+{% doc %}
+  Leather article picker generated from catalog/leathers.json.
+  Rebuild with node scripts/build-leather-catalog.mjs.
+  @param {string} block_id - The app block instance identifier.
+{% enddoc %}
+<div class="lv__field">
+  <label class="lv__label" for="lv-leather-group-{{ block_id }}">{{ 'leather_vision.catalog_group' | t }}</label>
+  <select id="lv-leather-group-{{ block_id }}" class="lv__input" data-leather-group>
+    <option value="">{{ 'leather_vision.catalog_all' | t }}</option>
+    <option value="Cowhide">{{ 'leather_vision.catalog_groups.group-0' | t }}</option>
+    <option value="Lambskin">{{ 'leather_vision.catalog_groups.group-1' | t }}</option>
+    <option value="Suede &amp; Nubuck">{{ 'leather_vision.catalog_groups.group-2' | t }}</option>
+    <option value="Shearling &amp; Fur">{{ 'leather_vision.catalog_groups.group-3' | t }}</option>
+    <option value="Hair-On">{{ 'leather_vision.catalog_groups.group-4' | t }}</option>
+    <option value="Novelty">{{ 'leather_vision.catalog_groups.group-5' | t }}</option>
+    <option value="Vegan">{{ 'leather_vision.catalog_groups.group-6' | t }}</option>
+  </select>
+</div>
+<fieldset class="lv__choices lv__choices--catalog" aria-labelledby="lv-flow-title-1-{{ block_id }}">
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="liquid-patent-cow" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-liquid-patent-cow.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.liquid-patent-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="plonge-lightweight-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-plonge-lightweight-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.plonge-lightweight-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="buffalo-pebble" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-buffalo-pebble.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.buffalo-pebble' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="atlas-full-grain" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-atlas-full-grain.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.atlas-full-grain' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="sassari-embossed" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-sassari-embossed.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sassari-embossed' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="crocodile-patent-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-crocodile-patent-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.crocodile-patent-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="barcelona-soft-full-grain-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-barcelona-soft-full-grain-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.barcelona-soft-full-grain-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="tennessee-italian" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-tennessee-italian.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.tennessee-italian' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="verona-vintage-distressed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-verona-vintage-distressed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.verona-vintage-distressed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="vermont-distressed-veg-tanned-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-vermont-distressed-veg-tanned-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.vermont-distressed-veg-tanned-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="stardust-glitter-cow" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-stardust-glitter-cow.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stardust-glitter-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="classic-crocodile-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-classic-crocodile-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.classic-crocodile-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="stingray-embossed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-stingray-embossed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stingray-embossed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="lorenzo-veg-tanned-firm-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-lorenzo-veg-tanned-firm-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.lorenzo-veg-tanned-firm-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="capri-embossed-pebble-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-capri-embossed-pebble-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.capri-embossed-pebble-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="cobra-matte-snake-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-cobra-matte-snake-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.cobra-matte-snake-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="sparkle-cow-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-sparkle-cow-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sparkle-cow-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="lugano-full-grain" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-lugano-full-grain.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.lugano-full-grain' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="phoenix-pebble-grain-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-phoenix-pebble-grain-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.phoenix-pebble-grain-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="sorrento-veg-tanned-natural-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-sorrento-veg-tanned-natural-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sorrento-veg-tanned-natural-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="boa-snake-print-embossed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-boa-snake-print-embossed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.boa-snake-print-embossed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="bomber-distressed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-bomber-distressed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.bomber-distressed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="smooth-neon-cow" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-smooth-neon-cow.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.smooth-neon-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="africa-python-snake-embossed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-africa-python-snake-embossed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.africa-python-snake-embossed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="cosmo-italian-pebble-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-cosmo-italian-pebble-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.cosmo-italian-pebble-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="sahara-snake-print-embossed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-sahara-snake-print-embossed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sahara-snake-print-embossed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="italian-hornback-crocodile-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-italian-hornback-crocodile-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.italian-hornback-crocodile-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="chameleon-uv-color-changing-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-chameleon-uv-color-changing-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.chameleon-uv-color-changing-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="nubuck" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-nubuck.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.nubuck' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="rodeo-full-grain-pebble-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-rodeo-full-grain-pebble-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.rodeo-full-grain-pebble-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="kenya-python-foil-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-kenya-python-foil-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.kenya-python-foil-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="arizona-lightweight-distressed" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-arizona-lightweight-distressed.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.arizona-lightweight-distressed' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="boston-full-grain-water-repellent-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-boston-full-grain-water-repellent-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.boston-full-grain-water-repellent-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="london-smooth-full-grain-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-london-smooth-full-grain-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.london-smooth-full-grain-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="smooth-matte-leopard-veg-tanned-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-smooth-matte-leopard-veg-tanned-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.smooth-matte-leopard-veg-tanned-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="ribbed-black-leather" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ribbed-black-leather.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ribbed-black-leather' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="skyline-italian-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-skyline-italian-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.skyline-italian-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="doubleface-classic-reversible-calfskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-doubleface-classic-reversible-calfskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.doubleface-classic-reversible-calfskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="madison-soft-veg-tanned-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-madison-soft-veg-tanned-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.madison-soft-veg-tanned-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="stone-wash-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-stone-wash-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stone-wash-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="africa-python-metallic-snake-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-africa-python-metallic-snake-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.africa-python-metallic-snake-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="caspian-veg-tanned-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-caspian-veg-tanned-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.caspian-veg-tanned-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="lauren-calfskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-lauren-calfskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.lauren-calfskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="ralph-calfskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ralph-calfskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ralph-calfskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="avalon-italian-pebble-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-avalon-italian-pebble-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.avalon-italian-pebble-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="monte-carlo-natural-grain-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-monte-carlo-natural-grain-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.monte-carlo-natural-grain-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="denim-printed-calf-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-denim-printed-calf-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.denim-printed-calf-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="fuzzy-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-fuzzy-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.fuzzy-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="atlantic-smooth-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-atlantic-smooth-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.atlantic-smooth-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="crazy-horse-veg-tanned-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-crazy-horse-veg-tanned-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.crazy-horse-veg-tanned-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="winston-veg-tanned-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-winston-veg-tanned-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.winston-veg-tanned-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On|Novelty">
+  <input type="radio" name="leather" value="hair-on-tiger-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-tiger-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-tiger-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="utah-distressed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-utah-distressed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.utah-distressed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="iridescent-foil-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-iridescent-foil-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.iridescent-foil-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="doubleface-reversible-pebble-calfskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-doubleface-reversible-pebble-calfskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.doubleface-reversible-pebble-calfskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="doubleface-reversible-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-doubleface-reversible-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.doubleface-reversible-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="amazon-snake-print-calfskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-amazon-snake-print-calfskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.amazon-snake-print-calfskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="imperial-natural-pebble-grain-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-imperial-natural-pebble-grain-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.imperial-natural-pebble-grain-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="sydney-crocodile-embossed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-sydney-crocodile-embossed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sydney-crocodile-embossed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="picasso-smooth-full-grain-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-picasso-smooth-full-grain-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.picasso-smooth-full-grain-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="viper-snake-embossed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-viper-snake-embossed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.viper-snake-embossed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-small-cheetah-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-small-cheetah-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-small-cheetah-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="pacific-veg-tanned-natural-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-pacific-veg-tanned-natural-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.pacific-veg-tanned-natural-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-natural-tricolor-cow" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-natural-tricolor-cow.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-natural-tricolor-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-medium-cheetah-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-medium-cheetah-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-medium-cheetah-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="victoria-nubuck-distressed-water-repellent-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-victoria-nubuck-distressed-water-repellent-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.victoria-nubuck-distressed-water-repellent-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="rocky-natural-distressed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-rocky-natural-distressed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.rocky-natural-distressed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="stella-metallic-foil-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-stella-metallic-foil-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stella-metallic-foil-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="black-tan-hair-on-large-cheetah-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-black-tan-hair-on-large-cheetah-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.black-tan-hair-on-large-cheetah-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="roxy-smooth-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-roxy-smooth-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.roxy-smooth-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide">
+  <input type="radio" name="leather" value="kansas-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-kansas-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.kansas-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="prato-honeycomb-embossed-metallic" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-prato-honeycomb-embossed-metallic.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.prato-honeycomb-embossed-metallic' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-natural-spotted-cow" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-natural-spotted-cow.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-natural-spotted-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-medium-zebra-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-medium-zebra-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-medium-zebra-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-mini-zebra-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-mini-zebra-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-mini-zebra-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Novelty">
+  <input type="radio" name="leather" value="leopard-metallic-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-leopard-metallic-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.leopard-metallic-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-large-zebra-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-large-zebra-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-large-zebra-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="black-white-hair-on-large-cheetah-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-black-white-hair-on-large-cheetah-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.black-white-hair-on-large-cheetah-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-butterfly-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-butterfly-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-butterfly-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="italian-hair-on-solid-dyed-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-italian-hair-on-solid-dyed-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.italian-hair-on-solid-dyed-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-printed-apache-cow" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-printed-apache-cow.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-printed-apache-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-python-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-python-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-python-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-metallic-acid-wash-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-metallic-acid-wash-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-metallic-acid-wash-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-feather-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-feather-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-feather-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-garden-floral-print-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-garden-floral-print-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-garden-floral-print-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Cowhide|Hair-On">
+  <input type="radio" name="leather" value="hair-on-laser-cut-snake-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hair-on-laser-cut-snake-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hair-on-laser-cut-snake-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="caprice-nappa-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-caprice-nappa-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.caprice-nappa-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="metallic-foil-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-metallic-foil-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.metallic-foil-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="lamb-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-lamb-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.lamb-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="torino-washed-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-torino-washed-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.torino-washed-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="pearlized-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-pearlized-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.pearlized-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="stretch-nappa-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-stretch-nappa-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stretch-nappa-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="bari-soft-matte-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-bari-soft-matte-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.bari-soft-matte-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="smooth-neon-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-smooth-neon-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.smooth-neon-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="borello-wrinkle-washed-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-borello-wrinkle-washed-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.borello-wrinkle-washed-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="25-roma-overstock-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-25-roma-overstock-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.25-roma-overstock-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="portofino-ultra-soft-nappa-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-portofino-ultra-soft-nappa-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.portofino-ultra-soft-nappa-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="small-round-perforated-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-small-round-perforated-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.small-round-perforated-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="camouflage-printed-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-camouflage-printed-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.camouflage-printed-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="dots-embossed-metallic-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-dots-embossed-metallic-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.dots-embossed-metallic-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="western-distressed-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-western-distressed-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.western-distressed-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="crackle-neon-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-crackle-neon-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.crackle-neon-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="smooth-patent-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-smooth-patent-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.smooth-patent-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="castle-stud-embossed-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-castle-stud-embossed-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.castle-stud-embossed-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="nicola-snake-lamb-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-nicola-snake-lamb-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.nicola-snake-lamb-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="rhino-metallic-bubbly-lambksin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-rhino-metallic-bubbly-lambksin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.rhino-metallic-bubbly-lambksin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="senegal-distressed-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-senegal-distressed-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.senegal-distressed-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="dots-embossed-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-dots-embossed-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.dots-embossed-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="sofia-snake-embossed-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-sofia-snake-embossed-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sofia-snake-embossed-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="large-oblong-perforated-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-large-oblong-perforated-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.large-oblong-perforated-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="borello-metallic-wrinkle-washed-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-borello-metallic-wrinkle-washed-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.borello-metallic-wrinkle-washed-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="amalfi-natural-grain-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-amalfi-natural-grain-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.amalfi-natural-grain-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="stretch-metallic-nappa-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-stretch-metallic-nappa-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stretch-metallic-nappa-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="liquid-patent-lambskin-copper" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-liquid-patent-lambskin-copper.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.liquid-patent-lambskin-copper' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="burnished-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-burnished-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.burnished-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="castle-metallic-stud-embossed-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-castle-metallic-stud-embossed-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.castle-metallic-stud-embossed-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="prada-metallic-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-prada-metallic-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.prada-metallic-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="braided-embossed-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-braided-embossed-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.braided-embossed-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="iridescent-foil-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-iridescent-foil-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.iridescent-foil-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="idaho-distressed-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-idaho-distressed-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.idaho-distressed-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="croc-embossed-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-croc-embossed-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.croc-embossed-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="metallic-printed-pebble-lamb-beige-silver" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-metallic-printed-pebble-lamb-beige-silver.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.metallic-printed-pebble-lamb-beige-silver' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="liquid-patent-lambskin-gold" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-liquid-patent-lambskin-gold.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.liquid-patent-lambskin-gold' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="mirror-crocodile-metallic-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-mirror-crocodile-metallic-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.mirror-crocodile-metallic-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="liquid-patent-lambskin-two-tone-patina-silver-gold" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-liquid-patent-lambskin-two-tone-patina-silver-gold.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.liquid-patent-lambskin-two-tone-patina-silver-gold' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="snake-print-reversible-double-face-lamb-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-snake-print-reversible-double-face-lamb-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.snake-print-reversible-double-face-lamb-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="mirror-snake-metallic-lamb" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-mirror-snake-metallic-lamb.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.mirror-snake-metallic-lamb' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="kenya-distressed-reversible-double-face-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-kenya-distressed-reversible-double-face-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.kenya-distressed-reversible-double-face-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Novelty">
+  <input type="radio" name="leather" value="hole-punch-cutout-lace-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-hole-punch-cutout-lace-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.hole-punch-cutout-lace-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="shrunken-metallic-lamb-silver" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-shrunken-metallic-lamb-silver.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.shrunken-metallic-lamb-silver' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Shearling &amp; Fur">
+  <input type="radio" name="leather" value="xl-4-panel-short-curly-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-xl-4-panel-short-curly-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.xl-4-panel-short-curly-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin|Shearling &amp; Fur">
+  <input type="radio" name="leather" value="xl-4-panel-natural-long-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-xl-4-panel-natural-long-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.xl-4-panel-natural-long-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Lambskin">
+  <input type="radio" name="leather" value="triangle-lasercut-lace-lambskin" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-triangle-lasercut-lace-lambskin.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.triangle-lasercut-lace-lambskin' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="calf-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-calf-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.calf-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Suede &amp; Nubuck">
+  <input type="radio" name="leather" value="pig-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-pig-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.pig-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="short-merino-ultra-soft-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-short-merino-ultra-soft-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.short-merino-ultra-soft-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="two-toned-ironed-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-two-toned-ironed-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.two-toned-ironed-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="teddy-curly-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-teddy-curly-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.teddy-curly-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="mongolian-sheep-fur-blanket-rug" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-mongolian-sheep-fur-blanket-rug.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.mongolian-sheep-fur-blanket-rug' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="ironed-straight-hair-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ironed-straight-hair-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ironed-straight-hair-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="curly-hair-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-curly-hair-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.curly-hair-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="natural-long-hair-shearling" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-natural-long-hair-shearling.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.natural-long-hair-shearling' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="mongolian-sheep-fur" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-mongolian-sheep-fur.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.mongolian-sheep-fur' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Shearling &amp; Fur">
+  <input type="radio" name="leather" value="long-hair-goat-fur" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-long-hair-goat-fur.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.long-hair-goat-fur' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Hair-On">
+  <input type="radio" name="leather" value="calf-hair" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-calf-hair.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.calf-hair' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Hair-On">
+  <input type="radio" name="leather" value="acid-wash-calf-hair" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-acid-wash-calf-hair.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.acid-wash-calf-hair' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Hair-On">
+  <input type="radio" name="leather" value="giraffe-print-calf-hair" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-giraffe-print-calf-hair.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.giraffe-print-calf-hair' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Hair-On">
+  <input type="radio" name="leather" value="deer-print-calf-hair" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-deer-print-calf-hair.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.deer-print-calf-hair' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="croc-embossed-lamb-pink" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-croc-embossed-lamb-pink.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.croc-embossed-lamb-pink' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="lizard-print-metallic-lamb-copper" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-lizard-print-metallic-lamb-copper.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.lizard-print-metallic-lamb-copper' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="embossed-lizard-lamb-blue" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-embossed-lizard-lamb-blue.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.embossed-lizard-lamb-blue' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="python-gloss-beige" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-python-gloss-beige.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.python-gloss-beige' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="lizard-print-metallic-lamb-charcoal" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-lizard-print-metallic-lamb-charcoal.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.lizard-print-metallic-lamb-charcoal' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="ruched-leather-black" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ruched-leather-black.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ruched-leather-black' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="python-gloss-orange" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-python-gloss-orange.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.python-gloss-orange' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="embossed-belly-croc-overstock" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-embossed-belly-croc-overstock.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.embossed-belly-croc-overstock' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="embossed-hornback-suede" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-embossed-hornback-suede.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.embossed-hornback-suede' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="ruched-leather-chocolate" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ruched-leather-chocolate.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ruched-leather-chocolate' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="ruched-leather-white" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ruched-leather-white.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ruched-leather-white' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="ruched-leather-cherry" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ruched-leather-cherry.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ruched-leather-cherry' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="metallic-foil-cowhide" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-metallic-foil-cowhide.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.metallic-foil-cowhide' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Novelty">
+  <input type="radio" name="leather" value="ruched-leather-red" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-ruched-leather-red.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.ruched-leather-red' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Vegan">
+  <input type="radio" name="leather" value="galaxy-vegan-leather" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-galaxy-vegan-leather.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.galaxy-vegan-leather' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Vegan">
+  <input type="radio" name="leather" value="terra-vegan-leather" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-terra-vegan-leather.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.terra-vegan-leather' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+<label class="lv__choice" data-leather-groups="Vegan">
+  <input type="radio" name="leather" value="venus-vegan-leather" required data-lv-field>
+  <span class="lv__choice-tile"><img src="{{ 'lv-catalog-venus-vegan-leather.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.venus-vegan-leather' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
+</label>
+</fieldset>

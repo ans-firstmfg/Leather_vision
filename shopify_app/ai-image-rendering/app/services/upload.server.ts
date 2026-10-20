@@ -70,7 +70,7 @@ export async function parseGenerationFormData(form: FormData):
   if (leather && !isLeather(leather)) {
     return { ok: false, error: "Invalid leather type." };
   }
-  const variationCount = Number(form.get("variationCount") ?? 2);
+  const variationCount = Number(form.get("variationCount") ?? 1);
   if (!Number.isInteger(variationCount) || variationCount < 1 || variationCount > 4) {
     return { ok: false, error: "Choose between 1 and 4 variations." };
   }

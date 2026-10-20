@@ -4,6 +4,8 @@ Leather Vision is a Shopify embedded app and theme app extension. Customers choo
 
 ## Architecture
 
+The leather picker contains 165 unique articles imported from [United Leather's Leather Vision catalogue](https://unitedleather.com/leather-vision) on October 17, 2026, across seven overlapping groups. `catalog/leathers.json` records the names, group memberships, product handles, and source image URLs. The app serves optimized local 240×240 JPEG thumbnails, without a live dependency on the supplier site or its API credentials. `scripts/build-leather-catalog.mjs` generates the translated labels and Liquid picker snippet during the storefront build. The backend reads the same catalogue for allowed material choices. The existing colour palette is independent of this article import; supplier stock and per-article colour availability are not synchronized.
+
 - React Router 7 / React 19 serves the merchant dashboard, authentication, webhooks, and app proxy routes.
 - Shopify's official React Router package handles merchant authentication, signed proxy requests, and webhooks.
 - Prisma / SQLite stores Shopify sessions and durable generation jobs.
@@ -53,7 +55,7 @@ Restart your existing development server after changing configuration. Keep the 
 
 This adapter supports text generation and editing one uploaded reference using FLUX.2 Klein 4B. Output is square at 256 or 512 pixels (default 512). Reference images are normalized to PNG within 448×448 pixels, preserving aspect ratio, to meet the model's below-512 input restriction. Requests use multipart form data even without a reference. See the [model request requirements](https://developers.cloudflare.com/changelog/post/2026-01-15-flux-2-klein-4b-workers-ai/).
 
-Workers AI currently includes 10,000 neurons per day, shared across the account. On the Workers Free plan, requests fail after the daily allowance is exhausted; paid plans can incur overage charges. Confirm your account's plan, model access, and usage before live testing. The storefront currently requests two variations per generation, making two provider calls. The adapter does not automatically retry or fall back to another provider. See [Cloudflare pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/).
+Workers AI currently includes 10,000 neurons per day, shared across the account. On the Workers Free plan, requests fail after the daily allowance is exhausted; paid plans can incur overage charges. Confirm your account's plan, model access, and usage before live testing. The storefront requests one image per generation, making one provider call. The adapter does not automatically retry or fall back to another provider. See [Cloudflare pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/).
 
 Uploaded references and instructions are sent to Cloudflare. Update your store's customer-facing privacy information before public use. Automated tests mock all Cloudflare requests; successful mocked tests do not establish live account access or image quality. Once credentials and free-tier access are confirmed, check one text-only request and one reference-edit request before testing the complete storefront flow.
 
@@ -74,7 +76,7 @@ PUTER_IMAGE_QUALITY=512
 PUTER_TEST_MODE=false
 ```
 
-No OpenAI or Google API key is required for this mode. Choose specifications and optionally supply a sample image, then click **Generate designs**. Allow the sign-in popup when needed and sign in to your own Puter account. The storefront requests two variations per generation. A signed-in Puter account covers each variation's usage; its free monthly allowance is limited and exhausted accounts may be prompted to upgrade. See [Puter's user-pays documentation](https://docs.puter.com/user-pays-model/).
+No OpenAI or Google API key is required for this mode. Choose specifications and optionally supply a sample image, then click **Generate designs**. Allow the sign-in popup when needed and sign in to your own Puter account. The storefront requests one image per generation. A signed-in Puter account covers each variation's usage; its free monthly allowance is limited and exhausted accounts may be prompted to upgrade. See [Puter's user-pays documentation](https://docs.puter.com/user-pays-model/).
 
 The Puter SDK is loaded only when this provider is selected. The server's validated choices build the prompts and normalize the optional reference. The browser calls `puter.ai.txt2img` with the configured model/quality and optional data-URI reference; returned images are downloaded in the browser and uploaded as bytes to `POST /apps/leather-vision/generations/:id/result`. Provider URLs are never fetched by our backend, and Puter account credentials are never sent to our backend. The result endpoint verifies the signed proxy, ownership, capability, count/order, request size, decoded image format and pixel limits, and stores private normalized PNGs. Selection and cart attachment use the existing routes.
 

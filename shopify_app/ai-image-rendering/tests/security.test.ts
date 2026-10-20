@@ -22,6 +22,8 @@ import { action as startGeneration } from "../app/routes/proxy.generations";
 import { action as saveClientResult } from "../app/routes/proxy.generations.$id.result";
 import { loader as providerConfig } from "../app/routes/proxy.config";
 import { puterConfiguration, cloudflareConfiguration } from "../app/services/ai/config.server";
+import catalogue from "../catalog/leathers.json";
+import { isLeather, leatherLabel } from "../app/services/materials.server";
 
 const owner = { shop: "test.myshopify.com", customerId: null, actorHash: "visitor" };
 const options = { variationCount: 2 };
@@ -42,6 +44,25 @@ test("supplied leather categories are accepted and described in generation promp
   }
 });
 let png: Buffer;
+
+test("every imported leather has a valid local thumbnail and can be submitted for generation", async () => {
+  assert.equal(catalogue.groups.length, 7);
+  assert.equal(catalogue.articles.length, 165);
+  assert.equal(new Set(catalogue.articles.map((article) => article.slug)).size, 165);
+  for (const article of catalogue.articles) {
+    assert.equal(isLeather(article.slug), true, article.slug);
+    assert.ok(article.groups.every((group) => catalogue.groups.includes(group)));
+    const form = new FormData();
+    form.set("leather", article.slug); form.set("color", "Red");
+    const parsed = await parseGenerationFormData(form);
+    assert.equal(parsed.ok, true, article.slug);
+    if (parsed.ok) assert.ok(buildEditPrompt({ ...parsed.data, hasReferenceImage: false }, 0).includes(leatherLabel(article.slug)!));
+    const metadata = await sharp(`extensions/leather-vision/assets/lv-catalog-${article.slug}.jpg`).metadata();
+    assert.equal(metadata.width, 240); assert.equal(metadata.height, 240);
+    assert.equal(metadata.format, "jpeg");
+  }
+  assert.equal(isLeather("not-a-catalogue-leather"), false);
+});
 
 function clientArgs(id: string, token: string, form: FormData, shop = owner.shop) {
   const url = new URL(request(id, token, shop).url);

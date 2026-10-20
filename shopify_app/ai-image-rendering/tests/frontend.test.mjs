@@ -6,7 +6,10 @@ import { JSDOM, VirtualConsole } from "jsdom";
 const source = await readFile("extensions/leather-vision/assets/leather-vision.js", "utf8");
 const puterSource = await readFile("extensions/leather-vision/assets/leather-vision-puter.js", "utf8");
 const flowSource = await readFile("extensions/leather-vision/assets/leather-vision-flow.js", "utf8");
-const block = await readFile("extensions/leather-vision/blocks/leather-vision.liquid", "utf8");
+const catalogue = JSON.parse(await readFile("catalog/leathers.json", "utf8"));
+const catalogueSnippet = await readFile("extensions/leather-vision/snippets/leather-catalog.liquid", "utf8");
+const block = (await readFile("extensions/leather-vision/blocks/leather-vision.liquid", "utf8"))
+  .replace("{% render 'leather-catalog', block_id: block.id %}", catalogueSnippet);
 const copy = JSON.parse(await readFile("extensions/leather-vision/locales/en.default.json", "utf8")).leather_vision;
 const id = "00000000-0000-4000-8000-000000000000", token = "a".repeat(64);
 
@@ -205,6 +208,7 @@ test("customers can generate from choices with the sample upload after instructi
   assert.equal(posted.get("leather"), "atlas-full-grain");
   assert.equal(posted.get("color"), "Camel");
   assert.equal(posted.get("instructions"), "Add brass buttons");
+  assert.equal(posted.get("variationCount"), "1");
   assert.equal(root.results.hidden, false);
   assert.equal(root.errorEl.hidden, true);
   root.remove(); window.close();
@@ -299,6 +303,28 @@ test("real storefront markup resumes a job, selects a variation, and sends only 
   }
   assert.equal(root.querySelector(".lv__card-img").getAttribute("src"), "blob:test");
   root.remove(); instance.window.close();
+});
+
+test("catalogue groups filter all unique leather choices and preserve the selected article", async () => {
+  const { root, window } = await storefront(async () => { throw new Error("No generation expected"); });
+  const cards = [...root.querySelectorAll("[data-leather-groups]")];
+  assert.equal(cards.length, catalogue.articles.length);
+  const selected = root.querySelector('input[value="atlas-full-grain"]');
+  selected.closest("label").querySelector(".lv__choice-label").textContent = "Atlas Full Grain Cowhide";
+  root.querySelector("leather-vision-flow").update();
+  assert.equal(root.querySelector('[data-flow-step="1"] [data-flow-summary]').textContent, "Atlas Full Grain Cowhide");
+  const group = root.querySelector("[data-leather-group]");
+  for (const label of catalogue.groups) {
+    group.value = label;
+    group.dispatchEvent(new window.Event("change", { bubbles: true }));
+    const visible = cards.filter((card) => !card.hidden);
+    assert.equal(visible.length, catalogue.articles.filter((article) => article.groups.includes(label)).length);
+    assert.ok(visible.every((card) => card.dataset.leatherGroups.split("|").includes(label)));
+    assert.equal(root.form.elements.leather.value, "atlas-full-grain");
+  }
+  group.value = ""; group.dispatchEvent(new window.Event("change", { bubbles: true }));
+  assert.equal(cards.filter((card) => !card.hidden).length, catalogue.articles.length);
+  root.remove(); window.close();
 });
 
 test("provider connection recovers on Generate without reloading or replaying a generation", async () => {

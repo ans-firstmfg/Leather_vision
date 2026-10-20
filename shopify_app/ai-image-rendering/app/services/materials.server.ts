@@ -1,3 +1,5 @@
+import catalogue from "../../catalog/leathers.json";
+
 const PRODUCT_TYPES: Record<string, string> = {
   briefcase: "briefcase",
   wallet: "wallet",
@@ -8,6 +10,7 @@ const PRODUCT_TYPES: Record<string, string> = {
 };
 
 const LEATHERS: Record<string, string> = {
+  ...Object.fromEntries(catalogue.articles.map((article) => [article.slug, article.name])),
   "atlas-full-grain": "Atlas full-grain leather",
   "buffalo-pebble": "Buffalo pebble leather with a pebbled grain",
   "sassari-embossed": "Sassari embossed leather with a woven basket pattern",

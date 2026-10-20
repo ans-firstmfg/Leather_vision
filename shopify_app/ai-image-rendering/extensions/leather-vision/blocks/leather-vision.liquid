@@ -57,26 +57,9 @@
     <h3 class="lv__flow-heading"><span class="lv__section-header">
       <span class="lv__flow-number" aria-hidden="true">1</span><span class="lv__flow-title"><span id="lv-flow-title-1-{{ block.id }}">{{ 'leather_vision.flow_category' | t }}</span><small data-flow-summary></small></span>
     </span></h3>
-    <div class="lv__flow-panel" id="lv-flow-1-{{ block.id }}" data-flow-panel ><fieldset class="lv__choices" aria-labelledby="lv-flow-title-1-{{ block.id }}"><label class="lv__choice ">
-      <input type="radio" name="leather" value="atlas-full-grain" required data-lv-field data-label="{{ 'leather_vision.flow_categories.atlas-full-grain' | t | escape }}">
-      <span class="lv__choice-tile"><img src="{{ 'lv-leather-atlas-full-grain.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.atlas-full-grain' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
-    </label>
-<label class="lv__choice ">
-      <input type="radio" name="leather" value="buffalo-pebble" required data-lv-field data-label="{{ 'leather_vision.flow_categories.buffalo-pebble' | t | escape }}">
-      <span class="lv__choice-tile"><img src="{{ 'lv-leather-buffalo-pebble.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.buffalo-pebble' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
-    </label>
-<label class="lv__choice ">
-      <input type="radio" name="leather" value="sassari-embossed" required data-lv-field data-label="{{ 'leather_vision.flow_categories.sassari-embossed' | t | escape }}">
-      <span class="lv__choice-tile"><img src="{{ 'lv-leather-sassari-embossed.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.sassari-embossed' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
-    </label>
-<label class="lv__choice ">
-      <input type="radio" name="leather" value="stardust-glitter-cow" required data-lv-field data-label="{{ 'leather_vision.flow_categories.stardust-glitter-cow' | t | escape }}">
-      <span class="lv__choice-tile"><img src="{{ 'lv-leather-stardust-glitter-cow.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.stardust-glitter-cow' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
-    </label>
-<label class="lv__choice ">
-      <input type="radio" name="leather" value="tennessee-italian" required data-lv-field data-label="{{ 'leather_vision.flow_categories.tennessee-italian' | t | escape }}">
-      <span class="lv__choice-tile"><img src="{{ 'lv-leather-tennessee-italian.jpg' | asset_url }}" alt="" width="320" height="200" loading="lazy"><span class="lv__choice-label">{{ 'leather_vision.flow_categories.tennessee-italian' | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span>
-    </label></fieldset></div>
+    <div class="lv__flow-panel" id="lv-flow-1-{{ block.id }}" data-flow-panel>
+      {% render 'leather-catalog', block_id: block.id %}
+    </div>
   </section>
   <section class="lv__flow-step" data-flow-step="2">
     <h3 class="lv__flow-heading"><span class="lv__section-header">
@@ -153,7 +136,7 @@
       <div class="lv__preview" data-lv-preview hidden></div>
     </div>
 
-    <input type="hidden" name="variationCount" value="2">
+    <input type="hidden" name="variationCount" value="1">
     <div class="lv__actions">
       <button type="submit" class="lv__btn" data-lv-submit>{{ 'leather_vision.submit' | t }}</button>
     </div>
