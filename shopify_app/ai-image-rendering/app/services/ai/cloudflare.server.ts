@@ -43,7 +43,7 @@ async function payload(response: Response): Promise<unknown> {
 
 export const cloudflareProvider: ImageEditProvider = {
   id: "cloudflare",
-  async editImage({ imagePng, prompt, signal }) {
+  async editImage({ imagePng, materialPng, prompt, signal }) {
     const config = cloudflareConfiguration();
     const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(180000)]) : AbortSignal.timeout(180000);
     requestSignal.throwIfAborted();
@@ -51,11 +51,12 @@ export const cloudflareProvider: ImageEditProvider = {
     form.set("prompt", prompt);
     form.set("width", String(config.size));
     form.set("height", String(config.size));
-    if (imagePng) {
+    const inputs = [imagePng, materialPng].filter((input): input is Buffer => Boolean(input));
+    for (const [index, input] of inputs.entries()) {
       // Klein accepts reference inputs below 512x512. Preserve aspect ratio at 448px.
-      const reference = await sharp(imagePng, { limitInputPixels: 16777216 })
+      const reference = await sharp(input, { limitInputPixels: 16777216 })
         .rotate().resize(448, 448, { fit: "inside", withoutEnlargement: true }).png().toBuffer();
-      form.set("input_image_0", new File([new Uint8Array(reference)], "reference.png", { type: "image/png" }));
+      form.set(`input_image_${index}`, new File([new Uint8Array(reference)], `reference-${index}.png`, { type: "image/png" }));
     }
     requestSignal.throwIfAborted();
     // Fixed host, validated account/model, no redirects and no automatic generation retries.

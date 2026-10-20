@@ -1,5 +1,6 @@
 export type ImageEditRequest = {
   imagePng?: Buffer;
+  materialPng?: Buffer;
   prompt: string;
   variationIndex?: number;
   signal?: AbortSignal;

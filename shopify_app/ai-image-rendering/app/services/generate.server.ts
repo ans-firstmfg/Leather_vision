@@ -8,6 +8,7 @@ import { OpenAIError } from "./ai/openai.server";
 import { CloudflareImageError } from "./ai/cloudflare.server";
 import { getJob, completeJob, failJob, type GenerationJob, type JobVariation } from "./jobs.server";
 import { buildEditPrompt } from "./promptBuilder.server";
+import { leatherSwatch } from "./materialReference.server";
 
 const DATA_ROOT = path.resolve(process.env.GENERATION_DATA_DIR || ".data");
 export const UPLOAD_FILENAME = "upload.png";
@@ -42,12 +43,13 @@ export async function runGeneration(job: GenerationJob, workerId: string, signal
     const imagePng = job.options.hasReferenceImage === false ? undefined
       : await readFile(generationFilePath(job.id, UPLOAD_FILENAME));
     const provider = getImageEditProvider(job.options.provider || "openai");
+    const materialPng = provider.id === "cloudflare" ? await leatherSwatch(job.options.leather) : undefined;
     const variations: JobVariation[] = [];
     for (let i = 0; i < job.options.variationCount; i++) {
       const current = await getJob(job.id);
       if (!current || current.status !== "processing" || current.workerId !== workerId) return;
-      const { bytes } = await provider.editImage({ imagePng,
-        prompt: buildEditPrompt(job.options, i), variationIndex: i, signal });
+      const { bytes } = await provider.editImage({ imagePng, materialPng,
+        prompt: buildEditPrompt(job.options, i, Boolean(materialPng)), variationIndex: i, signal });
       const afterEdit = await getJob(job.id);
       if (!afterEdit || afterEdit.status !== "processing" || afterEdit.workerId !== workerId) return;
       const filename = "variation-" + (i + 1) + ".png";

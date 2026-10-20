@@ -24,6 +24,7 @@ import { loader as providerConfig } from "../app/routes/proxy.config";
 import { puterConfiguration, cloudflareConfiguration } from "../app/services/ai/config.server";
 import catalogue from "../catalog/leathers.json";
 import { isLeather, leatherLabel } from "../app/services/materials.server";
+import { leatherSwatch } from "../app/services/materialReference.server";
 
 const owner = { shop: "test.myshopify.com", customerId: null, actorHash: "visitor" };
 const options = { variationCount: 2 };
@@ -814,6 +815,40 @@ test("Cloudflare edits normalize the uploaded reference below the documented inp
   });
 });
 
+test("Cloudflare sends material-only and product-plus-material references with distinct image roles", async () => {
+  await withCloudflare(async () => {
+    const materialPng = (await leatherSwatch("africa-python-snake-embossed-cowhide"))!;
+    assert.ok(materialPng.length);
+    assert.equal(await leatherSwatch("../../.env"), undefined);
+    assert.equal(await leatherSwatch("full-grain"), undefined);
+    for (const hasProduct of [false, true]) {
+      const options = { variationCount: 1, leather: "africa-python-snake-embossed-cowhide", color: "White",
+        instructions: "Make a jacket with a stand-up band collar and zippered chest pockets", hasReferenceImage: hasProduct };
+      const prompt = buildEditPrompt(options, 0, true);
+      assert.match(prompt, /Africa Python Snake Embossed Cowhide/);
+      assert.match(prompt, /Color: White/);
+      assert.match(prompt, /python snakeskin embossing clearly visible/);
+      assert.match(prompt, hasProduct ? /Image 1 is a material swatch/ : /Image 0 is a leather material swatch/);
+      globalThis.fetch = async (_url, init) => {
+        assert.ok(init?.body instanceof FormData);
+        const swatch = init.body.get(hasProduct ? "input_image_1" : "input_image_0");
+        assert.ok(swatch instanceof File);
+        const actual = await sharp(Buffer.from(await swatch.arrayBuffer())).raw().toBuffer();
+        const expected = await sharp(materialPng).raw().toBuffer();
+        assert.deepEqual(actual, expected, "The selected python swatch must reach the model");
+        if (hasProduct) {
+          const product = init.body.get("input_image_0");
+          assert.ok(product instanceof File);
+          assert.deepEqual(await sharp(Buffer.from(await product.arrayBuffer())).raw().toBuffer(), await sharp(png).raw().toBuffer());
+        }
+        assert.equal(init.body.has(hasProduct ? "input_image_2" : "input_image_1"), false);
+        return Response.json({ success: true, result: { image: png.toString("base64") } });
+      };
+      await getImageEditProvider().editImage({ prompt, materialPng, imagePng: hasProduct ? png : undefined });
+    }
+  });
+});
+
 test("Cloudflare quota and permission failures expose safe diagnostics and never repeat generation", async () => {
   await withCloudflare(async () => {
     for (const status of [401, 403, 429, 500]) {
@@ -864,11 +899,20 @@ test("queued Cloudflare jobs retain their provider, save private PNGs and surfac
     await db.session.create({ data: { id: "offline_cloudflare_test", shop, state: "test", accessToken: "test-only" } });
     try {
       const id = randomUUID();
-      const { token } = await createJob(id, cfOwner, { variationCount: 1, instructions: "Make a wallet", hasReferenceImage: false });
+      const { token } = await createJob(id, cfOwner, { variationCount: 1, instructions: "Make a jacket with zippered chest pockets",
+        leather: "africa-python-snake-embossed-cowhide", color: "White", hasReferenceImage: false });
       await enqueueJob(id);
       process.env.IMAGE_PROVIDER = "mock";
       let calls = 0;
-      globalThis.fetch = async () => { calls++; return Response.json({ success: true, result: { image: png.toString("base64") } }); };
+      globalThis.fetch = async (_url, init) => {
+        calls++;
+        assert.ok(init?.body instanceof FormData);
+        assert.match(String(init.body.get("prompt")), /Africa Python Snake Embossed Cowhide/);
+        assert.match(String(init.body.get("prompt")), /Image 0 is a leather material swatch/);
+        assert.match(String(init.body.get("prompt")), /Color: White/);
+        assert.ok(init.body.get("input_image_0") instanceof File);
+        return Response.json({ success: true, result: { image: png.toString("base64") } });
+      };
       const job = (await claimJob("cloudflare-worker"))!;
       assert.equal(job.id, id);
       assert.equal(job.options.provider, "cloudflare");

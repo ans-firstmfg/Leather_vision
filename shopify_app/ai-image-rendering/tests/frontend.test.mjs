@@ -305,6 +305,24 @@ test("real storefront markup resumes a job, selects a variation, and sends only 
   root.remove(); instance.window.close();
 });
 
+test("selected python article and White color reach generation independently of the browsing filter", async () => {
+  let posted;
+  const { root, window } = await storefront(async (_url, options) => {
+    posted = options.body;
+    return Response.json({ error: "Test complete" }, { status: 422 });
+  }, false, { fresh: true });
+  root.querySelector('input[value="africa-python-snake-embossed-cowhide"]').click();
+  root.querySelector('input[name="color"][value="White"]').click();
+  root.form.elements.instructions.value = "Make a jacket with a stand-up band collar and zippered chest pockets";
+  assert.equal(root.querySelector("[data-leather-group]").value, "");
+  await root.generate();
+  assert.equal(posted.get("leather"), "africa-python-snake-embossed-cowhide");
+  assert.equal(posted.get("color"), "White");
+  assert.match(posted.get("instructions"), /stand-up band collar/);
+  assert.equal(posted.get("variationCount"), "1");
+  root.remove(); window.close();
+});
+
 test("catalogue groups filter all unique leather choices and preserve the selected article", async () => {
   const { root, window } = await storefront(async () => { throw new Error("No generation expected"); });
   const cards = [...root.querySelectorAll("[data-leather-groups]")];
