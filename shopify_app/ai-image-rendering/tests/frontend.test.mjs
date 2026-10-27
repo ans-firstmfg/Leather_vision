@@ -7,7 +7,10 @@ const source = await readFile("extensions/leather-vision/assets/leather-vision.j
 const puterSource = await readFile("extensions/leather-vision/assets/leather-vision-puter.js", "utf8");
 const flowSource = await readFile("extensions/leather-vision/assets/leather-vision-flow.js", "utf8");
 const catalogue = JSON.parse(await readFile("catalog/leathers.json", "utf8"));
-const catalogueSnippet = await readFile("extensions/leather-vision/snippets/leather-catalog.liquid", "utf8");
+const cardSnippet = await readFile("extensions/leather-vision/snippets/leather-card.liquid", "utf8");
+const catalogueSnippet = (await readFile("extensions/leather-vision/snippets/leather-catalog.liquid", "utf8"))
+  .replace(/{% render 'leather-card', slug: '([^']+)', groups: '([^']*)' %}/g,
+    (_, slug, groups) => cardSnippet.replaceAll("{{ slug }}", slug).replaceAll("{{ groups }}", groups));
 const block = (await readFile("extensions/leather-vision/blocks/leather-vision.liquid", "utf8"))
   .replace("{% render 'leather-catalog', block_id: block.id %}", catalogueSnippet);
 const copy = JSON.parse(await readFile("extensions/leather-vision/locales/en.default.json", "utf8")).leather_vision;

@@ -1,0 +1,24 @@
+{
+  "name": "live-ar-try-on",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:storefront": "node scripts/build-storefront.mjs",
+    "build": "npm run build:storefront",
+    "predev": "npm run build:storefront",
+    "dev": "node scripts/dev.mjs",
+    "predeploy": "npm run build:storefront",
+    "deploy": "shopify app deploy",
+    "demo:ar": "npm run build:storefront && node scripts/live-ar-demo.mjs",
+    "pretest": "npm run build:storefront",
+    "test": "node scripts/test.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.8",
+    "esbuild": "^0.25.12",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.3"
+  }
+}

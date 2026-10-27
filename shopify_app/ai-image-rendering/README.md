@@ -1,5 +1,7 @@
 # Leather Vision
 
+Live AR is now a separate app in `../live-ar-try-on`, with its own Client ID, theme extension, build and tests. This app retains the original Leather Vision extension UID and image-generation service.
+
 Leather Vision is a Shopify embedded app and theme app extension. Customers choose leather and color, describe the product they want or upload an optional reference, generate variations, select a design, and attach its reference to a purchasable product in the cart. The three form sections remain visible, with results below the form.
 
 ## Architecture

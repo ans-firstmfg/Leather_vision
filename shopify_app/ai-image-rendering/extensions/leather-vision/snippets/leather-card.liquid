@@ -1,0 +1,7 @@
+{% doc %}
+  A single leather option.
+  @param {string} slug - Catalogue identifier.
+  @param {string} groups - Escaped group names separated by pipes.
+{% enddoc %}
+{% assign label_key = 'leather_vision.flow_categories.' | append: slug %}
+<label class="lv__choice" data-leather-groups="{{ groups }}"><input type="radio" name="leather" value="{{ slug }}" required data-lv-field><span class="lv__choice-tile"><img src="{{ 'lv-catalog-' | append: slug | append: '.jpg' | asset_url }}" alt="" width="240" height="240" loading="lazy"><span class="lv__choice-label">{{ label_key | t }}</span><span class="lv__choice-check" aria-hidden="true">✓</span></span></label>

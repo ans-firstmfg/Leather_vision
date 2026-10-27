@@ -1,0 +1,94 @@
+{% liquid
+assign ar_product = product | default: block.settings.product
+assign allowed_ids = block.settings.variant_ids | remove: ' ' | split: ','
+assign mapped_count = 0
+if ar_product != blank and block.settings.garment != blank and ar_product.requires_selling_plan == false
+for variant in ar_product.variants
+assign variant_key = variant.id | append: ''
+if allowed_ids contains variant_key
+assign mapped_count = mapped_count | plus: 1
+endif
+endfor
+endif
+%}
+{% assign demo = false %}
+{% if mapped_count == 0 and block.settings.sample_preview %}{% assign demo = true %}{% endif %}
+{% assign sample_names = 'Black cafe racer|Brown biker|Black trucker' | split: '|' %}
+{% assign sample_files = 'ar-sample-cafe.png|ar-sample-brown.png|ar-sample-trucker.png' | split: '|' %}
+{% if mapped_count > 0 or demo %}
+{% capture ar_data %}
+{"id":{{ ar_product.id | append: '' | json }},"title":{{ ar_product.title | json }},"url":{{ ar_product.url | json }},"variants":[
+{% assign emitted = false %}
+{% for variant in ar_product.variants %}
+{% assign variant_key = variant.id | append: '' %}
+{% if allowed_ids contains variant_key %}
+{% if emitted %},{% endif %}
+{"id":{{ variant_key | json }},"title":{{ variant.title | json }},"price":{{ variant.price | money_with_currency | json }},"available":{{ variant.available | json }},"asset":{{ block.settings.garment | image_url: width: 1200 | prepend: 'https:' | json }}}
+{% assign emitted = true %}
+{% endif %}
+{% endfor %}]}
+{% endcapture %}
+{% if demo %}
+{% capture ar_data %}{"id":"sample","title":{{ 'live_ar.demo' | t | json }},"url":"","demo":true,"variants":[{% for name in sample_names %}{% unless forloop.first %},{% endunless %}{"id":"{{ forloop.index }}","title":{{ name | json }},"price":"","available":true,"asset":{{ sample_files[forloop.index0] | asset_url | prepend: 'https:' | json }}}{% endfor %}]}{% endcapture %}
+{% endif %}
+{% capture ar_copy %}
+{"permission":{{ 'live_ar.permission' | t | json }},"starting":{{ 'live_ar.permission' | t | json }},"loading":{{ 'live_ar.loading' | t | json }},"body_missing":{{ 'live_ar.body_missing' | t | json }},"tracking":{{ 'live_ar.tracking' | t | json }},"lost":{{ 'live_ar.body_missing' | t | json }},"denied":{{ 'live_ar.denied' | t | json }},"unsupported":{{ 'live_ar.unsupported' | t | json }},"runtime_error":{{ 'live_ar.runtime_error' | t | json }},"asset_error":{{ 'live_ar.runtime_error' | t | json }},"paused":{{ 'live_ar.paused' | t | json }},"variant_unavailable":{{ 'live_ar.variant_unavailable' | t | json }},"cart_error":{{ 'live_ar.cart_error' | t | json }},"adding":{{ 'live_ar.adding' | t | json }},"added":{{ 'live_ar.added' | t | json }}}
+{% endcapture %}
+<first-mfg-live-ar class="fm-ar" data-product="{{ ar_data | escape }}" data-copy="{{ ar_copy | escape }}" data-engine="{{ 'leather-vision-ar-engine.js' | asset_url }}" data-cart-add-url="{{ routes.cart_add_url | append: '.js' }}" {{ block.shopify_attributes }}>
+<div class="fm-ar__showcase"><div class="fm-ar__intro"><span class="fm-ar__eyebrow">{{ shop.name | escape }}</span><h2>{{ 'live_ar.launch' | t }}</h2><p>{% if demo %}{{ 'live_ar.demo' | t }}{% else %}{{ ar_product.title | escape }}{% endif %}</p>
+<button type="button" class="fm-ar__button" data-ar-open>{{ 'live_ar.launch' | t }}</button><p class="fm-ar__note">{{ 'live_ar.privacy' | t }}</p></div>
+{% if demo %}<div class="fm-ar__samples">{% for name in sample_names %}<button type="button" class="fm-ar__sample" data-ar-sample="{{ forloop.index }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"><img src="{{ sample_files[forloop.index0] | asset_url }}" alt="{{ name | escape }}" width="240" height="300" loading="lazy"><span>{{ name | escape }}</span></button>{% endfor %}</div>{% else %}{{ block.settings.garment | image_url: width: 600 | image_tag: class: 'fm-ar__product', loading: 'lazy' }}{% endif %}</div>
+<dialog class="fm-ar__dialog" aria-label="{{ 'live_ar.launch' | t | escape }}">
+<header class="fm-ar__header">
+<strong>{{ shop.name | escape }}</strong>
+<button type="button" class="fm-ar__button fm-ar__button--quiet" data-ar-close>{{ 'live_ar.close' | t }}</button>
+</header>
+<div class="fm-ar__stage">
+<div class="fm-ar__feed"><video muted autoplay playsinline aria-label="{{ 'live_ar.launch' | t | escape }}"></video><canvas aria-hidden="true"></canvas></div>
+<p class="fm-ar__status" data-ar-status role="status">{{ 'live_ar.permission' | t }}</p>
+</div>
+<div class="fm-ar__controls">
+<h2>{% if demo %}{{ 'live_ar.demo' | t }}{% else %}{{ ar_product.title | escape }}{% endif %}</h2>
+<p>{{ 'live_ar.privacy' | t }}</p>
+
+<div class="fm-ar__row">
+<button type="button" class="fm-ar__button" data-ar-start>{{ 'live_ar.start' | t }}</button>
+<button type="button" class="fm-ar__button fm-ar__button--quiet" data-ar-switch disabled>{{ 'live_ar.switch' | t }}</button>
+</div>
+<label for="ar-variant-{{ block.id }}">{% if demo %}{{ 'live_ar.launch' | t }}{% else %}{{ 'live_ar.variant' | t }}{% endif %}</label>
+<select id="ar-variant-{{ block.id }}">{% if demo %}{% for name in sample_names %}<option value="{{ forloop.index }}">{{ name | escape }}</option>{% endfor %}{% else %}
+{% for variant in ar_product.variants %}
+{% assign variant_key = variant.id | append: '' %}
+{% if allowed_ids contains variant_key %}
+<option value="{{ variant.id }}" {% unless variant.available %}disabled{% endunless %} {% if variant == ar_product.selected_or_first_available_variant %}selected{% endif %}>{{ variant.title | escape }} · {{ variant.price | money_with_currency }}{% unless variant.available %} — {{ 'live_ar.sold_out' | t }}{% endunless %}</option>
+{% endif %}
+{% endfor %}
+{% endif %}</select>
+<div class="fm-ar__row">
+{% unless demo %}<button type="button" class="fm-ar__button" data-ar-cart>{{ 'live_ar.add_cart' | t }}</button>
+<a href="{{ routes.cart_url }}">{{ 'live_ar.view_cart' | t }}</a>{% endunless %}
+{% if block.settings.photo_url != blank %}<a href="{{ block.settings.photo_url }}">{{ 'live_ar.photo' | t }}</a>{% endif %}
+</div>
+<p data-ar-cart-status role="status"></p>
+</div>
+</dialog>
+<noscript><p>{{ 'live_ar.unsupported' | t }}</p></noscript>
+</first-mfg-live-ar>
+{% elsif request.design_mode %}
+<p {{ block.shopify_attributes }}>{{ 'live_ar.setup' | t }}</p>
+{% endif %}
+{% schema %}
+{
+"name": "t:live_ar.name",
+"target": "section",
+"stylesheet": "leather-vision-ar.css",
+"javascript": "leather-vision-ar.js",
+"settings": [
+{"type":"checkbox","id":"sample_preview","default":true,"label":"t:live_ar.sample_preview","info":"t:live_ar.sample_info"},
+{"type":"product","id":"product","label":"t:live_ar.product","info":"t:live_ar.product_info"},
+{"type":"image_picker","id":"garment","label":"t:live_ar.garment","info":"t:live_ar.garment_info"},
+{"type":"text","id":"variant_ids","label":"t:live_ar.variant_ids","info":"t:live_ar.variant_ids_info"},
+{"type":"url","id":"photo_url","label":"t:live_ar.photo_url"}
+]
+}
+{% endschema %}

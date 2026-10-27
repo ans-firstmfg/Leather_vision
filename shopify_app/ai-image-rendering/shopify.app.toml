@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "d942542aa2144f91ec5d37a3ee05a9ff"
-name = "AiImageRendering"
+name = "Leather Vision"
 application_url = "https://example.com"
 embedded = true
 
