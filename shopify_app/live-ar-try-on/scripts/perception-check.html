@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Body-aware preview check</title>
+<style>body{max-width:1050px;margin:24px auto;padding:20px;background:#151a16;color:#f4f3ef;font:16px/1.5 system-ui}canvas{width:100%;background:#263027;border-radius:12px}label{display:inline-block;margin:12px}input,button{min-height:40px}button{padding:10px 20px}.panels{display:grid;grid-template-columns:1fr 1fr;gap:20px}p{color:#cbd2c6}@media(max-width:650px){.panels{grid-template-columns:1fr}}</style>
+<h1>Body-aware preview check</h1><p>Synthetic silhouettes with identical shoulder landmarks. The right garment adapts to torso width. These are visual proportions, not body measurements.</p>
+<label>Torso width <input id="width" type="range" min="145" max="220" value="180"></label><label><input id="hand" type="checkbox">Hand in front of jacket</label>
+<div class="panels"><section><h2>Landmark sizing</h2><canvas id="before" width="480" height="640"></canvas></section><section><h2>Silhouette sizing and hand compositing</h2><canvas id="after" width="480" height="640"></canvas></section></div><p id="synthetic" role="status">Loading jacket…</p>
+<h2>Actual tracking runtime</h2><p>Runs pose, segmentation and hand detection on your previously supplied reference-person image locally. No camera permission, recording or image upload. The reference is a local developer fixture and is not packaged with the Shopify extension.</p><button id="run">Test actual runtime on reference image</button><p id="runtime" role="status">Ready</p><canvas id="reference" width="480" height="640" hidden></canvas>
+<script type="module">
+import {GarmentRenderer,prepareTorso,releaseFrame,createTracker} from '/leather-vision-ar-engine.js';
+const before=document.querySelector('#before'),after=document.querySelector('#after'),left=new GarmentRenderer(before),right=new GarmentRenderer(after),input=document.createElement('canvas');input.width=480;input.height=640;
+function frame(){
+ const width=Number(document.querySelector('#width').value),hand=document.querySelector('#hand').checked;
+ const p=Array.from({length:33},()=>({x:.5,y:.5,z:0,visibility:1}));
+ for(const [i,x,y]of [[11,.3,.24],[12,.7,.24],[23,.35,.76],[24,.65,.76],[13,.10,.49],[14,.90,.49],[15,hand?.5:.08,hand?.57:.82],[16,.92,.82]])p[i]={x,y,z:i===15&&hand?-.15:0,visibility:1};
+ const maskWidth=120,maskHeight=160,data=new Float32Array(maskWidth*maskHeight);
+ const c=input.getContext('2d');c.fillStyle='#455144';c.fillRect(0,0,480,640);c.fillStyle='#919e8b';c.fillRect(240-width/2,146,width,355);c.beginPath();c.ellipse(240,82,38,49,0,0,Math.PI*2);c.fill();
+ c.lineWidth=25;c.lineCap='round';c.beginPath();c.moveTo(144,154);c.lineTo(48,314);c.lineTo(p[15].x*480,p[15].y*640);c.moveTo(336,154);c.lineTo(432,314);c.lineTo(442,525);c.strokeStyle='#919e8b';c.stroke();
+ for(let y=0;y<maskHeight;y++)for(let x=0;x<maskWidth;x++){const px=(x+.5)*4,py=(y+.5)*4;if(py>=146&&py<501&&Math.abs(px-240)<width/2)data[y*maskWidth+x]=1;}
+ let hands;
+ if(hand){
+  hands=[Array.from({length:21},(_,i)=>({x:.5+(i%5-2)*.012,y:.57-Math.floor(i/5)*.018,z:0}))];hands[0][0]={x:.5,y:.57,z:0};
+  c.fillStyle='#bb967c';c.beginPath();c.ellipse(240,348,18,30,0,0,Math.PI*2);c.fill();
+ }
+ return {landmarks:[p],hands,segmentationMasks:[{width:maskWidth,height:maskHeight,getAsFloat32Array:()=>data,close(){}}]};
+}
+function render(){const f=frame(),pose=prepareTorso(f,480,640);if(!pose)return;
+ left.draw({...pose,body:undefined});right.draw(pose,f,input);
+ for(const canvas of [before,after]){const c=canvas.getContext('2d');c.globalCompositeOperation='destination-over';c.drawImage(input,0,0);c.globalCompositeOperation='source-over';}
+ document.querySelector('#synthetic').textContent='Sizing: '+after.dataset.bodySizing+' · accepted widths '+JSON.stringify(pose.body??{})+' · foreground hands '+after.dataset.handOcclusion+'. Hand crossing may reject contaminated silhouette rows.';releaseFrame(f);
+}
+try{await Promise.all([left.load('/ar-sample-cafe.png','cafe'),right.load('/ar-sample-cafe.png','cafe')]);document.querySelectorAll('input').forEach(el=>el.addEventListener('input',render));render();}catch(error){document.querySelector('#synthetic').textContent=error.message;}
+document.querySelector('#run').onclick=async()=>{
+ const status=document.querySelector('#runtime'),button=document.querySelector('#run');button.disabled=true;status.textContent='Loading actual body and hand models…';let tracker,result;
+ try{const image=new Image();image.src='/perception-reference.png';await image.decode();const canvas=document.querySelector('#reference'),context=canvas.getContext('2d');context.fillStyle='#777';context.fillRect(0,0,480,640);const scale=Math.min(480/image.width,640/image.height);context.drawImage(image,(480-image.width*scale)/2,0,image.width*scale,image.height*scale);canvas.hidden=false;
+  tracker=await createTracker();const handReady=await tracker.handReady;result=tracker.detectForVideo(canvas,performance.now());const pose=prepareTorso(result,480,640);
+  status.textContent=(pose&&result.mask?'Passed':'Check result')+': poses '+result.landmarks.length+' · segmentation '+(result.mask?result.mask.width+'×'+result.mask.height:'unavailable')+' · hand model '+(handReady?'loaded':'fallback')+' · hands detected '+(result.hands?.length??0)+' · silhouette '+JSON.stringify(pose?.body??{})+'. Image analyzed locally; physical-device fit still needs testing.';
+ }catch(error){status.textContent='Failed: '+error.message;}finally{if(result)releaseFrame(result);tracker?.close();button.disabled=false;}
+};
+window.addEventListener('pagehide',()=>{left.dispose();right.dispose();},{once:true});
+</script></html>

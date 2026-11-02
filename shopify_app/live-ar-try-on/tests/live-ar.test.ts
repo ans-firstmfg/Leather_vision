@@ -1,10 +1,124 @@
 import { test } from "node:test";
+import './perception.test';
+import {prepareTorso,releaseFrame} from '../storefront/live-ar/tracking';
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { CameraController } from "../storefront/live-ar/camera";
 import { torsoFromPose, PoseSmoother } from "../storefront/live-ar/pose";
 import { mappedVariant, addVariantToCart, type ARProduct } from "../storefront/live-ar/catalog";
+import { mobileHandoffUrl, incomingHandoff } from "../storefront/live-ar/handoff";
+import { MobileHandoff } from "../storefront/live-ar/handoff-ui";
+import jsQR from "jsqr";
+import { profiles, jacketTargets, warpPoint, drawJacket, jacketPoint, jacketShapePoint } from "../storefront/live-ar/garment-mesh";
+
+test('every image jacket uses a stable upper panel while retaining its collar style',()=>{
+  const torso=torsoFromPose(jacketPose(),640,480)!;
+  const bent=structuredClone(torso);bent.rig!.rightElbow!.y-=100;bent.rig!.rightWrist!.y-=140;
+  const a=jacketTargets(torso)!.points,b=jacketTargets(bent)!.points;
+  for(const profile of ['cafe','flame','raider','brown','trucker','jacket']){
+    for(const p of [{x:.5,y:.02},{x:.2,y:.08},{x:.8,y:.08},{x:.5,y:.5}]){
+      const original=jacketPoint(p,profile,a),moved=jacketPoint(p,profile,b);
+      assert.ok(Math.abs(original.x-moved.x)<1e-6);assert.ok(Math.abs(original.y-moved.y)<1e-6);
+    }
+    assert.deepEqual(jacketShapePoint({x:.5,y:.7},profile),{x:.5,y:.7});
+    for(let row=0;row<=12;row++)for(let column=0;column<=10;column++){
+      const p=jacketPoint({x:column/10,y:row/12},profile,b);
+      assert.ok(Number.isFinite(p.x)&&Number.isFinite(p.y));assert.ok(Math.abs(p.x)<2000&&Math.abs(p.y)<2000);
+    }
+  }
+  assert.ok(jacketShapePoint({x:.5,y:0},'cafe').y<0);
+  assert.ok(jacketShapePoint({x:.5,y:0},'brown').y<0);
+  assert.equal(jacketShapePoint({x:.5,y:0},'trucker').y,0);
+  assert.equal(jacketShapePoint({x:.5,y:0},'jacket').y,0);
+});
+import { adaptiveTargets, influences, modelAnchors, boundedAdjustment, roundedShoulderPoint, roundedChestDepth, prominentCollarPoint, collarWeight } from '../storefront/live-ar/adaptive-model';
+
+test('stand collar gains height without widening or folding its base into the chest',()=>{
+  for(const p of [{x:.2,y:0},{x:.5,y:.1},{x:.5,y:.4}])assert.deepEqual(prominentCollarPoint(p),p);
+  let previous=-Infinity;
+  for(let step=0;step<=100;step++){
+    const y=step/1000,left=prominentCollarPoint({x:.42,y}),right=prominentCollarPoint({x:.58,y});
+    assert.equal(left.x,.42);assert.equal(right.x,.58);assert.ok(Math.abs(left.y-right.y)<1e-12);
+    assert.ok(left.y>previous);previous=left.y;
+    assert.ok(collarWeight({x:.5,y})>=0 && collarWeight({x:.5,y})<=1);
+  }
+  assert.ok(prominentCollarPoint({x:.5,y:0}).y<-.1);
+  const torso=torsoFromPose(jacketPose(),640,480)!;
+  const bent=structuredClone(torso);bent.rig!.leftWrist!.y-=120;
+  const w=influences(prominentCollarPoint({x:.45,y:.02}));
+  for(const width of [.85,1,1.15])for(const length of [.85,1,1.15]){
+    const a=adaptiveTargets(torso,{width,length})!.points,b=adaptiveTargets(bent,{width,length})!.points;
+    for(const axis of ['x','y'] as const){
+      const before=w.reduce((sum,n,i)=>sum+n*a[i][axis],0),after=w.reduce((sum,n,i)=>sum+n*b[i][axis],0);
+      assert.ok(Number.isFinite(before));assert.ok(Math.abs(before-after)<1e-6);
+    }
+  }
+});
+
+test('rounded shoulder cap preserves the collar and waist, and chest volume tapers to the sides',()=>{
+  assert.deepEqual(roundedShoulderPoint({x:.5,y:0}),{x:.5,y:0});
+  assert.deepEqual(roundedShoulderPoint({x:.1,y:.5}),{x:.1,y:.5});
+  const left=roundedShoulderPoint({x:.15,y:.08}),right=roundedShoulderPoint({x:.85,y:.08});
+  assert.ok(left.y>.08 && left.y<.18);assert.equal(left.y,right.y);
+  assert.ok(roundedChestDepth(.5,.38,20,200)>20);
+  assert.ok(roundedChestDepth(.5,.38,-20,200)<-20);
+  assert.equal(roundedChestDepth(.5,0,20,200),20);
+  assert.equal(roundedChestDepth(.1,.38,20,200),20);
+  assert.ok(roundedChestDepth(.5,.38,20,200)>roundedChestDepth(.7,.38,20,200));
+});
+
+test('upper panel stays independent of asymmetric arm motion',()=>{
+  const torso=torsoFromPose(jacketPose(),640,480)!;
+  const bent=structuredClone(torso);bent.rig!.rightElbow!.y-=100;bent.rig!.rightWrist!.y-=140;
+  const before=adaptiveTargets(torso)!.points,after=adaptiveTargets(bent)!.points;
+  for(const p of [{x:.15,y:.08},{x:.85,y:.08},{x:.5,y:.15}]){
+    const weights=influences(roundedShoulderPoint(p));
+    for(const axis of ['x','y'] as const){
+      const a=weights.reduce((n,w,i)=>n+w*before[i][axis],0),b=weights.reduce((n,w,i)=>n+w*after[i][axis],0);
+      assert.ok(Math.abs(a-b)<1e-6);
+    }
+  }
+});
+
+test('3D influence coefficients preserve the original mesh and exactly attach garment anchors', () => {
+  for(const p of [...modelAnchors,{x:.1,y:.8},{x:.5,y:.5},{x:0,y:0},{x:1,y:1}]){
+    const w=influences(p);
+    const x=w.reduce((n,v,i)=>n+v*modelAnchors[i].x,0),y=w.reduce((n,v,i)=>n+v*modelAnchors[i].y,0);
+    assert.ok(Math.abs(x-p.x)<1e-6);assert.ok(Math.abs(y-p.y)<1e-6);
+    assert.ok(Math.abs(w.reduce((a,b)=>a+b,0)-1)<1e-6);
+  }
+});
+
+test('3D adaptation responds independently to body width, torso length and bent elbows', () => {
+  const torso=torsoFromPose(jacketPose(),640,480)!;
+  const target=adaptiveTargets(torso)!;assert.equal(target.complete,true);
+  const wider=structuredClone(torso);wider.rig!.leftShoulder.x-=30;wider.rig!.rightShoulder.x+=30;
+  assert.ok(adaptiveTargets(wider)!.points[1].x-adaptiveTargets(wider)!.points[0].x>target.points[1].x-target.points[0].x);
+  const bent=structuredClone(torso);bent.rig!.leftElbow!.y-=45;
+  assert.equal(adaptiveTargets(bent)!.points[4].y,target.points[4].y-45);
+  assert.deepEqual(adaptiveTargets(bent)!.points[0],target.points[0]);
+  const long=adaptiveTargets(torso,{width:1,length:1.1})!;
+  assert.ok(long.points[2].y>target.points[2].y);assert.equal(long.points[2].x,target.points[2].x);
+  assert.deepEqual(boundedAdjustment({width:10,length:NaN}),{width:1.15,length:1});
+  assert.equal(adaptiveTargets({...torso,yaw:.5}),null);
+  delete bent.rig!.leftWrist;assert.equal(adaptiveTargets(bent)!.complete,false);
+  bent.rig!.leftWrist={x:600,y:300};assert.equal(adaptiveTargets(bent),null);
+});
+
+test('all sample 3D vertices produce finite adaptive positions on a bent-arm body', async () => {
+  const gltf=JSON.parse(await readFile('extensions/live-ar/assets/white-mesh.gltf.json','utf8'));
+  const accessor=gltf.accessors[gltf.meshes[0].primitives[0].attributes.POSITION],view=gltf.bufferViews[accessor.bufferView];
+  const buffer=Buffer.from(gltf.buffers[view.buffer].uri.split(',')[1],'base64');
+  const target=adaptiveTargets(torsoFromPose(jacketPose(),640,480)!)!;
+  for(let i=0;i<accessor.count;i++){
+    const offset=(view.byteOffset??0)+(accessor.byteOffset??0)+i*(view.byteStride??12);
+    const x=buffer.readFloatLE(offset),y=buffer.readFloatLE(offset+4);
+    const w=influences({x:(x-accessor.min[0])/(accessor.max[0]-accessor.min[0]),y:1-(y-accessor.min[1])/(accessor.max[1]-accessor.min[1])});
+    const px=w.reduce((n,v,j)=>n+v*target.points[j].x,0),py=w.reduce((n,v,j)=>n+v*target.points[j].y,0);
+    assert.ok(Number.isFinite(px)&&Number.isFinite(py));assert.ok(Math.abs(px)<2000&&Math.abs(py)<2000);
+  }
+});
 
 const { JSDOM } = createRequire(import.meta.url)("jsdom") as {
   JSDOM: new (markup: string, options: object) => { window: Window & typeof globalThis };
@@ -91,6 +205,73 @@ test("smoothing damps small movements and resets after tracking loss", () => {
   smoother.reset(); assert.equal(smoother.update(next, 67).x, next.x);
 });
 
+function jacketPose() {
+  const p = pose();
+  for (const [i,x,y] of [[11,.30,.25],[12,.70,.25],[23,.36,.75],[24,.64,.75],[13,.20,.48],[14,.80,.48],[15,.15,.72],[16,.85,.72]]) {
+    p[i] = { x, y, visibility: .95 };
+  }
+  return p;
+}
+
+test("jacket texture shoulders, waist, elbows and cuffs land on their body anchors", () => {
+  const torso = torsoFromPose(jacketPose(), 640, 480)!;
+  const target = jacketTargets(torso)!;
+  assert.equal(target.complete, true);
+  for (const profile of Object.values(profiles)) for (let i=0;i<profile.length;i++) {
+    const actual = warpPoint(profile[i], profile, target.points);
+    assert.ok(Math.hypot(actual.x-target.points[i].x,actual.y-target.points[i].y)<.01, `anchor ${i}`);
+  }
+  assert.ok(target.points[1].x-target.points[0].x > torso.width*.8, "Jacket body covers the shoulders rather than shrinking inside a full-image rectangle");
+  const collar = warpPoint({x:.5,y:.03}, profiles.cafe, target.points);
+  assert.ok(collar.y < target.points[0].y, "Collar sits above the shoulder line");
+});
+
+test('jacket shoulder seams lift above tracked joints with scale and tilt preserved',()=>{
+  for(const scale of [1,2]){
+    const torso=torsoFromPose(jacketPose(),640*scale,480*scale)!;
+    const r=torso.rig!,target=jacketTargets(torso)!.points;
+    const span=r.rightShoulder.x-r.leftShoulder.x;
+    assert.ok(Math.abs(target[0].y-(r.leftShoulder.y-span*.10))<1e-6);
+    assert.ok(Math.abs(target[1].y-(r.rightShoulder.y-span*.10))<1e-6);
+    assert.ok(target[8].y<target[0].y && target[9].y<target[1].y);
+    assert.deepEqual(target[4],r.leftElbow);assert.deepEqual(target[5],r.rightElbow);
+    assert.deepEqual(target[6],r.leftWrist);assert.deepEqual(target[7],r.rightWrist);
+    const theta=.25,cos=Math.cos(theta),sin=Math.sin(theta),rot=(p:{x:number;y:number})=>({x:p.x*cos-p.y*sin,y:p.x*sin+p.y*cos});
+    const rotated={...torso,angle:theta,rig:{
+      leftShoulder:rot(r.leftShoulder),rightShoulder:rot(r.rightShoulder),leftHip:rot(r.leftHip),rightHip:rot(r.rightHip),
+      leftElbow:r.leftElbow?rot(r.leftElbow):undefined,rightElbow:r.rightElbow?rot(r.rightElbow):undefined,
+      leftWrist:r.leftWrist?rot(r.leftWrist):undefined,rightWrist:r.rightWrist?rot(r.rightWrist):undefined,
+    }};
+    const turned=jacketTargets(rotated)!.points;
+    for(let i=0;i<target.length;i++){const expected=rot(target[i]);assert.ok(Math.hypot(turned[i].x-expected.x,turned[i].y-expected.y)<1e-6);}
+  }
+});
+
+test("bent sleeves follow elbows/wrists while shoulder and waist anchors stay fixed", () => {
+  const p = jacketPose(), straight = jacketTargets(torsoFromPose(p,640,480)!)!;
+  p[13] = {x:.20,y:.56,visibility:.95}; p[15] = {x:.35,y:.65,visibility:.95};
+  const bent = jacketTargets(torsoFromPose(p,640,480)!)!;
+  assert.deepEqual(bent.points.slice(0,4),straight.points.slice(0,4));
+  const cuff = warpPoint(profiles.cafe[6],profiles.cafe,bent.points);
+  assert.ok(Math.abs(cuff.x-224)<.01 && Math.abs(cuff.y-312)<.01);
+  const smoother = new PoseSmoother(); smoother.update(torsoFromPose(p,640,480)!,1);
+  p[15].visibility = .1;
+  const uncertain = smoother.update(torsoFromPose(p,640,480)!,34);
+  assert.equal(uncertain.rig?.leftWrist,undefined, "Do not retain a stale visible wrist after confidence drops");
+  assert.equal(jacketTargets(uncertain)?.complete,false);
+});
+
+test("jacket rendering uses bounded, finite mesh transforms and balances canvas state", () => {
+  let depth=0,draws=0;
+  const context = {save(){depth++;},restore(){depth--;},beginPath(){},closePath(){},clip(){},
+    moveTo(x:number,y:number){assert.ok(Number.isFinite(x)&&Number.isFinite(y));},
+    lineTo(x:number,y:number){assert.ok(Number.isFinite(x)&&Number.isFinite(y));},
+    transform(...values:number[]){assert.ok(values.every(Number.isFinite));},drawImage(){draws++;},
+  } as unknown as CanvasRenderingContext2D;
+  assert.equal(drawJacket(context,{naturalWidth:1280,naturalHeight:1280} as HTMLImageElement,torsoFromPose(jacketPose(),640,480)!,"cafe"),true);
+  assert.ok(draws>100 && draws<=240); assert.equal(depth,0);
+});
+
 test("only explicitly mapped, available variants with a real asset can be selected", () => {
   assert.equal(mappedVariant(product, "101")?.title, "Black / M");
   assert.equal(mappedVariant(product, "102"), undefined);
@@ -122,16 +303,17 @@ test("cart refuses unmapped IDs, stale stock, subscription variants and external
   await assert.rejects(addVariantToCart(product, "101", "/en/cart/add.js", new AbortController().signal, subscription, "https://shop.example"), /variant_unavailable/);
 });
 
-async function ui() {
+async function ui(url = "https://shop.example/en/products/pilot?variant=101") {
   const source = await readFile("extensions/live-ar/assets/leather-vision-ar.js", "utf8");
-  const dom = new JSDOM(`<first-mfg-live-ar><button data-ar-open>Open</button><dialog><button data-ar-close>Close</button><button data-ar-start>Start</button><button data-ar-switch>Switch</button><video></video><canvas></canvas><select><option value="101">Black M</option></select><p data-ar-status></p><button data-ar-cart>Buy</button><p data-ar-cart-status></p></dialog></first-mfg-live-ar>`, {
-    url: "https://shop.example/en/products/pilot?variant=101", runScripts: "outside-only", pretendToBeVisual: true,
+  const dom = new JSDOM(`<first-mfg-live-ar><button data-ar-open>Open</button><button data-ar-mobile>Phone</button><p data-ar-mobile-error hidden></p><section data-ar-mobile-panel hidden tabindex="-1"><button data-ar-mobile-close>Close phone</button><div data-ar-qr></div><a data-ar-mobile-link hidden></a><p data-ar-mobile-unavailable hidden></p></section><dialog><button data-ar-close>Close</button><button data-ar-start>Start</button><button data-ar-switch>Switch</button><video></video><canvas></canvas><select><option value="101">Black M</option></select><p data-ar-status></p><button data-ar-cart>Buy</button><p data-ar-cart-status></p></dialog></first-mfg-live-ar>`, {
+    url, runScripts: "outside-only", pretendToBeVisual: true,
   });
   const window = dom.window;
   const root = window.document.querySelector("first-mfg-live-ar") as unknown as HTMLElement & {
-    start(): Promise<void>; addToCart(): Promise<void>; loadRuntime(): Promise<unknown>;
+    start(): Promise<void>; addToCart(): Promise<void>; loadRuntime(): Promise<unknown>; loadHandoff(): Promise<unknown>;
   };
   root.dataset.product = JSON.stringify(product); root.dataset.copy = JSON.stringify({ denied: "Camera blocked", paused: "Paused" });
+  root.dataset.handoffId = "pilot-block";
   Object.defineProperty(window, "isSecureContext", { value: true });
   window.HTMLMediaElement.prototype.pause = () => {};
   window.HTMLMediaElement.prototype.play = async () => {};
@@ -190,22 +372,22 @@ test("closing during SDK download releases the camera immediately", async () => 
 
 test("active tracking renders only confident poses, clears on loss, and releases all resources on pagehide", async () => {
   const { window, root, click } = await ui();
-  let stopped = 0, disposed = 0, closed = 0, draws = 0, clears = 0, time = 1, points = pose();
+  let stopped = 0, disposed = 0, closed = 0, draws = 0, clears = 0, time = 1, points = pose(), masksClosed=0;
   const frames: FrameRequestCallback[] = [];
   window.requestAnimationFrame = callback => { frames.push(callback); return frames.length; };
   window.cancelAnimationFrame = () => {};
   Object.defineProperty(window.navigator, "mediaDevices", { value: { getUserMedia: async () => ({ getTracks: () => [{ stop: () => stopped++ }] }) } });
   const video = root.querySelector("video")!;
   Object.defineProperties(video, { readyState: { value: 2 }, videoWidth: { value: 640 }, videoHeight: { value: 480 }, currentTime: { get: () => time } });
-  root.loadRuntime = async () => ({ mappedVariant, torsoFromPose, PoseSmoother,
-    createTracker: async () => ({ detectForVideo: () => ({ landmarks: [points] }), close: () => { closed++; } }),
+  root.loadRuntime = async () => ({ mappedVariant, torsoFromPose, PoseSmoother,prepareTorso,releaseFrame,
+    createTracker: async () => ({ detectForVideo: () => ({ landmarks: [points],segmentationMasks:[{width:8,height:8,getAsFloat32Array:()=>new Float32Array(64),close(){masksClosed++;}}] }), close: () => { closed++; } }),
     GarmentRenderer: class { async load() {} draw() { draws++; } clear() { clears++; } dispose() { disposed++; } },
   });
   click("[data-ar-open]"); await root.start();
-  frames.shift()!(100); assert.equal(root.dataset.state, "tracking"); assert.equal(draws, 1);
+  frames.shift()!(100); assert.equal(root.dataset.state, "tracking"); assert.equal(draws, 1);assert.equal(masksClosed,1);
   frames.shift()!(500); assert.equal(root.dataset.state, "lost", "A stalled camera must not leave a frozen garment visible");
   const before = clears; points = []; time++;
-  frames.shift()!(600); assert.equal(root.dataset.state, "lost"); assert.ok(clears > before); assert.equal(draws, 1);
+  frames.shift()!(600); assert.equal(root.dataset.state, "lost"); assert.ok(clears > before); assert.equal(draws, 1);assert.equal(masksClosed,2);
   window.dispatchEvent(new window.Event("pagehide"));
   assert.equal(stopped, 1); assert.equal(closed, 1); assert.equal(disposed, 1);
   assert.equal(root.dataset.state, "paused");
@@ -240,4 +422,122 @@ test("sample garments cannot reach Shopify cart endpoints", async () => {
   assert.ok(mappedVariant(sample, "101"), "sample image can be previewed");
   await assert.rejects(addVariantToCart(sample, "101", "/cart/add.js", new AbortController().signal, fetcher, "https://shop.example"), /variant_unavailable/);
   assert.equal(calls, 0);
+});
+
+test("supplied GLB and Shopify-compatible model contain the same self-contained geometry", async () => {
+  const binary = await readFile("models/white-mesh.glb");
+  assert.equal(binary.readUInt32LE(0), 0x46546c67);
+  assert.equal(binary.readUInt32LE(4), 2);
+  assert.equal(binary.readUInt32LE(8), binary.length);
+  const converted = JSON.parse(await readFile("extensions/live-ar/assets/white-mesh.gltf.json", "utf8"));
+  assert.equal(converted.accessors[0].count / 3, 40000);
+  assert.equal(converted.accessors[1].count, 16992);
+  assert.equal(converted.skins, undefined); assert.equal(converted.images, undefined);
+  const payload = Buffer.from(converted.buffers[0].uri.split(",")[1], "base64");
+  const binStart = 20 + binary.readUInt32LE(12) + 8;
+  assert.equal(payload.length, converted.buffers[0].byteLength);
+  assert.deepEqual(payload, binary.subarray(binStart, binStart + payload.length));
+  const liquid = await readFile("extensions/live-ar/blocks/live-ar.liquid", "utf8");
+  assert.ok(liquid.includes("model3d") && liquid.includes("white-mesh.gltf.json"));
+});
+
+test("Shopify CDN asset URLs work in absolute, protocol-relative and storefront-relative form", async () => {
+  for (const asset of ["https://cdn.shopify.com/extensions/a/coat.png", "//cdn.shopify.com/extensions/a/coat.png", "/cdn/shop/files/coat.png"]) {
+    const mapped = mappedVariant({ ...product, variants: [{ ...product.variants[0], asset }] }, "101");
+    assert.equal(mapped?.asset, asset);
+  }
+  for (const asset of ["javascript:alert(1)", "data:image/png;base64,test", "https:https://cdn.shopify.com/coat.png"]) {
+    assert.equal(mappedVariant({ ...product, variants: [{ ...product.variants[0], asset }] }, "101"), undefined);
+  }
+  const liquid = await readFile("extensions/live-ar/blocks/live-ar.liquid", "utf8");
+  assert.ok(!liquid.includes("prepend: 'https:'"), "CDN URLs must not be prefixed with an extra protocol");
+});
+
+test("model startup and garment load failures report distinct stages instead of the same generic error", async () => {
+  for (const failed of ["model", "asset"]) {
+    const { root, window, click } = await ui();
+    window.console.error = () => {};
+    let stopped = 0;
+    Object.defineProperty(window.navigator, "mediaDevices", { value: { getUserMedia: async () => ({ getTracks: () => [{ stop: () => stopped++ }] }) } });
+    root.loadRuntime = async () => ({ mappedVariant, PoseSmoother,
+      createTracker: async () => { if (failed === "model") throw new Error("Model failed"); return { close() {} }; },
+      GarmentRenderer: class { async load() { throw new Error("Image failed"); } clear() {} dispose() {} },
+    });
+    click("[data-ar-open]"); await root.start();
+    assert.equal(root.dataset.state, failed + "_error");
+    assert.equal(root.dataset.errorStage, failed);
+    root.remove(); assert.equal(stopped, 1); window.close();
+  }
+});
+
+test("phone links preserve page and garment but discard private parameters and fragment", () => {
+  const current = "https://shop.example/fr/pages/try?variant=1&preview_theme_id=123&token=secret&customer=private#secret";
+  const link = mobileHandoffUrl("https://shop.example/fr/pages/try?ignored=1", current, "block-2", "101")!;
+  const url = new URL(link);
+  assert.equal(url.pathname, "/fr/pages/try");
+  assert.equal(url.searchParams.get("preview_theme_id"), "123");
+  assert.equal(url.searchParams.get("fm_ar_variant"), "101");
+  assert.equal(url.hash, ""); assert.ok(!link.includes("secret") && !link.includes("private"));
+  assert.equal(incomingHandoff(link, "block-2"), "101");
+  assert.equal(incomingHandoff(link, "other-block"), null);
+  assert.equal(incomingHandoff("https://shop.example/?fm_ar=block-2&fm_ar_variant=oops", "block-2"), null);
+  for (const base of ["http://127.0.0.1:3092", "https://localhost", "https://10.1.2.3", "https://demo.local", "https://[::1]", "https://user:pass@shop.example"]) {
+    assert.equal(mobileHandoffUrl(base, current, "block-2", "101"), null, base);
+  }
+  const noPreview = mobileHandoffUrl("https://shop.example/fr/pages/try", "https://admin.shopify.com/?preview_theme_id=123", "block-2", "101")!;
+  assert.ok(!noPreview.includes("preview_theme_id"));
+});
+
+test("incoming mobile handoff opens the matching jacket without camera permission or runtime downloads", async () => {
+  const { root, window } = await ui("https://shop.example/en/products/pilot?fm_ar=pilot-block&fm_ar_variant=101");
+  assert.equal(root.querySelector("dialog")!.open, true);
+  assert.equal(root.querySelector("select")!.value, "101");
+  assert.equal(root.querySelector("video")!.srcObject ?? null, null);
+  assert.equal(root.dataset.state, "permission");
+  root.remove(); window.close();
+});
+
+test("phone choice loads QR only on demand and never requests desktop camera", async () => {
+  const { root, window, click } = await ui();
+  let cameras = 0, downloads = 0;
+  Object.defineProperty(window.navigator, "mediaDevices", { value: { getUserMedia: async () => { cameras++; throw new Error("Unexpected camera"); } } });
+  root.loadHandoff = async () => { downloads++; return { MobileHandoff }; };
+  assert.equal(downloads, 0);
+  click("[data-ar-mobile]"); await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(downloads, 1); assert.equal(cameras, 0);
+  assert.equal(root.querySelector<HTMLElement>("[data-ar-mobile-panel]")!.hidden, false);
+  assert.ok(root.querySelector("svg"));
+  assert.equal(root.querySelector("dialog")!.open, false);
+  root.remove(); window.close();
+});
+
+test("locally generated QR scans to the selected garment and changes when the selection changes", () => {
+  const dom = new JSDOM(`<div data-handoff-id="demo-block" data-handoff-base="https://shop.example/en/pages/try"><button data-ar-mobile></button><section data-ar-mobile-panel hidden tabindex="-1"><button data-ar-mobile-close></button><div data-ar-qr></div><a data-ar-mobile-link hidden></a><p data-ar-mobile-unavailable hidden></p></section></div>`, {
+    url: "https://shop.example/en/pages/try?token=private&preview_theme_id=123",
+  });
+  const root = dom.window.document.querySelector("div")!;
+  const handoff = new MobileHandoff(root, new dom.window.AbortController().signal);
+  handoff.show("2");
+  const link = root.querySelector<HTMLAnchorElement>("[data-ar-mobile-link]")!.href;
+  const svg = root.querySelector("svg")!;
+  const size = Number(svg.getAttribute("viewBox")!.split(" ")[2]), scale = 5, width = size * scale;
+  const pixels = new Uint8ClampedArray(width * width * 4).fill(255);
+  for (const match of svg.querySelector("path")!.getAttribute("d")!.matchAll(/M(\d+) (\d+)h1v1h-1z/g)) {
+    const x = Number(match[1]) * scale, y = Number(match[2]) * scale;
+    for (let py = y; py < y + scale; py++) for (let px = x; px < x + scale; px++) {
+      const offset = (py * width + px) * 4; pixels[offset] = pixels[offset + 1] = pixels[offset + 2] = 0;
+    }
+  }
+  assert.equal(jsQR(pixels, width, width)?.data, link);
+  assert.equal(new URL(link).searchParams.get("fm_ar_variant"), "2");
+  assert.ok(!link.includes("private"));
+  handoff.update("3");
+  assert.equal(new URL(root.querySelector<HTMLAnchorElement>("a")!.href).searchParams.get("fm_ar_variant"), "3");
+  (root.querySelector("[data-ar-mobile-close]") as HTMLButtonElement).click();
+  assert.equal(root.querySelector<HTMLElement>("section")!.hidden, true);
+  root.dataset.handoffBase = "http://127.0.0.1:3092"; handoff.show("3");
+  assert.equal(root.querySelector<HTMLElement>("[data-ar-mobile-unavailable]")!.hidden, false);
+  assert.equal(root.querySelector("svg"), null);
+  assert.equal(root.querySelector("a")!.hasAttribute("href"), false);
+  dom.window.close();
 });

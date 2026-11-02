@@ -2,48 +2,55 @@ export { CameraController } from "./camera";
 export { PoseSmoother, torsoFromPose } from "./pose";
 export { addVariantToCart, mappedVariant } from "./catalog";
 import type { Landmark, Torso } from "./pose";
+import { drawJacket } from "./garment-mesh";
+import type { ThreeGarment } from "./model3d";
 
-export interface Tracker {
-  detectForVideo(video: HTMLVideoElement, timestamp: number): { landmarks: Landmark[][] };
-  close(): void;
-}
-interface VisionModule {
-  FilesetResolver: { forVisionTasks(path: string): Promise<unknown> };
-  PoseLandmarker: { createFromOptions(files: unknown, options: unknown): Promise<Tracker> };
-}
-
-// A pinned public runtime is lazy-loaded; inference receives the video element locally.
-export async function createTracker(): Promise<Tracker> {
-  const base = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1";
-  const runtime = await import(/* @vite-ignore */ `${base}/vision_bundle.mjs`) as VisionModule;
-  const files = await runtime.FilesetResolver.forVisionTasks(`${base}/wasm`);
-  return runtime.PoseLandmarker.createFromOptions(files, {
-    baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task", delegate: "CPU" },
-    runningMode: "VIDEO", numPoses: 1, minPoseDetectionConfidence: 0.6,
-    minPosePresenceConfidence: 0.6, minTrackingConfidence: 0.6, outputSegmentationMasks: false,
-  });
-}
+export {createTracker,prepareTorso,releaseFrame} from './tracking';
+export type {Tracker} from './tracking';
+import type {TrackingFrame} from './tracking';
+import { FrameEffects } from './frame-effects';
 
 export class GarmentRenderer {
+  private effects=new FrameEffects();
   private image?: HTMLImageElement;
   private generation = 0;
-  constructor(private canvas: HTMLCanvasElement) {}
-  async load(url: string) {
+  private fit = "vest";
+  private model?: ThreeGarment;
+  constructor(private canvas: HTMLCanvasElement, private modelModule?: string) {}
+  async load(url: string, fit = "vest") {
     const generation = ++this.generation;
     this.image = undefined;
+    this.model?.dispose(); this.model = undefined;
     this.clear();
+    if (fit === "model3d") {
+      if (!this.modelModule) throw new Error("3D renderer is not configured");
+      const { ThreeGarment } = await import(/* @vite-ignore */ this.modelModule) as typeof import("./model3d");
+      if (generation !== this.generation) return;
+      const model = new ThreeGarment(this.canvas.closest<HTMLElement>('first-mfg-live-ar') ?? undefined); this.model = model;
+      await model.load(url);
+      if (generation !== this.generation) { model.dispose(); return; }
+      this.fit = fit; return;
+    }
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src = url;
     await image.decode();
-    if (generation === this.generation) this.image = image;
+    if (generation === this.generation) { this.image = image; this.fit = fit; }
   }
-  clear() { this.canvas.getContext("2d")?.clearRect(0, 0, this.canvas.width, this.canvas.height); }
-  dispose() { this.generation++; this.image = undefined; this.clear(); }
-  draw(torso: Torso) {
+  clear() { this.canvas.getContext("2d")?.clearRect(0, 0, this.canvas.width, this.canvas.height);this.canvas.dataset.handOcclusion='0'; }
+  dispose() { this.generation++; this.image = undefined; this.model?.dispose(); this.model = undefined; this.effects.dispose(); this.clear(); }
+  draw(torso: Torso, frame?: TrackingFrame, video?: HTMLVideoElement) {
     this.clear();
+    this.canvas.dataset.bodySizing=torso.body&&Object.keys(torso.body).length?'silhouette':'landmarks';
     const context = this.canvas.getContext("2d");
+    if(Math.abs(torso.yaw??0)>.5||Math.abs(torso.pitch??0)>.4)return 'body_missing';
+    if (context && this.model) {const status=this.model.draw(context,torso);if(status==='model_preview'&&frame&&video)this.effects.apply(context,torso,frame,video);return status;}
     if (!context || !this.image) return;
+    if (this.fit !== "vest" && torso.rig) {
+      const complete=drawJacket(context,this.image,torso,this.fit);
+      if(frame&&video)this.effects.apply(context,torso,frame,video);
+      return complete?'tracking':'arms_missing';
+    }
     context.save(); context.translate(torso.x, torso.y); context.rotate(torso.angle);
     context.drawImage(this.image, -torso.width / 2, -torso.height / 2, torso.width, torso.height);
     context.restore();

@@ -2,11 +2,15 @@ import { build } from 'esbuild';
 import { readFile, writeFile, readdir, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const extension = new URL('../extensions/live-ar/', import.meta.url);
-for (const [entry, name, format] of [['element.ts','leather-vision-ar.js','iife'],['engine.ts','leather-vision-ar-engine.js','esm']]) {
+for (const [entry, name, format, budget] of [['element.ts','leather-vision-ar.js','iife',10000],['engine.ts','leather-vision-ar-engine.js','esm',30000],['handoff-ui.ts','live-ar-handoff.js','esm',30000],['model3d.ts','live-ar-3d.js','esm',1000000]]) {
   const result = await build({entryPoints:[fileURLToPath(new URL('../storefront/live-ar/'+entry,import.meta.url))],bundle:true,format,minify:true,target:'es2022',write:false,legalComments:'none'});
   const output=result.outputFiles[0].contents;
-  if(output.byteLength>10000) throw new Error(`${name} exceeds the JavaScript budget`);
-  await writeFile(new URL('assets/'+name,extension),output);
+  // The schema entry stays under 10 KB. The QR encoder is a separate, lazy helper.
+  if(output.byteLength>budget) throw new Error(`${name} exceeds the JavaScript budget`);
+  const destination = new URL('assets/'+name,extension);
+  const previous = await readFile(destination).catch(error => { if(error.code==='ENOENT')return null; throw error; });
+  // No-op builds must not trigger Shopify's extension watcher/rebundler.
+  if(!previous || !previous.equals(Buffer.from(output)))await writeFile(destination,output);
 }
 const keys=value=>Object.values(value).reduce((n,v)=>n+(v && typeof v==='object'?keys(v):1),0);
 let liquid=0,total=0;

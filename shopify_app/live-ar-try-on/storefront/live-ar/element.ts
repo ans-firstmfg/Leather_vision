@@ -1,6 +1,8 @@
 import type * as Engine from "./engine";
 import type { ARProduct } from "./catalog";
 import { CameraController } from "./camera";
+import { incomingHandoff } from "./handoff";
+import type { MobileHandoff } from "./handoff-ui";
 
 class LiveARTryOn extends HTMLElement {
   private controller?: AbortController;
@@ -27,6 +29,7 @@ class LiveARTryOn extends HTMLElement {
   private canvas!: HTMLCanvasElement;
   private variant!: HTMLSelectElement;
   private assetOperation = 0;
+  private handoff?: MobileHandoff;
 
   connectedCallback() {
     if (this.controller) return;
@@ -42,6 +45,7 @@ class LiveARTryOn extends HTMLElement {
     if (!this.dialog || !this.video || !this.canvas || !this.variant) return;
     const { signal } = this.controller;
     this.querySelector("[data-ar-open]")?.addEventListener("click", () => this.open(), { signal });
+    this.querySelector("[data-ar-mobile]")?.addEventListener("click", () => { void this.mobile(); }, { signal });
     this.querySelector("[data-ar-close]")?.addEventListener("click", () => this.close(), { signal });
     this.querySelector("[data-ar-start]")?.addEventListener("click", () => { void this.start(); }, { signal });
     this.querySelector("[data-ar-switch]")?.addEventListener("click", () => {
@@ -62,9 +66,31 @@ class LiveARTryOn extends HTMLElement {
     const selected = new URL(location.href).searchParams.get("variant");
     if (selected && this.product.variants.some(v => v.id === selected)) this.variant.value = selected;
     this.updateCart();
+    const incoming = incomingHandoff(location.href, this.dataset.handoffId || "");
+    if (incoming && this.product.variants.some(v => v.id === incoming && v.available)) {
+      this.variant.value = incoming; this.open();
+    }
   }
 
-  disconnectedCallback() { this.stop(); this.controller?.abort(); this.controller = undefined; }
+  disconnectedCallback() { this.stop(); this.controller?.abort(); this.controller = undefined; this.handoff = undefined; }
+
+  loadHandoff(): Promise<typeof import("./handoff-ui")> { return import(/* @vite-ignore */ this.dataset.handoffModule!); }
+  private async mobile() {
+    const signal = this.controller!.signal;
+    try {
+      if (!this.handoff) {
+        const { MobileHandoff } = await this.loadHandoff();
+        if (signal.aborted || !this.isConnected) return;
+        this.handoff ??= new MobileHandoff(this, signal);
+      }
+      this.handoff.show(this.variant.value);
+      const feedback = this.querySelector<HTMLElement>("[data-ar-mobile-error]");
+      if (feedback) feedback.hidden = true;
+    } catch {
+      const feedback = this.querySelector<HTMLElement>("[data-ar-mobile-error]");
+      if (!signal.aborted && feedback) feedback.hidden = false;
+    }
+  }
 
   loadRuntime(): Promise<typeof Engine> { return import(/* @vite-ignore */ this.dataset.engine!); }
 
@@ -73,6 +99,13 @@ class LiveARTryOn extends HTMLElement {
     const el = this.querySelector<HTMLElement>("[data-ar-status]");
     if (el && el.textContent !== this.text(key)) el.textContent = this.text(key);
     this.dataset.state = key;
+  }
+
+  private failure(stage: string, error: unknown) {
+    this.dataset.errorStage = stage;
+    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    console.error("[Live AR]", stage, detail.replace(/https?:\/\/\S+/g, "[resource]").slice(0, 240));
+    this.status(stage + "_error");
   }
 
   private open() {
@@ -112,20 +145,24 @@ class LiveARTryOn extends HTMLElement {
     const operation = this.operation;
     const valid = () => operation === this.operation && this.isConnected && this.dialog.open;
     this.starting = true;
+    delete this.dataset.errorStage;
     this.querySelector<HTMLButtonElement>("[data-ar-start]")!.disabled = true;
     this.status("starting");
+    let stage = "camera";
     try {
       // Request camera within the click action; no SDK download before permission is granted.
-      this.camera = new CameraController(this.video, navigator.mediaDevices, () => { this.stop(); this.status("runtime_error"); });
+      this.camera = new CameraController(this.video, navigator.mediaDevices, () => { this.stop(); this.status("camera_error"); });
       await this.camera.start(this.facing);
       if (!valid()) return;
       this.status("loading");
+      stage = "module";
       this.runtime = await this.loadRuntime();
       if (!valid()) return;
+      stage = "model";
       const tracker = await this.runtime.createTracker();
       if (!valid()) { tracker.close(); return; }
       this.tracker = tracker;
-      this.renderer = new this.runtime.GarmentRenderer(this.canvas);
+      this.renderer = new this.runtime.GarmentRenderer(this.canvas, this.dataset.modelModule);
       this.smoother = new this.runtime.PoseSmoother();
       this.active = true;
       await this.loadAsset();
@@ -139,7 +176,8 @@ class LiveARTryOn extends HTMLElement {
     } catch (error) {
       if (!valid()) return;
       this.stop();
-      this.status(error instanceof DOMException && ["NotAllowedError", "PermissionDeniedError"].includes(error.name) ? "denied" : "runtime_error");
+      if (error instanceof DOMException && ["NotAllowedError", "PermissionDeniedError"].includes(error.name)) this.status("denied");
+      else this.failure(stage, error);
     }
   }
 
@@ -150,36 +188,41 @@ class LiveARTryOn extends HTMLElement {
     if (!variant) { this.status("variant_unavailable"); return; }
     this.status("loading");
     try {
-      await this.renderer?.load(variant.asset);
+      await this.renderer?.load(variant.asset, variant.fit);
       if (operation === this.assetOperation && this.active) { this.assetReady = true; this.status("body_missing"); }
-    } catch { if (operation === this.assetOperation && this.active) this.status("asset_error"); }
+    } catch (error) { if (operation === this.assetOperation && this.active) this.failure("asset", error); }
   }
 
   private tick(now: number) {
     if (!this.active || !this.tracker || !this.runtime || !this.renderer || !this.smoother) return;
     try {
-      if (this.video.readyState >= 2 && this.video.currentTime !== this.lastVideoTime && now - this.lastInference >= this.interval) {
+      if (this.video.readyState >= 2 && this.video.videoWidth > 0 && this.video.videoHeight > 0 && this.video.currentTime !== this.lastVideoTime && now - this.lastInference >= this.interval) {
         this.lastVideoTime = this.video.currentTime; this.lastInference = now;
         if (this.canvas.width !== this.video.videoWidth) this.canvas.width = this.video.videoWidth;
         if (this.canvas.height !== this.video.videoHeight) this.canvas.height = this.video.videoHeight;
         const before = performance.now();
         const result = this.tracker.detectForVideo(this.video, now);
-        const torso = this.runtime.torsoFromPose(result.landmarks[0] || [], this.canvas.width, this.canvas.height);
-        this.interval = Math.min(125, Math.max(42, this.interval * 0.8 + (performance.now() - before) * 1.3 * 0.2));
+        try {
+        const torso = this.runtime.prepareTorso(result, this.canvas.width, this.canvas.height);
+
         if (torso && this.assetReady) {
-          this.renderer.draw(this.smoother.update(torso, now)); this.hadTracking = true; this.status("tracking");
+          this.status(this.renderer.draw(this.smoother.update(torso, now),result,this.video) || "tracking"); this.hadTracking = true;
         } else {
           this.renderer.clear(); this.smoother.reset();
           if (this.assetReady) this.status(this.hadTracking ? "lost" : "body_missing");
         }
+        } finally { this.runtime.releaseFrame(result); }
+        this.interval = Math.min(200, Math.max(42, this.interval * .8 + (performance.now() - before) * 1.3 * .2));
       } else if (now - this.lastInference > 350 && this.assetReady) {
         this.renderer.clear(); this.smoother.reset(); this.status(this.hadTracking ? "lost" : "body_missing");
       }
       this.frame = requestAnimationFrame(time => this.tick(time));
-    } catch { this.stop(); this.status("runtime_error"); }
+    } catch (error) { this.stop(); this.failure("frame", error); }
   }
 
   private updateCart() {
+    this.querySelectorAll<HTMLButtonElement>("[data-ar-sample]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.arSample === this.variant.value)));
+    this.handoff?.update(this.variant.value);
     const button = this.querySelector<HTMLButtonElement>("[data-ar-cart]");
     if (button) button.disabled = !!this.product.demo || this.cartBusy || !this.product.variants.some(v => v.id === this.variant.value && v.available && /^\d+$/.test(v.id) && !!v.asset);
   }

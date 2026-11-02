@@ -1,0 +1,15 @@
+# Adaptive 3D pilot
+
+This first implementation deforms the supplied white jacket mesh in the front-facing camera view. It is a visual experiment, not a calibrated body scan or clothing size recommendation.
+
+`adaptive-model.ts` precomputes sample-specific local affine influence weights. Each frame maps the shoulders, hips, elbows, wrists and collar to confident smoothed landmarks. The central torso uses shoulder/hip weights independent of arm movement to reduce hem distortion. The upper panel uses collar/shoulder weights independent of the arms, with a rounded shoulder cap correction. An ellipsoidal chest volume is added to both sides of the mesh and tapers away at the neck, waist and sides. These are sample-specific visual shape corrections, not measured anatomy. Original surface detail remains; the raw GLB is unchanged. There is no inferred depth scan or physical collision model. Vertex normals are recomputed after deformation, with softer lighting to show curvature.
+
+All four arm joints must be visible. Missing joints, significant yaw and wrists crossing beyond opposite shoulders suppress the overlay. Other crossed-arm configurations, large rotations and unusual poses can still distort it. Existing 2D samples retain their previous behavior. The white geometry remains untextured; approximate sample anchors and procedural deformation do not replace an authored skeleton, skin weights or morph targets.
+
+The sample's stand collar is extended vertically with a smooth falloff at its base, without widening its opening. Its deformation uses only upper-panel anchors, so arm movement does not collapse it. A subtle vertex tint distinguishes the rim on the white sample. This is a runtime shape correction; the source GLB and packaged geometry are unchanged. Rough source topology remains and real-camera neck placement still needs validation.
+
+After selecting **3D white mesh (experimental)** and starting the camera, shoppers can adjust jacket width and length between 85% and 115%, or reset both. These controls change visual proportions only and never change a Shopify variant. Controls disappear on garment change or camera shutdown and return to 100% on restart. Values remain in memory, with no measurements stored or uploaded.
+
+Run `npm run demo:ar`, then open `/model-check` to inspect standard, wider and longer synthetic torsos, elbow movement, original geometry, rotation and preview adjustments without camera permission. These synthetic checks establish rendering behavior only. Test actual camera alignment, clothing/background variations and mobile frame rate before merchant release.
+
+Next inputs: a clean textured jacket with artist-authored shoulder/elbow skinning and body-shape controls; measured garment dimensions for every real size; intended ease allowance. These enable the next stage of calibrated proportions and validated size recommendations. Hand/body occlusion and cloth simulation remain separate unfinished stages. The original `models/white-mesh.glb` is preserved unchanged. All changes are confined to Live AR.

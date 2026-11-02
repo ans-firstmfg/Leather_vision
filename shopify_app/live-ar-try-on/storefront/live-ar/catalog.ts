@@ -1,9 +1,9 @@
-export interface ARVariant { id: string; title: string; price: string; available: boolean; asset: string }
+export interface ARVariant { id: string; title: string; price: string; available: boolean; asset: string; fit?: string }
 export interface ARProduct { id: string; title: string; url: string; demo?: boolean; variants: ARVariant[] }
 
 export function mappedVariant(product: ARProduct, id: string): ARVariant | undefined {
   return product.variants.find(variant => variant.id === id && /^\d+$/.test(variant.id) && variant.available &&
-    /^https?:\/\//.test(variant.asset));
+    /^(https?:\/\/|\/\/|\/(?!\/))/.test(variant.asset));
 }
 
 export async function addVariantToCart(product: ARProduct, id: string, cartUrl: string,

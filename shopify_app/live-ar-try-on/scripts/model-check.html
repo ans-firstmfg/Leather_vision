@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Adaptive 3D jacket lab</title><link rel="stylesheet" href="/leather-vision-ar.css">
+<style>body{background:#151a16;color:#eee;font:16px/1.5 system-ui;max-width:1000px;margin:24px auto;padding:20px}canvas{width:100%;height:auto;background:#29312b;border-radius:12px}input,select{width:100%;min-height:44px}p{color:#cdd4cd}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}a{color:#d9e7b5}</style>
+<h1>Adaptive 3D jacket lab</h1><p>Your supplied mesh with experimental body and sleeve deformation. Synthetic landmarks demonstrate tracking behavior; they do not validate real body measurements. Camera-free test.</p>
+<div class="controls"><label>Preview mode<select id="mode"><option value="adaptive">Adaptive body preview</option><option value="original">Original 3D geometry</option></select></label><label>Body proportions<select id="body"><option value="standard">Standard torso</option><option value="wide">Wider torso</option><option value="long">Longer torso</option></select></label><label>Elbow bend<input id="bend" type="range" min="0" max="100" value="0"></label><label>Rotate original model<input id="yaw" type="range" min="-180" max="180" value="0"></label></div>
+<section id="adjustments" class="fm-ar"><div class="fm-ar__controls"></div></section><canvas width="900" height="700" aria-label="Original or adaptive 3D jacket preview"></canvas><p id="status" role="status">Loading model…</p><p><a href="/">Open Live AR and choose 3D white mesh to try your camera</a></p>
+<script type="module">
+import{ThreeGarment}from'/live-ar-3d.js';
+const canvas=document.querySelector('canvas'),context=canvas.getContext('2d'),status=document.querySelector('#status');let model;
+function render(){
+ context.clearRect(0,0,900,700);
+ if(document.querySelector('#mode').value==='original'){model.preview(context,Number(document.querySelector('#yaw').value)*Math.PI/180);status.textContent='Original mesh. No textures or authored skeleton.';return;}
+ const body=document.querySelector('#body').value,half=body==='wide'?130:100,hip=body==='wide'?115:85,base=body==='long'?540:460,bend=Number(document.querySelector('#bend').value)/100;
+ const rig={leftShoulder:{x:450-half,y:150},rightShoulder:{x:450+half,y:150},leftHip:{x:450-hip,y:base},rightHip:{x:450+hip,y:base},leftElbow:{x:450-half-35-40*bend,y:310-50*bend},rightElbow:{x:450+half+35+40*bend,y:310-50*bend},leftWrist:{x:450-half-45-80*bend,y:base-20-160*bend},rightWrist:{x:450+half+45+80*bend,y:base-20-160*bend}};
+ context.strokeStyle='#9fab90';context.lineWidth=16;context.lineCap='round';
+ context.beginPath();context.moveTo(rig.leftHip.x,base);context.lineTo(rig.leftShoulder.x,150);context.lineTo(rig.rightShoulder.x,150);context.lineTo(rig.rightHip.x,base);context.stroke();
+ context.beginPath();context.arc(450,80,43,0,Math.PI*2);context.stroke();
+ for(const side of ['left','right']){context.beginPath();for(const [i,joint]of['Shoulder','Elbow','Wrist'].entries()){const p=rig[side+joint];i?context.lineTo(p.x,p.y):context.moveTo(p.x,p.y);}context.stroke();}
+ const before=performance.now();model.draw(context,{x:450,y:(150+base)/2,width:half*2*1.28,height:(base-150)*1.18,angle:0,yaw:0,rig});
+ status.textContent='Adaptive mesh · '+body+' torso · elbow bend '+Math.round(bend*100)+'% · frame '+Math.round(performance.now()-before)+' ms. No cloth simulation or hand occlusion.';
+}
+try{model=new ThreeGarment(document.querySelector('#adjustments'));await model.load('/white-mesh.gltf.json');document.querySelectorAll('input,select').forEach(input=>input.addEventListener('input',render));document.querySelector('#adjustments').addEventListener('input',render);document.querySelector('#adjustments').addEventListener('click',render);render();}catch(error){status.textContent='Could not load 3D sample: '+error.message;}
+window.addEventListener('pagehide',()=>model?.dispose(),{once:true});
+</script></html>
+
