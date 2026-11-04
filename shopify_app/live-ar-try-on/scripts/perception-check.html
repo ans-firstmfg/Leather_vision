@@ -27,7 +27,7 @@ function render(){const f=frame(),pose=prepareTorso(f,480,640);if(!pose)return;
  for(const canvas of [before,after]){const c=canvas.getContext('2d');c.globalCompositeOperation='destination-over';c.drawImage(input,0,0);c.globalCompositeOperation='source-over';}
  document.querySelector('#synthetic').textContent='Sizing: '+after.dataset.bodySizing+' · accepted widths '+JSON.stringify(pose.body??{})+' · foreground hands '+after.dataset.handOcclusion+'. Hand crossing may reject contaminated silhouette rows.';releaseFrame(f);
 }
-try{await Promise.all([left.load('/ar-sample-cafe.png','cafe'),right.load('/ar-sample-cafe.png','cafe')]);document.querySelectorAll('input').forEach(el=>el.addEventListener('input',render));render();}catch(error){document.querySelector('#synthetic').textContent=error.message;}
+try{await Promise.all([left.load('/ar-sample-open-rider.png','open'),right.load('/ar-sample-open-rider.png','open')]);document.querySelectorAll('input').forEach(el=>el.addEventListener('input',render));render();}catch(error){document.querySelector('#synthetic').textContent=error.message;}
 document.querySelector('#run').onclick=async()=>{
  const status=document.querySelector('#runtime'),button=document.querySelector('#run');button.disabled=true;status.textContent='Loading actual body and hand models…';let tracker,result;
  try{const image=new Image();image.src='/perception-reference.png';await image.decode();const canvas=document.querySelector('#reference'),context=canvas.getContext('2d');context.fillStyle='#777';context.fillRect(0,0,480,640);const scale=Math.min(480/image.width,640/image.height);context.drawImage(image,(480-image.width*scale)/2,0,image.width*scale,image.height*scale);canvas.hidden=false;

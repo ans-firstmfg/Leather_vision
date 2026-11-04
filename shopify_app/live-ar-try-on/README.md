@@ -11,17 +11,15 @@ Independent Shopify extension-only app for the First MFG camera preview.
 
 Run `npm install`, then `npm run dev -- --store leather-vision-dev.myshopify.com`. Stop other Shopify CLI dev sessions first to avoid theme preview port conflicts. Follow the CLI install/preview link for this app, then add its Live AR Try-On block in the theme editor. The new extension gets its own Shopify identifier; do not reuse Leather Vision's UID.
 
-Enable **Show sample jackets when unconfigured** to see the three sample garments. For real purchases, select a product, transparent garment image and matching variant IDs. Sample mode cannot purchase anything.
+Enable **Show sample jackets when unconfigured** to see the two open-front image jackets. Both image jackets have straight sleeves and a transparent opening from neck to hem so the shopper's own clothing shows through. For real purchases, select a product, transparent garment image and matching variant IDs. Sample mode cannot purchase anything.
 
 The AR block previously belonged to Leather Vision. Remove that old block instance from the theme and add the block supplied by this new app after both app versions/previews are updated. Local changes alone do not update installed Shopify versions. Deploying the original app removes its old AR block, so do this on the development store/draft theme first.
 
-## 3D sample experiment
+## Body-aware image preview
+
+Both image samples have separate torso and sleeve meshes. Sleeves follow their own shoulders, elbows and wrists without pulling the body or opposite sleeve. The default front body has one shoulder-derived width from top to hem, with straight sides and no silhouette-driven waist taper. It follows body posture and camera distance, and the hem follows the hips. See `docs/straight-sizing.md`; `/fit-check` includes raised-arm and wrist-only synthetic poses. Generic uploaded jackets still need individual part calibration.
 
 The body-aware milestone adds segmentation-assisted torso proportions, One-Euro joint smoothing, world-landmark orientation, conservative hand occlusion, and subtle lighting adaptation. See `docs/body-aware-preview.md` for fallback rules and limits; run `/perception-check` on the local demo for synthetic and actual-runtime diagnostics. These remain visual previews, not reliable body measurements or size recommendations.
-
-The supplied GLB is preserved at `models/white-mesh.glb`. Select **3D white mesh (experimental)** from the sample row, then start the camera. The adaptive pilot deforms its torso and sleeves using confident shoulder, hip, elbow and wrist landmarks, with bounded visual width/length controls. This is sample-specific procedural deformation of untextured geometry, not an authored skeletal rig or a size recommendation. The separate Three.js helper loads only when this sample is selected after camera consent. The existing 2D options remain available.
-
-For camera-free inspection, run `npm run demo:ar` and open http://127.0.0.1:3092/model-check. Compare standard, wider and longer synthetic bodies, bend the elbows, adjust proportions, or rotate the original model. `node scripts/prepare-model.mjs` regenerates its self-contained glTF JSON equivalent for Shopify's supported asset formats. See `docs/adaptive-preview.md` for pilot behavior, limitations and required assets before realistic try-on.
 
 ## Laptop or phone camera
 
@@ -43,4 +41,4 @@ Shopify preview-bar CSS MIME failures and unused preload warnings come from stor
 
 `npm test`, `npm run typecheck`, and `npm run build` operate independently of Leather Vision. `npm run demo:ar` starts the loopback preview at http://127.0.0.1:3092.
 
-Camera processing stays on-device. The three sample jackets use a 2D mesh anchored at the shoulders, waist, elbows and wrists. For uploaded images, choose **Uploaded garment type** in the block: Vest uses a rigid overlay; Jacket uses a generic garment calibration. These are experimental visual previews, not 3D garments or size measurements. Cloth drape and arm occlusion are not simulated. Physical-phone tracking and real product alignment still require testing. See `docs/sample-assets.md` for image provenance and `docs/jacket-alignment.md` for calibration limits. Earlier investigation/validation files record the previous combined-app architecture; this README describes the current split.
+Camera processing stays on-device. The two open-front image samples use a 2D mesh anchored at the shoulders, waist, elbows and wrists. For uploaded images, choose **Uploaded garment type** in the block: Vest uses a rigid overlay; Jacket uses a generic garment calibration. These are experimental visual previews, not size measurements. Cloth drape and full forearm occlusion are not simulated. Physical-phone tracking and real product alignment still require testing. See `docs/open-front-sample.md` for the current images' provenance and `docs/jacket-alignment.md` for calibration limits. Earlier investigation/validation files record previous samples and the combined-app architecture; this README describes the current split.

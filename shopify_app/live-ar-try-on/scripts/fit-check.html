@@ -2,17 +2,26 @@
 <title>Jacket alignment check</title>
 <style>body{margin:0;padding:28px;background:#121411;color:#f4f3ef;font:15px/1.5 system-ui}main{max-width:1080px;margin:auto}h1{font-size:28px;margin:0 0 8px}p{color:#c6c9c0}.panels{display:grid;grid-template-columns:1fr 1fr;gap:20px}canvas{width:100%;background:#242920;border:1px solid #555f48;border-radius:10px}select{padding:10px;font:inherit;margin-bottom:20px}h2{font-size:18px}@media(max-width:640px){.panels{grid-template-columns:1fr}}</style>
 <main><h1>Jacket alignment check</h1><p>Technical illustration with fixed body landmarks. No camera, person photo, cloth simulation or sizing prediction.</p>
-<select aria-label="Sample jacket"><option value="cafe">Black cafe racer</option><option value="flame">Flame-detail jacket</option><option value="raider">Raider motorcycle jacket</option></select>
+<select aria-label="Sample jacket"><option value="open">Open-front rider jacket</option><option value="open_brown">Brown open-front jacket</option></select>
+<select id="pose" aria-label="Arm pose"><option value="down">Arms down</option><option value="left">Left arm raised</option><option value="both">Both arms raised</option><option value="wrist">Left wrist only</option></select>
 <div class="panels"><section><h2>Before: one flat rectangle</h2><canvas id="before" width="600" height="760"></canvas></section><section><h2>After: shoulder, waist and arm anchors</h2><canvas id="after" width="600" height="760"></canvas></section></div><p id="status" role="status">Loading…</p></main>
 <script type="module">
 import {GarmentRenderer,torsoFromPose} from '/leather-vision-ar-engine.js';
 const points=Array.from({length:33},()=>({x:.5,y:.5,visibility:.95}));
-for(const [i,x,y] of [[11,.32,.25],[12,.68,.25],[23,.37,.75],[24,.63,.75],[13,.19,.49],[14,.81,.49],[15,.30,.72],[16,.70,.72]])points[i]={x,y,visibility:.95};
-const pose=torsoFromPose(points,600,760),before=document.querySelector('#before'),after=document.querySelector('#after');
+for(const [i,x,y] of [[11,.32,.25],[12,.68,.25],[23,.37,.75],[24,.63,.75],[13,.19,.49],[14,.81,.49],[15,.18,.78],[16,.82,.78]])points[i]={x,y,visibility:.95};
+let pose=torsoFromPose(points,600,760);const before=document.querySelector('#before'),after=document.querySelector('#after');
 function mannequin(canvas){const c=canvas.getContext('2d');c.clearRect(0,0,600,760);c.fillStyle='#9da799';c.beginPath();c.ellipse(300,105,47,62,0,0,Math.PI*2);c.fill();c.lineCap='round';c.strokeStyle='#9da799';c.lineWidth=40;c.beginPath();c.moveTo(300,155);c.lineTo(300,205);c.stroke();c.beginPath();c.moveTo(192,190);c.lineTo(408,190);c.lineTo(390,590);c.lineTo(210,590);c.closePath();c.fill();for(const ids of [[11,13,15],[12,14,16]]){c.lineWidth=58;c.beginPath();ids.forEach((id,i)=>{const p=points[id];i?c.lineTo(p.x*600,p.y*760):c.moveTo(p.x*600,p.y*760)});c.stroke();}c.fillStyle='#677461';c.fillRect(220,590,68,170);c.fillRect(312,590,68,170);}
-async function render(){const fit=document.querySelector('select').value;const file={cafe:'ar-sample-cafe.png',flame:'ar-sample-flame.png',raider:'ar-sample-raider.png'}[fit];const flat=new GarmentRenderer(before),mesh=new GarmentRenderer(after);await Promise.all([flat.load('/'+file,'vest'),mesh.load('/'+file,fit)]);mannequin(before);mannequin(after);
+async function render(){const fit=document.querySelector('select').value;const file=fit==='open_brown'?'ar-sample-open-brown.png':'ar-sample-open-rider.png';const flat=new GarmentRenderer(before),mesh=new GarmentRenderer(after);await Promise.all([flat.load('/'+file,'vest'),mesh.load('/'+file,fit)]);mannequin(before);mannequin(after);
 // GarmentRenderer clears its overlay canvas. Composite its result over the illustration.
 for(const [canvas,renderer] of [[before,flat],[after,mesh]]){const base=document.createElement('canvas');base.width=600;base.height=760;base.getContext('2d').drawImage(canvas,0,0);renderer.draw(pose);const c=canvas.getContext('2d');c.globalCompositeOperation='destination-over';c.drawImage(base,0,0);c.globalCompositeOperation='source-over';}
 document.querySelector('#status').textContent='Rendered with the production garment renderer. Physical-device fit is still to be tested.';}
 document.querySelector('select').addEventListener('change',()=>render().catch(error=>document.querySelector('#status').textContent=error.message));render().catch(error=>document.querySelector('#status').textContent=error.message);
+document.querySelector('#pose').addEventListener('change',()=>{
+ const mode=document.querySelector('#pose').value;
+ for(const [i,x,y] of [[13,.19,.49],[14,.81,.49],[15,.18,.78],[16,.82,.78]])points[i]={x,y,visibility:.95};
+ if(mode==='left'||mode==='both'){points[13]={x:.16,y:.30,visibility:.95};points[15]={x:.14,y:.13,visibility:.95};}
+ if(mode==='both'){points[14]={x:.84,y:.30,visibility:.95};points[16]={x:.86,y:.13,visibility:.95};}
+ if(mode==='wrist')points[15]={x:.12,y:.30,visibility:.95};
+ pose=torsoFromPose(points,600,760);render().catch(error=>document.querySelector('#status').textContent=error.message);
+});
 </script></html>

@@ -162,7 +162,7 @@ class LiveARTryOn extends HTMLElement {
       const tracker = await this.runtime.createTracker();
       if (!valid()) { tracker.close(); return; }
       this.tracker = tracker;
-      this.renderer = new this.runtime.GarmentRenderer(this.canvas, this.dataset.modelModule);
+      this.renderer = new this.runtime.GarmentRenderer(this.canvas);
       this.smoother = new this.runtime.PoseSmoother();
       this.active = true;
       await this.loadAsset();

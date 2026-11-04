@@ -1,11 +1,12 @@
 import { test } from "node:test";
 import './perception.test';
+import './waist-sleeves.test';
 import {prepareTorso,releaseFrame} from '../storefront/live-ar/tracking';
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { CameraController } from "../storefront/live-ar/camera";
-import { torsoFromPose, PoseSmoother } from "../storefront/live-ar/pose";
+import { torsoFromPose, PoseSmoother, type Landmark } from "../storefront/live-ar/pose";
 import { mappedVariant, addVariantToCart, type ARProduct } from "../storefront/live-ar/catalog";
 import { mobileHandoffUrl, incomingHandoff } from "../storefront/live-ar/handoff";
 import { MobileHandoff } from "../storefront/live-ar/handoff-ui";
@@ -16,7 +17,7 @@ test('every image jacket uses a stable upper panel while retaining its collar st
   const torso=torsoFromPose(jacketPose(),640,480)!;
   const bent=structuredClone(torso);bent.rig!.rightElbow!.y-=100;bent.rig!.rightWrist!.y-=140;
   const a=jacketTargets(torso)!.points,b=jacketTargets(bent)!.points;
-  for(const profile of ['cafe','flame','raider','brown','trucker','jacket']){
+  for(const profile of ['open','open_brown','cafe','flame','raider','brown','trucker','jacket']){
     for(const p of [{x:.5,y:.02},{x:.2,y:.08},{x:.8,y:.08},{x:.5,y:.5}]){
       const original=jacketPoint(p,profile,a),moved=jacketPoint(p,profile,b);
       assert.ok(Math.abs(original.x-moved.x)<1e-6);assert.ok(Math.abs(original.y-moved.y)<1e-6);
@@ -32,93 +33,20 @@ test('every image jacket uses a stable upper panel while retaining its collar st
   assert.equal(jacketShapePoint({x:.5,y:0},'trucker').y,0);
   assert.equal(jacketShapePoint({x:.5,y:0},'jacket').y,0);
 });
-import { adaptiveTargets, influences, modelAnchors, boundedAdjustment, roundedShoulderPoint, roundedChestDepth, prominentCollarPoint, collarWeight } from '../storefront/live-ar/adaptive-model';
-
-test('stand collar gains height without widening or folding its base into the chest',()=>{
-  for(const p of [{x:.2,y:0},{x:.5,y:.1},{x:.5,y:.4}])assert.deepEqual(prominentCollarPoint(p),p);
-  let previous=-Infinity;
-  for(let step=0;step<=100;step++){
-    const y=step/1000,left=prominentCollarPoint({x:.42,y}),right=prominentCollarPoint({x:.58,y});
-    assert.equal(left.x,.42);assert.equal(right.x,.58);assert.ok(Math.abs(left.y-right.y)<1e-12);
-    assert.ok(left.y>previous);previous=left.y;
-    assert.ok(collarWeight({x:.5,y})>=0 && collarWeight({x:.5,y})<=1);
-  }
-  assert.ok(prominentCollarPoint({x:.5,y:0}).y<-.1);
-  const torso=torsoFromPose(jacketPose(),640,480)!;
-  const bent=structuredClone(torso);bent.rig!.leftWrist!.y-=120;
-  const w=influences(prominentCollarPoint({x:.45,y:.02}));
-  for(const width of [.85,1,1.15])for(const length of [.85,1,1.15]){
-    const a=adaptiveTargets(torso,{width,length})!.points,b=adaptiveTargets(bent,{width,length})!.points;
-    for(const axis of ['x','y'] as const){
-      const before=w.reduce((sum,n,i)=>sum+n*a[i][axis],0),after=w.reduce((sum,n,i)=>sum+n*b[i][axis],0);
-      assert.ok(Number.isFinite(before));assert.ok(Math.abs(before-after)<1e-6);
-    }
-  }
+test('pose mouth clearance is confidence-gated, bounded, smoothed and dropped on tracking loss',()=>{
+  const points:Landmark[]=Array.from({length:33},()=>({x:.5,y:.5,visibility:1}));
+  points[11]={x:.3,y:.4,visibility:1};points[12]={x:.7,y:.4,visibility:1};
+  points[23]={x:.35,y:.85,visibility:1};points[24]={x:.65,y:.85,visibility:1};
+  points[9]={x:.48,y:.24,visibility:1};points[10]={x:.52,y:.24,visibility:1};
+  const a=torsoFromPose(points,640,480)!;assert.ok(a.neckClearance!>=.25&&a.neckClearance!<=.38);
+  const filter=new PoseSmoother();filter.update(a,100);
+  const next=filter.update({...a,neckClearance:.38},133);assert.ok(next.neckClearance!<.38);
+  points[9].visibility=.3;const missing=torsoFromPose(points,640,480)!;assert.equal(missing.neckClearance,undefined);
+  assert.equal(filter.update(missing,166).neckClearance,undefined);
+  points[9].visibility=1;points[9].x=points[10].x=.95;
+  assert.equal(torsoFromPose(points,640,480)!.neckClearance,undefined);
 });
 
-test('rounded shoulder cap preserves the collar and waist, and chest volume tapers to the sides',()=>{
-  assert.deepEqual(roundedShoulderPoint({x:.5,y:0}),{x:.5,y:0});
-  assert.deepEqual(roundedShoulderPoint({x:.1,y:.5}),{x:.1,y:.5});
-  const left=roundedShoulderPoint({x:.15,y:.08}),right=roundedShoulderPoint({x:.85,y:.08});
-  assert.ok(left.y>.08 && left.y<.18);assert.equal(left.y,right.y);
-  assert.ok(roundedChestDepth(.5,.38,20,200)>20);
-  assert.ok(roundedChestDepth(.5,.38,-20,200)<-20);
-  assert.equal(roundedChestDepth(.5,0,20,200),20);
-  assert.equal(roundedChestDepth(.1,.38,20,200),20);
-  assert.ok(roundedChestDepth(.5,.38,20,200)>roundedChestDepth(.7,.38,20,200));
-});
-
-test('upper panel stays independent of asymmetric arm motion',()=>{
-  const torso=torsoFromPose(jacketPose(),640,480)!;
-  const bent=structuredClone(torso);bent.rig!.rightElbow!.y-=100;bent.rig!.rightWrist!.y-=140;
-  const before=adaptiveTargets(torso)!.points,after=adaptiveTargets(bent)!.points;
-  for(const p of [{x:.15,y:.08},{x:.85,y:.08},{x:.5,y:.15}]){
-    const weights=influences(roundedShoulderPoint(p));
-    for(const axis of ['x','y'] as const){
-      const a=weights.reduce((n,w,i)=>n+w*before[i][axis],0),b=weights.reduce((n,w,i)=>n+w*after[i][axis],0);
-      assert.ok(Math.abs(a-b)<1e-6);
-    }
-  }
-});
-
-test('3D influence coefficients preserve the original mesh and exactly attach garment anchors', () => {
-  for(const p of [...modelAnchors,{x:.1,y:.8},{x:.5,y:.5},{x:0,y:0},{x:1,y:1}]){
-    const w=influences(p);
-    const x=w.reduce((n,v,i)=>n+v*modelAnchors[i].x,0),y=w.reduce((n,v,i)=>n+v*modelAnchors[i].y,0);
-    assert.ok(Math.abs(x-p.x)<1e-6);assert.ok(Math.abs(y-p.y)<1e-6);
-    assert.ok(Math.abs(w.reduce((a,b)=>a+b,0)-1)<1e-6);
-  }
-});
-
-test('3D adaptation responds independently to body width, torso length and bent elbows', () => {
-  const torso=torsoFromPose(jacketPose(),640,480)!;
-  const target=adaptiveTargets(torso)!;assert.equal(target.complete,true);
-  const wider=structuredClone(torso);wider.rig!.leftShoulder.x-=30;wider.rig!.rightShoulder.x+=30;
-  assert.ok(adaptiveTargets(wider)!.points[1].x-adaptiveTargets(wider)!.points[0].x>target.points[1].x-target.points[0].x);
-  const bent=structuredClone(torso);bent.rig!.leftElbow!.y-=45;
-  assert.equal(adaptiveTargets(bent)!.points[4].y,target.points[4].y-45);
-  assert.deepEqual(adaptiveTargets(bent)!.points[0],target.points[0]);
-  const long=adaptiveTargets(torso,{width:1,length:1.1})!;
-  assert.ok(long.points[2].y>target.points[2].y);assert.equal(long.points[2].x,target.points[2].x);
-  assert.deepEqual(boundedAdjustment({width:10,length:NaN}),{width:1.15,length:1});
-  assert.equal(adaptiveTargets({...torso,yaw:.5}),null);
-  delete bent.rig!.leftWrist;assert.equal(adaptiveTargets(bent)!.complete,false);
-  bent.rig!.leftWrist={x:600,y:300};assert.equal(adaptiveTargets(bent),null);
-});
-
-test('all sample 3D vertices produce finite adaptive positions on a bent-arm body', async () => {
-  const gltf=JSON.parse(await readFile('extensions/live-ar/assets/white-mesh.gltf.json','utf8'));
-  const accessor=gltf.accessors[gltf.meshes[0].primitives[0].attributes.POSITION],view=gltf.bufferViews[accessor.bufferView];
-  const buffer=Buffer.from(gltf.buffers[view.buffer].uri.split(',')[1],'base64');
-  const target=adaptiveTargets(torsoFromPose(jacketPose(),640,480)!)!;
-  for(let i=0;i<accessor.count;i++){
-    const offset=(view.byteOffset??0)+(accessor.byteOffset??0)+i*(view.byteStride??12);
-    const x=buffer.readFloatLE(offset),y=buffer.readFloatLE(offset+4);
-    const w=influences({x:(x-accessor.min[0])/(accessor.max[0]-accessor.min[0]),y:1-(y-accessor.min[1])/(accessor.max[1]-accessor.min[1])});
-    const px=w.reduce((n,v,j)=>n+v*target.points[j].x,0),py=w.reduce((n,v,j)=>n+v*target.points[j].y,0);
-    assert.ok(Number.isFinite(px)&&Number.isFinite(py));assert.ok(Math.abs(px)<2000&&Math.abs(py)<2000);
-  }
-});
 
 const { JSDOM } = createRequire(import.meta.url)("jsdom") as {
   JSDOM: new (markup: string, options: object) => { window: Window & typeof globalThis };
@@ -422,23 +350,6 @@ test("sample garments cannot reach Shopify cart endpoints", async () => {
   assert.ok(mappedVariant(sample, "101"), "sample image can be previewed");
   await assert.rejects(addVariantToCart(sample, "101", "/cart/add.js", new AbortController().signal, fetcher, "https://shop.example"), /variant_unavailable/);
   assert.equal(calls, 0);
-});
-
-test("supplied GLB and Shopify-compatible model contain the same self-contained geometry", async () => {
-  const binary = await readFile("models/white-mesh.glb");
-  assert.equal(binary.readUInt32LE(0), 0x46546c67);
-  assert.equal(binary.readUInt32LE(4), 2);
-  assert.equal(binary.readUInt32LE(8), binary.length);
-  const converted = JSON.parse(await readFile("extensions/live-ar/assets/white-mesh.gltf.json", "utf8"));
-  assert.equal(converted.accessors[0].count / 3, 40000);
-  assert.equal(converted.accessors[1].count, 16992);
-  assert.equal(converted.skins, undefined); assert.equal(converted.images, undefined);
-  const payload = Buffer.from(converted.buffers[0].uri.split(",")[1], "base64");
-  const binStart = 20 + binary.readUInt32LE(12) + 8;
-  assert.equal(payload.length, converted.buffers[0].byteLength);
-  assert.deepEqual(payload, binary.subarray(binStart, binStart + payload.length));
-  const liquid = await readFile("extensions/live-ar/blocks/live-ar.liquid", "utf8");
-  assert.ok(liquid.includes("model3d") && liquid.includes("white-mesh.gltf.json"));
 });
 
 test("Shopify CDN asset URLs work in absolute, protocol-relative and storefront-relative form", async () => {

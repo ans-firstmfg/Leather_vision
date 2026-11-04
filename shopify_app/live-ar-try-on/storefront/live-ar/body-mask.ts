@@ -1,4 +1,5 @@
 import type { Point,Torso } from './pose';
+import {waistFraction} from './pose';
 
 export interface BodyMask { width:number; height:number; data:Float32Array }
 export interface BodyWidths { chest:number; waist:number; hips:number }
@@ -17,7 +18,7 @@ export function silhouetteWidths(mask:BodyMask,torso:Torso,width:number,height:n
   const ux=Math.cos(torso.angle),uy=Math.sin(torso.angle),along=(p:Point,c:Point)=>(p.x-c.x)*ux+(p.y-c.y)*uy;
   const down=(p:Point,c:Point)=>-(p.x-c.x)*uy+(p.y-c.y)*ux;
   const result:Partial<BodyWidths>={};
-  for(const [name,fraction] of [['chest',.30],['waist',.65],['hips',.90]] as const){
+  for(const [name,fraction] of [['chest',.30],['waist',waistFraction],['hips',.90]] as const){
     const samples:number[]=[];
     for(const delta of [-.025,0,.025]){
       const t=fraction+delta,c={x:top.x+(bottom.x-top.x)*t,y:top.y+(bottom.y-top.y)*t};

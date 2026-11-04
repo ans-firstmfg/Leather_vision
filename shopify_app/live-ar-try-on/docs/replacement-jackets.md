@@ -1,6 +1,6 @@
 # Replacement sample jackets
 
-Current choices: Black cafe racer (ID 1), Flame-detail jacket (ID 6), Raider motorcycle jacket (ID 7), and experimental 3D white mesh (ID 4). Mastermind (ID 5) and its packaged cutout were removed at the user's request. Retired IDs are not reassigned, preserving phone-link behavior. This changes demo choices only, not Shopify product records. Small thumbnails remain in a single horizontally scrolling row.
+Historical note: these samples were subsequently removed at the user's request. Current choices are Open-front rider jacket (ID 8) and Brown open-front jacket (ID 9); see `open-front-sample.md`. All 3D models are removed. Retired IDs are not reassigned. The preparation notes below describe former samples.
 
 Inputs were the user-supplied `9_a70dc6a8-e8a5-4d56-a3d7-8e24880d9459.webp` and Raider product WEBP in Documents. The first name is descriptive, pending an official product title. Separate approximate alignment profiles cover each jacket. Raider retains the source's angled perspective; no true front or side views are inferred. Real-camera alignment remains unvalidated.
 
