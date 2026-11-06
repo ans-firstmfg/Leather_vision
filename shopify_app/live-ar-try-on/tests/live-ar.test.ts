@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import './perception.test';
 import './waist-sleeves.test';
+import './sizing.test';
+import './size-selection.test';
 import {prepareTorso,releaseFrame} from '../storefront/live-ar/tracking';
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
@@ -10,6 +12,7 @@ import { torsoFromPose, PoseSmoother, type Landmark } from "../storefront/live-a
 import { mappedVariant, addVariantToCart, type ARProduct } from "../storefront/live-ar/catalog";
 import { mobileHandoffUrl, incomingHandoff } from "../storefront/live-ar/handoff";
 import { MobileHandoff } from "../storefront/live-ar/handoff-ui";
+import {demoSizeChart} from '../storefront/live-ar/size-profiles';
 import jsQR from "jsqr";
 import { profiles, jacketTargets, warpPoint, drawJacket, jacketPoint, jacketShapePoint } from "../storefront/live-ar/garment-mesh";
 
@@ -231,16 +234,16 @@ test("cart refuses unmapped IDs, stale stock, subscription variants and external
   await assert.rejects(addVariantToCart(product, "101", "/en/cart/add.js", new AbortController().signal, subscription, "https://shop.example"), /variant_unavailable/);
 });
 
-async function ui(url = "https://shop.example/en/products/pilot?variant=101") {
+async function ui(url = "https://shop.example/en/products/pilot?variant=101",configured=product) {
   const source = await readFile("extensions/live-ar/assets/leather-vision-ar.js", "utf8");
   const dom = new JSDOM(`<first-mfg-live-ar><button data-ar-open>Open</button><button data-ar-mobile>Phone</button><p data-ar-mobile-error hidden></p><section data-ar-mobile-panel hidden tabindex="-1"><button data-ar-mobile-close>Close phone</button><div data-ar-qr></div><a data-ar-mobile-link hidden></a><p data-ar-mobile-unavailable hidden></p></section><dialog><button data-ar-close>Close</button><button data-ar-start>Start</button><button data-ar-switch>Switch</button><video></video><canvas></canvas><select><option value="101">Black M</option></select><p data-ar-status></p><button data-ar-cart>Buy</button><p data-ar-cart-status></p></dialog></first-mfg-live-ar>`, {
     url, runScripts: "outside-only", pretendToBeVisual: true,
   });
   const window = dom.window;
   const root = window.document.querySelector("first-mfg-live-ar") as unknown as HTMLElement & {
-    start(): Promise<void>; addToCart(): Promise<void>; loadRuntime(): Promise<unknown>; loadHandoff(): Promise<unknown>;
+    start(): Promise<void>; addToCart(): Promise<void>; loadRuntime(): Promise<unknown>; loadHandoff(): Promise<unknown>;loadSizing():Promise<void>;
   };
-  root.dataset.product = JSON.stringify(product); root.dataset.copy = JSON.stringify({ denied: "Camera blocked", paused: "Paused" });
+  root.dataset.product = JSON.stringify(configured); root.dataset.copy = JSON.stringify({ denied: "Camera blocked", paused: "Paused" });
   root.dataset.handoffId = "pilot-block";
   Object.defineProperty(window, "isSecureContext", { value: true });
   window.HTMLMediaElement.prototype.pause = () => {};
@@ -309,7 +312,7 @@ test("active tracking renders only confident poses, clears on loss, and releases
   Object.defineProperties(video, { readyState: { value: 2 }, videoWidth: { value: 640 }, videoHeight: { value: 480 }, currentTime: { get: () => time } });
   root.loadRuntime = async () => ({ mappedVariant, torsoFromPose, PoseSmoother,prepareTorso,releaseFrame,
     createTracker: async () => ({ detectForVideo: () => ({ landmarks: [points],segmentationMasks:[{width:8,height:8,getAsFloat32Array:()=>new Float32Array(64),close(){masksClosed++;}}] }), close: () => { closed++; } }),
-    GarmentRenderer: class { async load() {} draw() { draws++; } clear() { clears++; } dispose() { disposed++; } },
+    GarmentRenderer: class { async load() {} draw() { draws++; } clear() { clears++; } resetTracking(){clears++;} dispose() { disposed++; } },
   });
   click("[data-ar-open]"); await root.start();
   frames.shift()!(100); assert.equal(root.dataset.state, "tracking"); assert.equal(draws, 1);assert.equal(masksClosed,1);
@@ -321,6 +324,43 @@ test("active tracking renders only confident poses, clears on loss, and releases
   assert.equal(root.dataset.state, "paused");
   frames.shift()!(700); assert.equal(draws, 1, "A stale scheduled frame must not draw after cleanup");
   root.remove(); window.close();
+});
+
+test('size choice survives camera restart and late artwork loads while same-artwork size changes avoid reload',async()=>{
+  const configured:ARProduct={id:'9',title:'Jacket',url:'/products/jacket',variants:[
+    {id:'101',title:'M',size:'M',price:'',available:true,asset:'/same.png',fit:'open'},
+    {id:'103',title:'L',size:'L',price:'',available:true,asset:'/same.png',fit:'open'},
+    {id:'104',title:'XL',size:'XL',price:'',available:true,asset:'/other.png',fit:'open'},
+  ]};
+  const {window,root,click}=await ui(undefined,configured);
+  const locale=JSON.parse(await readFile('extensions/live-ar/locales/en.default.json','utf8')).live_ar;
+  root.dataset.sizeCopy=JSON.stringify(locale);root.dataset.sizeChart=JSON.stringify({...demoSizeChart,productId:'9'});
+  root.querySelector('dialog')!.insertAdjacentHTML('beforeend',`<p data-size-result></p><p data-size-note></p><div data-size-capture></div><button data-size-use></button>${['M','L','XL'].map(size=>`<input type="radio" name="size" value="${size}" data-ar-size>`).join('')}`);
+  const select=root.querySelector('select')!;select.add(new window.Option('L','103'));select.add(new window.Option('XL','104'));
+  const helper=await readFile('extensions/live-ar/assets/live-ar-sizing.js','utf8');
+  window.eval(helper.replace(/export\s*\{([^}]+)\};?\s*$/,(_,exports:string)=>exports.split(',').map(e=>{const [name,alias]=e.trim().split(/\s+as\s+/);return `window.${alias||name}=${name};`;}).join('')));
+  root.loadSizing=async()=>{(root as any).sizing??=new (window as any).SizeAssistant(root,configured,()=>true);};
+  let loads=0,videoTime=1,finishOther!:()=>void,lastGrading:{width:number;length:number;sleeve:number}|undefined;
+  window.requestAnimationFrame=()=>1;window.cancelAnimationFrame=()=>{};
+  Object.defineProperty(window.navigator,'mediaDevices',{value:{getUserMedia:async()=>({getTracks:()=>[{stop(){}}]})}});
+  Object.defineProperties(root.querySelector('video'),{readyState:{value:2},videoWidth:{value:640},videoHeight:{value:480},currentTime:{get:()=>videoTime}});
+  root.loadRuntime=async()=>({mappedVariant,PoseSmoother,prepareTorso,releaseFrame,
+    createTracker:async()=>({detectForVideo:()=>({landmarks:[pose()]}),close(){}}),
+    GarmentRenderer:class {
+      private asset='';private generation=0;
+      async load(url:string){loads++;const generation=++this.generation;if(url==='/other.png')await new Promise<void>(resolve=>{finishOther=resolve;});if(generation===this.generation)this.asset=url;}
+      readyFor(url:string){return this.asset===url;}clear(){}resetTracking(){}dispose(){this.generation++;}
+      draw(_t:unknown,_f:unknown,_v:unknown,_n:number,grading:typeof lastGrading){lastGrading=grading;}
+    },
+  });
+  const tick=(now:number)=>{videoTime++;(root as any).tick(now);};
+  click('[data-ar-open]');await root.start();tick(100);assert.equal(loads,1);assert.equal(root.dataset.selectedSize,'M');
+  click('[data-ar-size][value="L"]');await Promise.resolve();tick(200);assert.equal(loads,1);assert.ok(lastGrading!.width>1);const l=lastGrading;
+  await root.start();tick(300);assert.equal(root.dataset.selectedSize,'L');assert.deepEqual(lastGrading,l);assert.equal(loads,2);
+  click('[data-ar-size][value="XL"]');click('[data-ar-size][value="M"]');await new Promise(resolve=>setTimeout(resolve,0));tick(400);
+  assert.equal(root.dataset.selectedSize,'M');assert.equal(lastGrading!.width,1);
+  finishOther();await new Promise(resolve=>setTimeout(resolve,0));tick(500);assert.equal(root.dataset.selectedSize,'M');assert.equal(lastGrading!.length,1);
+  click('[data-ar-close]');root.remove();window.close();
 });
 
 test("tracker finishing after close is disposed without restarting the camera", async () => {

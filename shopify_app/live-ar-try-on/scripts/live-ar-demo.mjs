@@ -25,11 +25,16 @@ let markup = block.slice(start, end)
   .replace(/<button[^>]*data-ar-cart[\s\S]*?<\/button>/, "")
   .replace(/{% if block.settings.photo_url[\s\S]*?{% endif %}/, "")
   .replace(/<a href="{{ routes.cart_url }}"[\s\S]*?<\/a>/, "")
+  .replace(/{% assign size_labels[^%]*%}/, '')
+  .replace(/{% for size_label in size_labels %}([\s\S]*?){% endfor %}/, (_, template) => ['S','M','L','XL','XXL','3XL'].map(size => template.replaceAll('{{ size_label }}',size)).join(''))
+  .replace(/{% if demo and size_label == 'M' %}checked{% endif %}/g,'')
   .replace(/{{ 'live_ar\.(\w+)' \| t(?: \| escape)? }}/g, (_, key) => escape(copy[key]))
   .replaceAll("{{ ar_data | escape }}", escape(JSON.stringify(product)))
   .replaceAll("{{ ar_copy | escape }}", escape(JSON.stringify(copy)))
   .replaceAll("{{ 'leather-vision-ar-engine.js' | asset_url }}", "/leather-vision-ar-engine.js")
   .replaceAll("{{ 'live-ar-handoff.js' | asset_url }}", "/live-ar-handoff.js")
+  .replaceAll("{{ 'live-ar-sizing.js' | asset_url }}", "/live-ar-sizing.js")
+  .replaceAll("{{ size_copy | escape }}", escape(JSON.stringify(copy)))
   .replaceAll("{{ block.id | escape }}", "demo")
   .replaceAll("{{ request.path | prepend: request.origin | escape }}", "http://127.0.0.1:3092/")
   .replaceAll("{{ ar_product.title | escape }}", product.title)
@@ -38,7 +43,7 @@ let markup = block.slice(start, end)
   .replace(/{{[\s\S]*?}}/g, "");
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500"><defs><linearGradient id="leather"><stop stop-color="#20211f"/><stop offset=".5" stop-color="#41433d"/><stop offset="1" stop-color="#151713"/></linearGradient></defs><path d="M80 12 145 0 200 76 255 0 320 12 308 120 370 176 360 480 40 480 30 176 92 120Z" fill="url(#leather)" stroke="#c6ccab" stroke-width="3"/><path d="m145 0 55 76 55-76-28 130-27-44-27 44Z" fill="#10120e" stroke="#9da68a"/><path d="M200 90v390M58 330h104v66H56m286-66H238v66h106" fill="none" stroke="#8b9479" stroke-width="4"/><text x="200" y="250" fill="#dae6bb" text-anchor="middle" font-size="20" font-family="sans-serif">CALIBRATION</text><text x="200" y="278" fill="#dae6bb" text-anchor="middle" font-size="14" font-family="sans-serif">NOT PRODUCT ARTWORK</text></svg>`;
 const page = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>First MFG Live AR Lab</title><link rel="stylesheet" href="/leather-vision-ar.css"><style>body{margin:0;background:#121411;color:#f4f3ef;font:16px/1.6 system-ui}main{max-width:900px;margin:10vh auto;padding:24px}h1{font-size:clamp(32px,5vw,56px);line-height:1.08;max-width:700px}p{max-width:650px;color:#c6c9c0}small{letter-spacing:.15em;color:#dae6bb}</style><main><small>FIRST MFG · EXPERIMENTAL CAMERA LAB</small><h1>Move with your next idea.</h1><p>Try the black or brown open-front jacket with a transparent center. These visual previews are not fit measurements or purchasable products.</p><p>Nothing is recorded or uploaded. The tracker downloads from jsDelivr and Google only after you allow the camera. Frame your shoulders and hips, face forward and move slowly.</p>${markup}<p>Product mapping and physical-device validation are still pending. Side views, cloth simulation and full forearm occlusion are outside this milestone.</p></main><script src="/leather-vision-ar.js" defer></script></html>`;
-const assets = new Set(["leather-vision-ar.js", "leather-vision-ar-engine.js", "live-ar-handoff.js", "leather-vision-ar.css", ...samples.map(({file}) => file)]);
+const assets = new Set(["leather-vision-ar.js", "leather-vision-ar-engine.js", "live-ar-handoff.js", "live-ar-sizing.js", "leather-vision-ar.css", ...samples.map(({file}) => file)]);
 createServer(async (request, response) => {
   const name = new URL(request.url || "/", "http://127.0.0.1:3092").pathname.slice(1);
   response.setHeader("Cache-Control", "no-store");

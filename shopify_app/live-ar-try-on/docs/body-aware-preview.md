@@ -1,5 +1,9 @@
 # Body-aware preview milestone
 
+This document describes the earlier perception milestone. Current automatic
+straight-body scaling and experimental height-calibrated size recommendations
+are documented in [size-recommendations.md](size-recommendations.md).
+
 ## Implemented
 
 - The existing pinned MediaPipe Pose Landmarker now returns person segmentation and world landmarks. No TensorFlow dependency was added. Masks are read and released inside each frame, including failures and tracking loss.

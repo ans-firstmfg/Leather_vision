@@ -12,6 +12,8 @@
     "sample_info": "Preview the black and brown open-front image jackets without configuring a product. Samples cannot be purchased.",
     "garment_kind": "Uploaded garment type",
     "vest": "Vest",
-    "jacket": "Jacket (experimental sleeve alignment)"
+    "jacket": "Jacket (experimental sleeve alignment)",
+    "size_chart": "Approved product size chart (JSON, cm)",
+    "size_chart_info": "Real products require a matching productId, body ranges and garment dimensions. See docs/size-recommendations.md for the format. Leave blank until approved measurements are available. Demo mode uses illustrative data only."
   }
 }

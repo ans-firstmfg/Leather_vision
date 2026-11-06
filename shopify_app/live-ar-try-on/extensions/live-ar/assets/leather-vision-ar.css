@@ -39,9 +39,26 @@
 .fm-ar__button:disabled { opacity: .45; cursor: default; }
 .fm-ar a { color: #e3edca; font-size: 14px; text-underline-offset: 3px; }
 .fm-ar :focus-visible { outline: 3px solid #f9ca70; outline-offset: 3px; }
+.fm-ar__sizing { border: 1px solid #606957; border-radius: 10px; padding: 12px; }
+.fm-ar__sizing summary { cursor: pointer; font-weight: 650; }
+.fm-ar__sizing .fm-ar__sizes { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; }
+.fm-ar__size-label { margin-bottom: 8px; font-size: 13px; }
+.fm-ar__size-option { position: relative; cursor: pointer; }
+.fm-ar__size-option input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; }
+.fm-ar__size-option span { display: grid; place-items: center; min-width: 42px; min-height: 44px; padding-inline: 6px; border: 1px solid #6a7161; border-radius: 6px; }
+.fm-ar__size-option input:checked + span { background: #dae6bb; color: #14200b; border-color: #dae6bb; }
+.fm-ar__size-option input:focus-visible + span { outline: 3px solid #f9ca70; outline-offset: 3px; }
+.fm-ar__size-option input:disabled + span { opacity: .45; cursor: default; }
+.fm-ar__size-capture { display: grid; gap: 10px; }
+.fm-ar__sizing input[type="number"] { box-sizing: border-box; width: 100%; min-height: 44px; padding: 8px 12px; background: #121411; color: #f4f3ef; border: 1px solid #6a7161; border-radius: 6px; font: inherit; }
+.fm-ar__sizing [data-size-result] { padding: 10px; border-inline-start: 3px solid #dae6bb; color: #f4f3ef; }
+.fm-ar__size-guide { position: absolute; inset-inline: 12px; bottom: 12px; padding: 12px; margin: 0; background: #111e; color: #fff; border: 1px solid #dae6bb; border-radius: 10px; font-size: 14px; line-height: 1.5; text-align: center; }
+.fm-ar__sizing[open] { display: grid; gap: 12px; }
+.fm-ar__sizing fieldset { min-width: 0; display: grid; gap: 8px; border: 1px solid #606957; border-radius: 6px; padding: 10px; margin: 0; }
 @media (min-width: 780px) {
   .fm-ar__dialog[open] { grid-template: auto 1fr / minmax(0, 1fr) 320px; }
   .fm-ar__header { grid-column: 1 / -1; }
   .fm-ar__controls { align-content: center; gap: 18px; }
+  .fm-ar__controls:has(.fm-ar__sizing[open]) { align-content: start; min-height: 0; overflow-y: auto; }
 }
 @media (max-width: 779px) { .fm-ar__dialog { border-radius: 0; border: 0; } }

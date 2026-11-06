@@ -1,6 +1,7 @@
 import type { Point, Torso } from "./pose";
 import {hipFrame} from './pose';
 import { garmentInfluences, torsoInfluences } from './garment-shape';
+import {neutralGrading,type SizeGrading} from './size-profiles';
 
 // Normalized joints measured on the prepared sample textures, rather than the PNG bounds.
 export const profiles: Record<string, Point[]> = {
@@ -102,7 +103,7 @@ export function jacketPoint(v: Point, profile: string, target: Point[]): Point {
   return {x:w.reduce((sum,n,i)=>sum+n*target[i].x,0),y:w.reduce((sum,n,i)=>sum+n*target[i].y,0)};
 }
 
-export function jacketTargets(torso: Torso, profile = ''): { points: Point[]; complete: boolean } | null {
+export function jacketTargets(torso: Torso, profile = '',grading:SizeGrading=neutralGrading): { points: Point[]; complete: boolean } | null {
   const r = torso.rig;
   if (!r) return null;
   const dx = r.rightShoulder.x - r.leftShoulder.x, dy = r.rightShoulder.y - r.leftShoulder.y;
@@ -111,16 +112,19 @@ export function jacketTargets(torso: Torso, profile = ''): { points: Point[]; co
   const offset = (p: Point, across: number, down = 0) => ({ x: p.x + ux * across - uy * down, y: p.y + uy * across + ux * down });
   // Pose shoulder joints sit inside the upper arm, below the garment's shoulder
   // seam. Lift along the body axis so the jacket covers the actual shoulder cap.
-  const shoulderLeft = offset(r.leftShoulder, -span * .055, -span * .10), shoulderRight = offset(r.rightShoulder, span * .055, -span * .10);
+  const visual=Number.isFinite(torso.previewWidth)?Math.max(.95,Math.min(1.35,torso.previewWidth!)):1;
+  const coverage=span*(visual*grading.width*1.11-1)/2;
+  const shoulderLeft = offset(r.leftShoulder, -coverage, -span * .10), shoulderRight = offset(r.rightShoulder, coverage, -span * .10);
   const hips=hipFrame(torso)!;
   // The open brown sample needs slightly more neck and hem coverage. Lengthen
   // only its body panel; shoulder seams, elbows and cuffs stay pose-anchored.
   const hemDrop=span*(profile==='open_brown'?.16:.10);
   const leftHem = offset(hips.center,-hips.width*.54,hemDrop), rightHem = offset(hips.center,hips.width*.54,hemDrop);
-  const elbowLeft = r.leftElbow ?? offset(shoulderLeft,-span*.10,torso.height*.48);
-  const elbowRight = r.rightElbow ?? offset(shoulderRight,span*.10,torso.height*.48);
-  const wristLeft = r.leftWrist ?? offset(elbowLeft,0,torso.height*.42);
-  const wristRight = r.rightWrist ?? offset(elbowRight,0,torso.height*.42);
+  const between=(a:Point,b:Point,t:number)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+  const elbowLeft = r.leftElbow ?? (r.leftWrist?between(shoulderLeft,r.leftWrist,.52):offset(shoulderLeft,-span*.10,torso.height*.48));
+  const elbowRight = r.rightElbow ?? (r.rightWrist?between(shoulderRight,r.rightWrist,.52):offset(shoulderRight,span*.10,torso.height*.48));
+  const wristLeft = r.leftWrist ?? between(shoulderLeft,elbowLeft,1.85);
+  const wristRight = r.rightWrist ?? between(shoulderRight,elbowRight,1.85);
   // Collar height follows shoulder span, not torso length, to avoid stretching onto the face.
   const neck = {x:(r.leftShoulder.x+r.rightShoulder.x)/2,y:(r.leftShoulder.y+r.rightShoulder.y)/2};
   const collarRise=span*(profile==='open_brown'?.335:.30);
@@ -131,6 +135,17 @@ export function jacketTargets(torso: Torso, profile = ''): { points: Point[]; co
     const measured=torso.body?.[key];
     if(measured!==undefined){const center={x:(left.x+right.x)/2,y:(left.y+right.y)/2};points.push(offset(center,-measured*.54),offset(center,measured*.54));}
     else points.push(left,right);
+  }
+  const top={x:(points[0].x+points[1].x)/2,y:(points[0].y+points[1].y)/2};
+  for(const [a,b] of [[2,3],[10,11],[12,13]]){
+    const cx=(points[a].x+points[b].x)/2,cy=(points[a].y+points[b].y)/2;
+    for(const i of [a,b])points[i]={x:points[i].x+(cx-top.x)*(grading.length-1),y:points[i].y+(cy-top.y)*(grading.length-1)};
+  }
+  for(const [shoulder,elbow,wrist] of [[0,4,6],[1,5,7]]){
+    if(grading.sleeve===1)continue;
+    const a=points[shoulder],b=points[elbow],c=points[wrist],upper=Math.hypot(b.x-a.x,b.y-a.y),lower=Math.hypot(c.x-b.x,c.y-b.y);
+    const scale=lower>1?Math.max(.4,Math.min(1.8,((upper+lower)*grading.sleeve-upper)/lower)):1;
+    points[wrist]={x:b.x+(c.x-b.x)*scale,y:b.y+(c.y-b.y)*scale};
   }
   return { points,
     complete: !!(r.leftElbow && r.rightElbow && r.leftWrist && r.rightWrist) };
@@ -164,8 +179,8 @@ for(let y=0;y<rows;y++)for(let x=0;x<columns;x++) {
   const a=y*(columns+1)+x,b=a+1,c=a+columns+1,d=c+1;triangles.push([a,b,d],[a,d,c]);
 }
 
-export function drawJacket(context: CanvasRenderingContext2D, image: HTMLImageElement, torso: Torso, profile: string): boolean {
-  const target=jacketTargets(torso,profile);
+export function drawJacket(context: CanvasRenderingContext2D, image: HTMLImageElement, torso: Torso, profile: string,grading:SizeGrading=neutralGrading): boolean {
+  const target=jacketTargets(torso,profile,grading);
   if(!target)return false;
   const span=torso.width/1.28;
   const patches=profile==='open'||profile==='open_brown'?jacketMesh(profile):[{part:'body' as const,vertices,triangles}];

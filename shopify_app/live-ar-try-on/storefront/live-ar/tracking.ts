@@ -1,10 +1,11 @@
-import { torsoFromPose,type Landmark } from './pose';
+import { torsoFromPose,type Landmark,type Torso } from './pose';
 import { silhouetteWidths,type BodyMask } from './body-mask';
 
 interface VisionMask {width:number;height:number;getAsFloat32Array():Float32Array;close():void}
 export interface TrackingFrame {
   landmarks:Landmark[][];worldLandmarks?:Landmark[][];segmentationMasks?:VisionMask[];
   hands?:Landmark[][];mask?:BodyMask;release?:()=>void;
+  poseHistory?:{last?:Torso};
 }
 export interface Tracker {detectForVideo(video:HTMLVideoElement,timestamp:number):TrackingFrame;close():void;handReady?:Promise<boolean>}
 interface HandTracker {detectForVideo(video:HTMLVideoElement,timestamp:number):{landmarks:Landmark[][]};close():void}
@@ -31,6 +32,7 @@ export async function createTracker():Promise<Tracker>{
 /** Extra hand model never blocks pose startup. This also owns late-load cleanup. */
 export function combineTrackers(pose:Tracker,loadHand:()=>Promise<HandTracker>):Tracker {
   let hand:HandTracker|undefined,closed=false;
+  const poseHistory:{last?:Torso}={};
   const handReady=Promise.resolve().then(loadHand).then(value=>{
     if(closed){value.close();return false;}hand=value;return true;
   }).catch(()=>{console.warn('[Live AR] Hand tracking unavailable; using garment preview without hand occlusion.');return false;});
@@ -42,17 +44,18 @@ export function combineTrackers(pose:Tracker,loadHand:()=>Promise<HandTracker>):
       if(hand&&raw.landmarks.length&&performance.now()-before<80){
         try{hands=hand.detectForVideo(video,timestamp).landmarks;}catch{hand.close();hand=undefined;console.warn('[Live AR] Hand tracking stopped; pose preview remains available.');}
       }
-      return {landmarks:raw.landmarks,worldLandmarks:raw.worldLandmarks,segmentationMasks:raw.segmentationMasks,hands,
+      return {landmarks:raw.landmarks,worldLandmarks:raw.worldLandmarks,segmentationMasks:raw.segmentationMasks,hands,poseHistory,
         release:()=>{for(const mask of raw.segmentationMasks??[])mask.close();}};
     },
-    close(){if(closed)return;closed=true;pose.close();hand?.close();hand=undefined;},
+    close(){if(closed)return;closed=true;pose.close();hand?.close();hand=undefined;poseHistory.last=undefined;},
   };
 }
 
 export function prepareTorso(frame:TrackingFrame,width:number,height:number){
   frame.mask=undefined;
-  const torso=torsoFromPose(frame.landmarks[0]??[],width,height,frame.worldLandmarks?.[0]);
+  const torso=torsoFromPose(frame.landmarks[0]??[],width,height,frame.worldLandmarks?.[0],frame.poseHistory?.last);
   if(!torso)return null;
+  if(frame.poseHistory)frame.poseHistory.last=torso;
   const mask=frame.segmentationMasks?.[0];
   if(mask)try{
     const data=mask.getAsFloat32Array();

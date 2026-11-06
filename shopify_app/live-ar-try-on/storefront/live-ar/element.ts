@@ -3,6 +3,7 @@ import type { ARProduct } from "./catalog";
 import { CameraController } from "./camera";
 import { incomingHandoff } from "./handoff";
 import type { MobileHandoff } from "./handoff-ui";
+import type {SizeAssistant} from './sizing-ui';
 
 class LiveARTryOn extends HTMLElement {
   private controller?: AbortController;
@@ -30,6 +31,7 @@ class LiveARTryOn extends HTMLElement {
   private variant!: HTMLSelectElement;
   private assetOperation = 0;
   private handoff?: MobileHandoff;
+  private sizing?:SizeAssistant;
 
   connectedCallback() {
     if (this.controller) return;
@@ -44,15 +46,15 @@ class LiveARTryOn extends HTMLElement {
     this.variant = this.querySelector("select")!;
     if (!this.dialog || !this.video || !this.canvas || !this.variant) return;
     const { signal } = this.controller;
-    this.querySelector("[data-ar-open]")?.addEventListener("click", () => this.open(), { signal });
-    this.querySelector("[data-ar-mobile]")?.addEventListener("click", () => { void this.mobile(); }, { signal });
-    this.querySelector("[data-ar-close]")?.addEventListener("click", () => this.close(), { signal });
-    this.querySelector("[data-ar-start]")?.addEventListener("click", () => { void this.start(); }, { signal });
-    this.querySelector("[data-ar-switch]")?.addEventListener("click", () => {
+    this.control("open")?.addEventListener("click", () => this.open(), { signal });
+    this.control("mobile")?.addEventListener("click", () => { void this.mobile(); }, { signal });
+    this.control("close")?.addEventListener("click", () => this.close(), { signal });
+    this.control("start")?.addEventListener("click", () => { void this.start(); }, { signal });
+    this.control("switch")?.addEventListener("click", () => {
       if (!this.active || this.starting) return;
       this.facing = this.facing === "user" ? "environment" : "user"; void this.start();
     }, { signal });
-    this.querySelector("[data-ar-cart]")?.addEventListener("click", () => { void this.addToCart(); }, { signal });
+    this.control("cart")?.addEventListener("click", () => { void this.addToCart(); }, { signal });
     this.variant.addEventListener("change", () => { if (this.active) void this.loadAsset(); this.updateCart(); }, { signal });
     this.querySelectorAll<HTMLButtonElement>("[data-ar-sample]").forEach(button => button.addEventListener("click", () => {
       this.variant.value = button.dataset.arSample!;
@@ -72,7 +74,16 @@ class LiveARTryOn extends HTMLElement {
     }
   }
 
-  disconnectedCallback() { this.stop(); this.controller?.abort(); this.controller = undefined; this.handoff = undefined; }
+  disconnectedCallback() { this.stop();this.sizing?.dispose();this.sizing=undefined;this.controller?.abort(); this.controller = undefined; this.handoff = undefined; }
+
+  async loadSizing(){
+    if(this.sizing||!this.dataset.sizingModule)return;
+    const signal=this.controller!.signal;
+    try{const module=await import(/* @vite-ignore */ this.dataset.sizingModule);
+      if(!signal.aborted)this.sizing??=new module.SizeAssistant(this,this.product,()=>this.active);
+    }catch{if(!signal.aborted)this.status('module_error');}
+  }
+
 
   loadHandoff(): Promise<typeof import("./handoff-ui")> { return import(/* @vite-ignore */ this.dataset.handoffModule!); }
   private async mobile() {
@@ -84,10 +95,10 @@ class LiveARTryOn extends HTMLElement {
         this.handoff ??= new MobileHandoff(this, signal);
       }
       this.handoff.show(this.variant.value);
-      const feedback = this.querySelector<HTMLElement>("[data-ar-mobile-error]");
+      const feedback = this.control<HTMLElement>("mobile-error");
       if (feedback) feedback.hidden = true;
     } catch {
-      const feedback = this.querySelector<HTMLElement>("[data-ar-mobile-error]");
+      const feedback = this.control<HTMLElement>("mobile-error");
       if (!signal.aborted && feedback) feedback.hidden = false;
     }
   }
@@ -95,8 +106,9 @@ class LiveARTryOn extends HTMLElement {
   loadRuntime(): Promise<typeof Engine> { return import(/* @vite-ignore */ this.dataset.engine!); }
 
   private text(key: string) { return this.copy[key] || key; }
+  private control<T extends HTMLElement=HTMLElement>(name:string){return this.querySelector<T>(`[data-ar-${name}]`);}
   private status(key: string) {
-    const el = this.querySelector<HTMLElement>("[data-ar-status]");
+    const el = this.control<HTMLElement>("status");
     if (el && el.textContent !== this.text(key)) el.textContent = this.text(key);
     this.dataset.state = key;
   }
@@ -110,20 +122,21 @@ class LiveARTryOn extends HTMLElement {
 
   private open() {
     if (typeof this.dialog.showModal !== "function") {
-      let message = this.querySelector<HTMLElement>("[data-ar-launch-status]");
+      let message = this.control<HTMLElement>("launch-status");
       if (!message) { message = document.createElement("p"); message.dataset.arLaunchStatus = ""; message.setAttribute("role", "status"); this.append(message); }
       message.textContent = this.text("unsupported"); return;
     }
-    this.dialog.showModal(); this.status("permission");
+    this.dialog.showModal(); this.status("permission");void this.loadSizing();
     const current = new URL(location.href).searchParams.get("variant");
     if (current && this.product.variants.some(v => v.id === current)) this.variant.value = current;
     this.updateCart();
   }
 
-  private close() { this.stop(); this.dialog.close(); this.querySelector<HTMLButtonElement>("[data-ar-open]")?.focus(); }
-  private pause() { this.stop(); if (this.dialog?.open) this.status("paused"); }
+  private close() { this.stop();this.sizing?.clearCapture(); this.dialog.close(); this.control<HTMLButtonElement>("open")?.focus(); }
+  private pause() { this.stop();this.sizing?.clearCapture(); if (this.dialog?.open) this.status("paused"); }
 
   private stop() {
+    this.sizing?.cancelScan();
     this.operation++; this.assetOperation++;
     this.active = false; this.starting = false; this.assetReady = false;
     cancelAnimationFrame(this.frame);
@@ -132,9 +145,9 @@ class LiveARTryOn extends HTMLElement {
     this.renderer?.dispose(); this.renderer = undefined;
     this.smoother?.reset(); this.smoother = undefined;
     this.hadTracking = false; this.lastVideoTime = -1; this.lastInference = 0; this.interval = 42;
-    const start = this.querySelector<HTMLButtonElement>("[data-ar-start]");
+    const start = this.control<HTMLButtonElement>("start");
     if (start) start.disabled = false;
-    const switcher = this.querySelector<HTMLButtonElement>("[data-ar-switch]");
+    const switcher = this.control<HTMLButtonElement>("switch");
     if (switcher) switcher.disabled = true;
   }
 
@@ -146,7 +159,7 @@ class LiveARTryOn extends HTMLElement {
     const valid = () => operation === this.operation && this.isConnected && this.dialog.open;
     this.starting = true;
     delete this.dataset.errorStage;
-    this.querySelector<HTMLButtonElement>("[data-ar-start]")!.disabled = true;
+    this.control<HTMLButtonElement>("start")!.disabled = true;
     this.status("starting");
     let stage = "camera";
     try {
@@ -168,8 +181,8 @@ class LiveARTryOn extends HTMLElement {
       await this.loadAsset();
       if (!valid()) return;
       this.starting = false;
-      this.querySelector<HTMLButtonElement>("[data-ar-start]")!.disabled = false;
-      this.querySelector<HTMLButtonElement>("[data-ar-switch]")!.disabled = false;
+      this.control<HTMLButtonElement>("start")!.disabled = false;
+      this.control<HTMLButtonElement>("switch")!.disabled = false;
       this.status(this.assetReady ? "body_missing" : "asset_error");
       this.dataset.mirrored = String(this.facing === "user");
       this.frame = requestAnimationFrame(time => this.tick(time));
@@ -182,9 +195,10 @@ class LiveARTryOn extends HTMLElement {
   }
 
   private async loadAsset() {
+    const variant = this.runtime?.mappedVariant(this.product, this.variant.value);
+    if(variant&&this.assetReady&&this.renderer?.readyFor(variant.asset,variant.fit))return;
     const operation = ++this.assetOperation;
     this.assetReady = false; this.renderer?.clear(); this.smoother?.reset();
-    const variant = this.runtime?.mappedVariant(this.product, this.variant.value);
     if (!variant) { this.status("variant_unavailable"); return; }
     this.status("loading");
     try {
@@ -196,25 +210,28 @@ class LiveARTryOn extends HTMLElement {
   private tick(now: number) {
     if (!this.active || !this.tracker || !this.runtime || !this.renderer || !this.smoother) return;
     try {
-      if (this.video.readyState >= 2 && this.video.videoWidth > 0 && this.video.videoHeight > 0 && this.video.currentTime !== this.lastVideoTime && now - this.lastInference >= this.interval) {
+      const width=this.video.videoWidth,height=this.video.videoHeight;
+      if (this.video.readyState >= 2 && width > 0 && height > 0 && this.video.currentTime !== this.lastVideoTime && now - this.lastInference >= this.interval) {
         this.lastVideoTime = this.video.currentTime; this.lastInference = now;
-        if (this.canvas.width !== this.video.videoWidth) this.canvas.width = this.video.videoWidth;
-        if (this.canvas.height !== this.video.videoHeight) this.canvas.height = this.video.videoHeight;
+        if (this.canvas.width !== width) this.canvas.width = width;
+        if (this.canvas.height !== height) this.canvas.height = height;
         const before = performance.now();
         const result = this.tracker.detectForVideo(this.video, now);
         try {
-        const torso = this.runtime.prepareTorso(result, this.canvas.width, this.canvas.height);
+        this.sizing?.update(result,width,height,now);
+        const torso = this.runtime.prepareTorso(result,width,height);
 
-        if (torso && this.assetReady) {
-          this.status(this.renderer.draw(this.smoother.update(torso, now),result,this.video) || "tracking"); this.hadTracking = true;
+        if (this.assetReady) {
+          const state=this.renderer.draw(torso?this.smoother.update(torso,now):null,result,this.video,now,this.sizing?.grading());
+          if(state==='body_missing'){this.smoother.reset();this.status(this.hadTracking?'lost':'body_missing');}
+          else {this.status(state||'tracking');this.hadTracking=true;}
         } else {
-          this.renderer.clear(); this.smoother.reset();
-          if (this.assetReady) this.status(this.hadTracking ? "lost" : "body_missing");
+          this.renderer.resetTracking(); this.smoother.reset();
         }
         } finally { this.runtime.releaseFrame(result); }
         this.interval = Math.min(200, Math.max(42, this.interval * .8 + (performance.now() - before) * 1.3 * .2));
-      } else if (now - this.lastInference > 350 && this.assetReady) {
-        this.renderer.clear(); this.smoother.reset(); this.status(this.hadTracking ? "lost" : "body_missing");
+      } else if (now - this.lastInference > 1000 && this.assetReady) {
+        this.renderer.resetTracking(); this.smoother.reset(); this.status(this.hadTracking ? "lost" : "body_missing");
       }
       this.frame = requestAnimationFrame(time => this.tick(time));
     } catch (error) { this.stop(); this.failure("frame", error); }
@@ -223,14 +240,14 @@ class LiveARTryOn extends HTMLElement {
   private updateCart() {
     this.querySelectorAll<HTMLButtonElement>("[data-ar-sample]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.arSample === this.variant.value)));
     this.handoff?.update(this.variant.value);
-    const button = this.querySelector<HTMLButtonElement>("[data-ar-cart]");
+    const button = this.control<HTMLButtonElement>("cart");
     if (button) button.disabled = !!this.product.demo || this.cartBusy || !this.product.variants.some(v => v.id === this.variant.value && v.available && /^\d+$/.test(v.id) && !!v.asset);
   }
 
   async addToCart() {
     if (this.cartBusy || this.product.demo) return;
     this.cartBusy = true; this.updateCart();
-    const feedback = this.querySelector<HTMLElement>("[data-ar-cart-status]")!;
+    const feedback = this.control<HTMLElement>("cart-status")!;
     feedback.textContent = this.text("adding");
     try {
       const runtime = this.runtime ?? await this.loadRuntime();

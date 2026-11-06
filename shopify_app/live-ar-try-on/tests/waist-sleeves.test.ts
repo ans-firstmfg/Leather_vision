@@ -36,7 +36,7 @@ test('dynamic torso length places the artwork hem at the hips on shorter and tal
   }
 });
 
-test('production renderer keeps front-panel draw transforms fixed while sleeves and mask widths change',async()=>{
+test('production renderer holds front panels during arm movement and recalibrates steady body width without taper',async()=>{
   const previous=globalThis.Image;
   globalThis.Image=class {naturalWidth=1280;naturalHeight=1280;async decode(){}} as unknown as typeof Image;
   try{for(const profile of ['open','open_brown']){
@@ -51,11 +51,14 @@ test('production renderer keeps front-panel draw transforms fixed while sleeves 
       const t=pose();t.body=measured;t.rig!.leftElbow={x:100,y:200};t.rig!.leftWrist={x:50,y:120};
       transforms=[];renderer.draw(t);assert.deepEqual(transforms.slice(-bodyCount),original);
     }
-    // Sustained mask changes must not taper the straight default either.
-    for(let frame=0;frame<100;frame++){const t=pose();t.body={hips:260,chest:260};transforms=[];renderer.draw(t);}
-    assert.deepEqual(transforms.slice(-bodyCount),original,'straight default must ignore silhouette width changes');
-    const t=pose();t.body={hips:260,chest:270};
-    transforms=[];renderer.draw(t);assert.deepEqual(transforms.slice(-bodyCount),original);
+    // A stable, neutral pose may adjust the entire straight body width.
+    for(let frame=0;frame<50;frame++){const t=pose();t.body={hips:260,chest:260};transforms=[];renderer.draw(t,undefined,undefined,1000+frame*50);}
+    assert.notDeepEqual(transforms.slice(-bodyCount),original);
+    assert.ok(Number(canvas.dataset.previewWidth)>1.1);
+    const adapted=transforms.slice(-bodyCount),t=pose();t.rig!.leftElbow={x:100,y:200};t.rig!.leftWrist={x:50,y:120};
+    t.body={hips:150,chest:150};transforms=[];renderer.draw(t,undefined,undefined,4000);
+    assert.deepEqual(transforms.slice(-bodyCount),adapted,'arm movement cannot shrink calibrated body panels');
+    renderer.resetTracking();transforms=[];renderer.draw(pose(),undefined,undefined,5000);assert.deepEqual(transforms.slice(-bodyCount),original);
     renderer.dispose();
   }}finally{globalThis.Image=previous;}
 });
